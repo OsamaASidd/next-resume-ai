@@ -1,45 +1,86 @@
 import { z } from 'zod';
-import { j, publicProcedure } from '../jstack';
+import { j, privateProcedure } from '../jstack';
+import { db } from '../db';
+import { resumes } from '../db/schema/resumes';
+import { eq } from 'drizzle-orm';
+import { nanoid } from 'nanoid';
+import {
+  resumeFormSchema,
+  resumeEditFormSchema
+} from '@/features/resume/utils/form-schema';
 
 export const resumeRouter = j.router({
-  mergeInfo: publicProcedure
+  // Create a new resume
+  createResume: privateProcedure
     .input(
       z.object({
-        userId: z.string(),
-        jobId: z.string()
+        profileId: z.string(),
+        ...resumeFormSchema.shape
       })
     )
-    .query(async ({ c, ctx, input }) => {
-      // Here you would fetch and merge data from both collections
+    .mutation(async ({ c, ctx, input }) => {
+      const { user } = ctx;
+      const { profileId, ...resumeData } = input;
 
-      return c.json({
-        message: 'User and job info merged successfully',
-        data: {
-          mergedInfo: {
-            // Merged data would go here
-          }
-        }
-      });
+      const newResume = {
+        id: nanoid(),
+        profileId,
+        jdJobTitle: resumeData.jd_job_title,
+        employer: resumeData.employer,
+        jdPostDetails: resumeData.jd_post_details
+      };
+
+      const [created] = await db.insert(resumes).values(newResume).returning();
+
+      return c.json(created);
     }),
 
-  generate: publicProcedure
+  // Get a resume by ID
+  getResume: privateProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ c, ctx, input }) => {
+      const resume = await db.query.resumes.findFirst({
+        where: eq(resumes.id, input.id)
+      });
+
+      if (!resume) {
+        return c.json({ error: 'Resume not found' }, 404);
+      }
+
+      return c.json(resume);
+    }),
+
+  // Update a resume
+  updateResume: privateProcedure
     .input(
       z.object({
-        mergedInfo: z.object({
-          name: z.string(),
-          email: z.string()
-          // ... other fields
-        })
+        id: z.string(),
+        ...resumeEditFormSchema.shape
       })
     )
-    .mutation(async ({ c, input }) => {
-      // Here you would call your text generation service
+    .mutation(async ({ c, ctx, input }) => {
+      const { id, ...updateData } = input;
 
-      return c.json({
-        message: 'Resume generated successfully',
-        data: {
-          generatedText: 'Generated resume content would go here...'
-        }
+      const [updated] = await db
+        .update(resumes)
+        .set({
+          ...updateData,
+          updatedAt: new Date()
+        })
+        .where(eq(resumes.id, id))
+        .returning();
+
+      return c.json(updated);
+    }),
+
+  // Get all resumes for a profile
+  getProfileResumes: privateProcedure
+    .input(z.object({ profileId: z.string() }))
+    .query(async ({ c, ctx, input }) => {
+      const profileResumes = await db.query.resumes.findMany({
+        where: eq(resumes.profileId, input.profileId)
       });
+
+      return c.json(profileResumes);
     })
 });

@@ -23,9 +23,9 @@ const api = j
 const appRouter = j.mergeRouters(api, {
   user: userRouter,
   job: jobRouter,
-  resume: resumeRouter,
   auth: authRouter,
-  profile: profileRouter
+  profile: profileRouter,
+  resume: resumeRouter
 });
 
 export type AppRouter = typeof appRouter;

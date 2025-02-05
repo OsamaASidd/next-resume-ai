@@ -26,6 +26,12 @@ export const navItems: NavItem[] = [
     label: 'Profile Management'
   },
   {
+    title: 'Resume',
+    url: '/dashboard/resume',
+    icon: 'user',
+    label: 'Resume Management'
+  },
+  {
     title: 'Product',
     url: '/dashboard/product',
     icon: 'product',
