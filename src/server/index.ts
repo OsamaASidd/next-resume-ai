@@ -2,6 +2,7 @@ import { j } from './jstack';
 import { userRouter } from './routers/user-router';
 import { jobRouter } from './routers/job-router';
 import { resumeRouter } from './routers/resume-router';
+import { authRouter } from './routers/auth-router';
 
 const api = j
   .router()
@@ -21,7 +22,8 @@ const api = j
 const appRouter = j.mergeRouters(api, {
   user: userRouter,
   job: jobRouter,
-  resume: resumeRouter
+  resume: resumeRouter,
+  auth: authRouter
 });
 
 export type AppRouter = typeof appRouter;

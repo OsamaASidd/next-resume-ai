@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { db } from '../db';
 import { users } from '../db/schema/users';
 import { j, privateProcedure, publicProcedure } from '../jstack';
+import { accounts } from '../db/schema/accounts';
 
 // Input validation schema for user info
 const userInfoSchema = z.object({
@@ -19,10 +20,26 @@ const userInfoSchema = z.object({
 
 export const userRouter = j.router({
   // Public procedures
-  createBasicInfo: publicProcedure
+  createBasicInfo: privateProcedure
     .input(userInfoSchema)
     .mutation(async ({ c, ctx, input }) => {
-      const newUser = { id: nanoid(), ...input };
+      const { user } = ctx; // This is the Clerk user ID from auth middleware
+
+      // Get the account record
+      const account = await db.query.accounts.findFirst({
+        where: (accounts, { eq }) => eq(accounts.externalId, user.id)
+      });
+
+      if (!account) {
+        throw new HTTPException(401, { message: 'Account not found' });
+      }
+
+      const newUser = {
+        id: nanoid(),
+        accountId: account.id, // Link to the account
+        ...input
+      };
+
       const [createdUser] = await db.insert(users).values(newUser).returning();
       return c.superjson({ message: 'User created', data: createdUser });
     }),

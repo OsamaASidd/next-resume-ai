@@ -1,5 +1,7 @@
 import { jstack } from 'jstack';
 import { HTTPException } from 'hono/http-exception';
+import { db } from './db';
+import { currentUser } from '@clerk/nextjs/server';
 
 interface Env {
   Bindings: { DATABASE_URL: string };
@@ -9,16 +11,35 @@ export const j = jstack.init<Env>();
 
 // Auth middleware for protected routes
 const authMiddleware = j.middleware(async ({ c, next }) => {
-  const authHeader = c.req.header('authorization');
-
-  if (!authHeader) {
-    throw new HTTPException(401, {
-      message: 'Unauthorized, sign in to continue.'
+  const authHeader = c.req.header('Authorization');
+  //todo: bearer token need to handle in schema and table.
+  if (authHeader) {
+    const apiKey = authHeader.split(' ')[1]; // bearer <API_KEY>
+    console.log('header', apiKey);
+    const user = await db.query.accounts.findFirst({
+      where: (accounts, { eq }) => eq(accounts.id, apiKey)
     });
+
+    if (user) return next({ user });
   }
 
-  // Add user to context
-  return next({ user: { id: authHeader } });
+  const auth = await currentUser();
+
+  console.log('auth', auth);
+
+  if (!auth) {
+    throw new HTTPException(401, { message: 'Unauthorized' });
+  }
+
+  const user = await db.query.accounts.findFirst({
+    where: (accounts, { eq }) => eq(accounts.externalId, auth.id)
+  });
+
+  if (!user) {
+    throw new HTTPException(401, { message: 'Unauthorized' });
+  }
+
+  return next({ user });
 });
 
 export const publicProcedure = j.procedure;

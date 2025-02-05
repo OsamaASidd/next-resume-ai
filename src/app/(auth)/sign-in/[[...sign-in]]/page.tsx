@@ -25,5 +25,5 @@ export default async function Page() {
   } catch (error) {
     console.error('Error fetching GitHub stars:', error);
   }
-  return <SignIn forceRedirectUrl={'/dashboard/overview'} />;
+  return <SignIn forceRedirectUrl={'/welcome'} redirectUrl={'/welcome'} />;
 }
