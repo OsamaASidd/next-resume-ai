@@ -31,19 +31,17 @@ import {
   useSidebar
 } from '@/components/ui/sidebar';
 import { navItems } from '@/constants/data';
+import { SignOutButton, useUser } from '@clerk/nextjs';
 import {
   BadgeCheck,
   Bell,
   ChevronRight,
   ChevronsUpDown,
   CreditCard,
-  GalleryVerticalEnd,
-  LogOut
+  GalleryVerticalEnd
 } from 'lucide-react';
-import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import * as React from 'react';
 import { Icons } from '../icons';
 
 export const company = {
@@ -52,8 +50,27 @@ export const company = {
   plan: 'Enterprise'
 };
 
+type UserInfoProps = ReturnType<typeof useUser>['user'];
+
+const UserInfo = ({ user }: { user: UserInfoProps }) => (
+  <div className='flex items-center gap-2'>
+    <Avatar className='h-8 w-8 rounded-lg'>
+      <AvatarImage src={user?.imageUrl || ''} alt={user?.firstName || ''} />
+      <AvatarFallback className='rounded-lg'>
+        {user?.firstName?.slice(0, 2)?.toUpperCase() || 'CN'}
+      </AvatarFallback>
+    </Avatar>
+    <div className='grid flex-1 text-left text-sm leading-tight'>
+      <span className='truncate font-semibold'>{user?.fullName || ''}</span>
+      <span className='truncate text-xs'>
+        {user?.primaryEmailAddress?.emailAddress || ''}
+      </span>
+    </div>
+  </div>
+);
+
 export default function AppSidebar() {
-  const { data: session } = useSession();
+  const { user } = useUser();
   const pathname = usePathname();
   const { state, isMobile } = useSidebar();
 
@@ -139,23 +156,7 @@ export default function AppSidebar() {
                   size='lg'
                   className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
                 >
-                  <Avatar className='h-8 w-8 rounded-lg'>
-                    <AvatarImage
-                      src={session?.user?.image || ''}
-                      alt={session?.user?.name || ''}
-                    />
-                    <AvatarFallback className='rounded-lg'>
-                      {session?.user?.name?.slice(0, 2)?.toUpperCase() || 'CN'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className='grid flex-1 text-left text-sm leading-tight'>
-                    <span className='truncate font-semibold'>
-                      {session?.user?.name || ''}
-                    </span>
-                    <span className='truncate text-xs'>
-                      {session?.user?.email || ''}
-                    </span>
-                  </div>
+                  <UserInfo user={user} />
                   <ChevronsUpDown className='ml-auto size-4' />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -166,26 +167,8 @@ export default function AppSidebar() {
                 sideOffset={4}
               >
                 <DropdownMenuLabel className='p-0 font-normal'>
-                  <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
-                    <Avatar className='h-8 w-8 rounded-lg'>
-                      <AvatarImage
-                        src={session?.user?.image || ''}
-                        alt={session?.user?.name || ''}
-                      />
-                      <AvatarFallback className='rounded-lg'>
-                        {session?.user?.name?.slice(0, 2)?.toUpperCase() ||
-                          'CN'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className='grid flex-1 text-left text-sm leading-tight'>
-                      <span className='truncate font-semibold'>
-                        {session?.user?.name || ''}
-                      </span>
-                      <span className='truncate text-xs'>
-                        {' '}
-                        {session?.user?.email || ''}
-                      </span>
-                    </div>
+                  <div className='px-1 py-1.5'>
+                    <UserInfo user={user} />
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -205,9 +188,10 @@ export default function AppSidebar() {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => signOut()}>
-                  <LogOut />
-                  Log out
+                <DropdownMenuItem asChild>
+                  <SignOutButton>
+                    <div className='flex w-full items-center'>Log out</div>
+                  </SignOutButton>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

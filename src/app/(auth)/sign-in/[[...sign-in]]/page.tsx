@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import SignInViewPage from '@/features/auth/components/sigin-view';
+import { SignIn } from '@clerk/nextjs';
 
 export const metadata: Metadata = {
   title: 'Authentication | Sign In',
@@ -24,5 +25,5 @@ export default async function Page() {
   } catch (error) {
     console.error('Error fetching GitHub stars:', error);
   }
-  return <SignInViewPage stars={stars} />;
+  return <SignIn forceRedirectUrl={'/dashboard/overview'} />;
 }

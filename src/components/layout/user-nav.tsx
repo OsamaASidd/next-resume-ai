@@ -11,20 +11,22 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { signOut, useSession } from 'next-auth/react';
+import { SignOutButton, useUser } from '@clerk/nextjs';
+
 export function UserNav() {
-  const { data: session } = useSession();
-  if (session) {
+  const { user } = useUser();
+
+  if (user) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='relative h-8 w-8 rounded-full'>
             <Avatar className='h-8 w-8'>
               <AvatarImage
-                src={session.user?.image ?? ''}
-                alt={session.user?.name ?? ''}
+                src={user.imageUrl || ''}
+                alt={user.fullName || ''}
               />
-              <AvatarFallback>{session.user?.name?.[0]}</AvatarFallback>
+              <AvatarFallback>{user.firstName?.[0]}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
@@ -32,10 +34,10 @@ export function UserNav() {
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col space-y-1'>
               <p className='text-sm font-medium leading-none'>
-                {session.user?.name}
+                {user.fullName}
               </p>
               <p className='text-xs leading-none text-muted-foreground'>
-                {session.user?.email}
+                {user.primaryEmailAddress?.emailAddress}
               </p>
             </div>
           </DropdownMenuLabel>
@@ -56,9 +58,13 @@ export function UserNav() {
             <DropdownMenuItem>New Team</DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => signOut()}>
-            Log out
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+          <DropdownMenuItem asChild>
+            <SignOutButton>
+              <div className='flex w-full items-center justify-between'>
+                Log out
+                <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+              </div>
+            </SignOutButton>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
