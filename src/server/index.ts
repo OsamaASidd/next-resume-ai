@@ -3,6 +3,7 @@ import { userRouter } from './routers/user-router';
 import { jobRouter } from './routers/job-router';
 import { resumeRouter } from './routers/resume-router';
 import { authRouter } from './routers/auth-router';
+import { profileRouter } from './routers/profile-router';
 
 const api = j
   .router()
@@ -23,7 +24,8 @@ const appRouter = j.mergeRouters(api, {
   user: userRouter,
   job: jobRouter,
   resume: resumeRouter,
-  auth: authRouter
+  auth: authRouter,
+  profile: profileRouter
 });
 
 export type AppRouter = typeof appRouter;
