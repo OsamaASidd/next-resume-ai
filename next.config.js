@@ -14,7 +14,15 @@ const nextConfig = {
       }
     ]
   },
-  transpilePackages: ['geist']
+  transpilePackages: ['geist'],
+  webpack: (config) => {
+    config.resolve.alias.canvas = false;
+
+    return config;
+  },
+  experimental: {
+    reactCompiler: true
+  }
 };
 
 module.exports = nextConfig;
