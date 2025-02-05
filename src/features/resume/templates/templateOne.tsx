@@ -59,7 +59,7 @@ const ResumePadding = () => {
 };
 
 export default function ResumeTemplate({ formData }: TResumeTemplateProps) {
-  console.log('formData', formData);
+  console.log('Template One Rendering with data:', formData);
 
   return (
     <Document>

@@ -2,7 +2,7 @@
 
 import { Icons } from '@/components/icons';
 import { BlobProvider } from '@react-pdf/renderer';
-import { memo, useState } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
@@ -19,78 +19,126 @@ type TPdfRendererProps = {
   templateId: string;
 };
 
-const PdfRenderer = memo(({ formData, templateId }: TPdfRendererProps) => {
-  const template = getTemplate(templateId);
-  const Template = template.component;
-  const [numPages, setNumPages] = useState<number>();
-  const [isLoaded, setIsLoaded] = useState<boolean>(false);
-  const [render, setRender] = useState(0);
-  // const [instance, updateInstance] = usePDF({
-  //   document: <ResumeTemplate formData={formData} />,
-  // });
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  console.log('comp rendered');
+const PdfRenderer = memo(
+  ({ formData, templateId }: TPdfRendererProps) => {
+    const template = getTemplate(templateId);
+    const Template = template?.component;
+    const [numPages, setNumPages] = useState<number>();
+    const [pageNumber, setPageNumber] = useState<number>(1);
+    const [url, setUrl] = useState<string | null>(null);
 
-  // console.log("comp rerender?", instance);
-  function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
-    setNumPages(numPages);
-  }
+    if (!Template) {
+      return <FallBackLoader />;
+    }
 
-  function onPrevPage(): void {
-    setPageNumber((prev) => (prev - 1 > 1 ? prev - 1 : 1));
-  }
+    function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
+      setNumPages(numPages);
+    }
 
-  function onNextPage(): void {
-    setPageNumber((prev) => (prev + 1 > numPages! ? numPages! : prev + 1));
-  }
+    function onPrevPage(): void {
+      setPageNumber((prev) => (prev - 1 > 1 ? prev - 1 : 1));
+    }
 
-  function FallBackLoader() {
+    function onNextPage(): void {
+      setPageNumber((prev) => (prev + 1 > numPages! ? numPages! : prev + 1));
+    }
+
+    function FallBackLoader() {
+      return (
+        <div className='flex items-center justify-center'>
+          <Icons.spinner className='h-6 w-6 animate-spin' />
+        </div>
+      );
+    }
+
+    // Cleanup effect
+    useEffect(() => {
+      return () => {
+        if (url) {
+          URL.revokeObjectURL(url);
+        }
+      };
+    }, [url]);
+
     return (
-      <p>
-        <Icons.spinner className='animate-spin' />
-      </p>
+      <div className='relative min-h-[500px]'>
+        <BlobProvider
+          key={`${templateId}-${JSON.stringify(formData)}`}
+          document={<Template formData={formData} />}
+        >
+          {({ blob, url: pdfUrl, loading, error }) => {
+            if (loading || !pdfUrl) {
+              return <FallBackLoader />;
+            }
+
+            if (error) {
+              return <div>Error generating PDF</div>;
+            }
+
+            return (
+              <div className='space-y-4'>
+                <Document
+                  loading={<FallBackLoader />}
+                  file={pdfUrl}
+                  onLoadSuccess={onDocumentLoadSuccess}
+                  error={<div>Failed to load PDF</div>}
+                  onLoadError={(error) => {
+                    console.error('Error loading PDF:', error);
+                  }}
+                >
+                  <Page
+                    key={`page-${pageNumber}`}
+                    pageNumber={pageNumber}
+                    loading={<FallBackLoader />}
+                    renderTextLayer={false}
+                    renderAnnotationLayer={false}
+                  />
+                </Document>
+                {numPages && numPages > 0 && (
+                  <div className='flex items-center justify-between px-4'>
+                    <button
+                      onClick={onPrevPage}
+                      disabled={pageNumber <= 1}
+                      className='disabled:opacity-50'
+                    >
+                      <Icons.chevronLeft className='h-4 w-4' />
+                    </button>
+                    <span>
+                      Page {pageNumber} of {numPages}
+                    </span>
+                    <button
+                      onClick={onNextPage}
+                      disabled={pageNumber >= numPages}
+                      className='disabled:opacity-50'
+                    >
+                      <Icons.chevronRight className='h-4 w-4' />
+                    </button>
+                    {blob && (
+                      <a
+                        href={URL.createObjectURL(blob)}
+                        download='resume.pdf'
+                        className='text-primary hover:underline'
+                      >
+                        Download PDF
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          }}
+        </BlobProvider>
+      </div>
+    );
+  },
+  (prevProps, nextProps) => {
+    return !(
+      prevProps.templateId !== nextProps.templateId ||
+      JSON.stringify(prevProps.formData) !== JSON.stringify(nextProps.formData)
     );
   }
-
-  // const MemoizedResumeTemplate = memo(ResumeTemplate);
-
-  return (
-    <div>
-      <BlobProvider
-        key={templateId}
-        document={<Template formData={formData} />}
-      >
-        {({ blob, url, loading, error }) => {
-          console.log('blob', blob, url, loading, error);
-          if (loading) {
-            return <FallBackLoader />;
-          }
-
-          return (
-            <>
-              <Document
-                key={templateId}
-                loading={<FallBackLoader />}
-                file={url}
-                onLoadSuccess={onDocumentLoadSuccess}
-              >
-                <Page pageNumber={pageNumber} />
-              </Document>
-              <div className='my-2 flex cursor-pointer items-center text-black'>
-                <Icons.chevronLeft onClick={onPrevPage} /> {pageNumber} of{' '}
-                {numPages}
-                <Icons.chevronRight onClick={onNextPage} />
-                <a href={url!} download='resume.pdf'>
-                  Download
-                </a>
-              </div>
-            </>
-          );
-        }}
-      </BlobProvider>
-    </div>
-  );
-});
-export default PdfRenderer;
+);
 
 PdfRenderer.displayName = 'PdfRenderer';
+
+export default PdfRenderer;

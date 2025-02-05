@@ -133,6 +133,7 @@ export default function EditResumePage() {
   });
 
   const formData = form.watch();
+  console.log('Form Data Changed:', formData);
 
   const handleApplyTemplate = (templateId: string) => {
     applyTemplate(templateId);
@@ -165,7 +166,11 @@ export default function EditResumePage() {
         <ResizablePanel defaultSize={45} minSize={45}>
           <div className='relative flex h-full justify-center bg-[#D9D9D9]'>
             <div className='relative'>
-              <PdfRenderer formData={formData} templateId={selectedTemplate} />
+              <PdfRenderer
+                key={JSON.stringify(formData)}
+                formData={formData}
+                templateId={selectedTemplate}
+              />
             </div>
           </div>
         </ResizablePanel>

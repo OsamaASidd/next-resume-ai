@@ -19,10 +19,10 @@ const nextConfig = {
     config.resolve.alias.canvas = false;
 
     return config;
-  },
-  experimental: {
-    reactCompiler: true
   }
+  // experimental: {
+  //   reactCompiler: true
+  // }
 };
 
 module.exports = nextConfig;

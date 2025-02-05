@@ -40,6 +40,7 @@ const BulletedList = ({ items }: { items: Item[] }) => (
 const HeaderSection = () => <View fixed style={tw('h-4 w-full bg-primary')} />;
 
 export default function ResumeTemplateTwo({ formData }: TResumeTemplateProps) {
+  console.log('Template Two Rendering with data:', formData);
   return (
     <Document>
       <Page size='A4' style={tw('p-6')}>
