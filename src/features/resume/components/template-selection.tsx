@@ -58,7 +58,7 @@ export function TemplateSelection({
             <CardContent className='p-6'>
               <div className='relative mb-4 aspect-[210/297] overflow-hidden rounded-lg border'>
                 <Image
-                  src={template.thumbnail}
+                  src={template.thumbnail ?? ''}
                   alt={template.name}
                   fill
                   className='object-cover'

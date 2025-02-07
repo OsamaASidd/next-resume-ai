@@ -90,7 +90,9 @@ export default async function ResumePage({
                 <CardContent className='h-[300px] p-0'>
                   <div className='relative h-full w-full overflow-hidden'>
                     <Image
-                      src={resume.previewImageUrl ?? '/templates/default.png'}
+                      src={
+                        resume.previewImageUrl || '/templates/default.png' || ''
+                      }
                       alt={resume.jdJobTitle}
                       fill
                       className='absolute inset-0 h-full w-full object-contain'
