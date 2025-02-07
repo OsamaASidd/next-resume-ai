@@ -26,6 +26,15 @@ const PdfRenderer = memo(
     const [numPages, setNumPages] = useState<number>();
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [url, setUrl] = useState<string | null>(null);
+    // Cleanup effect
+    useEffect(() => {
+      return () => {
+        if (url) {
+          URL.revokeObjectURL(url);
+        }
+      };
+    }, [url]);
+
     if (!Template) {
       return <FallBackLoader />;
     }
@@ -49,15 +58,6 @@ const PdfRenderer = memo(
         </div>
       );
     }
-
-    // Cleanup effect
-    useEffect(() => {
-      return () => {
-        if (url) {
-          URL.revokeObjectURL(url);
-        }
-      };
-    }, [url]);
 
     return (
       <div className='relative min-h-[500px]'>
