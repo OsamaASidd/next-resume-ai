@@ -1,6 +1,5 @@
-import { text, timestamp, pgTable } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { accounts } from './accounts';
-import { users } from './users';
 
 export const profiles = pgTable('profiles', {
   id: text('id').primaryKey().notNull(),

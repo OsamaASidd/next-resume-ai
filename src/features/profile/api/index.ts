@@ -7,7 +7,7 @@ export const useProfiles = () => {
     queryKey: ['profiles'],
     queryFn: async () => {
       const response = await client.profile.getProfiles.$get();
-      return response.json();
+      return await response.json();
     }
   });
 };
@@ -17,7 +17,7 @@ export const useCreateProfile = () => {
   return useMutation({
     mutationFn: async (data: ProfileFormValues) => {
       const response = await client.profile.createProfile.$post(data);
-      return response.json();
+      return await response.json();
     },
     onSettled: () => {
       // Invalidate and refetch profiles after successful submission

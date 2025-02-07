@@ -1,6 +1,5 @@
-import { Metadata } from 'next';
-import SignInViewPage from '@/features/auth/components/sigin-view';
 import { SignIn } from '@clerk/nextjs';
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Authentication | Sign In',

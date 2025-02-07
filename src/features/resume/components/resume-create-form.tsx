@@ -1,8 +1,6 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
+import { Button as UiButton } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -13,11 +11,12 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { useCreateResume } from '../api';
 import { TResumeFormValues, resumeFormSchema } from '../utils/form-schema';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-import { Button as UiButton } from '@/components/ui/button';
 
 interface ResumeCreateFormProps {
   profileId: string | null;
@@ -30,9 +29,10 @@ export function ResumeCreateForm({ profileId }: ResumeCreateFormProps) {
   const form = useForm<TResumeFormValues>({
     resolver: zodResolver(resumeFormSchema),
     defaultValues: {
-      jd_job_title: '',
-      employer: '',
-      jd_post_details: ''
+      jd_job_title: 'Software Engineer',
+      employer: 'Company Name',
+      jd_post_details:
+        'We are looking for a Software Engineer to join our team. The ideal candidate will have experience with React, TypeScript, and modern web development practices.'
     }
   });
 
@@ -45,10 +45,13 @@ export function ResumeCreateForm({ profileId }: ResumeCreateFormProps) {
           ...data,
           profileId
         },
+
         {
-          onSuccess: (resume) => {
+          onSuccess: (data) => {
+            console.log('resume data', data);
             toast.success('Resume created successfully');
-            router.push(`/dashboard/resume/${resume}`);
+            // @ts-ignore
+            router.push(`/dashboard/resume/edit/${data?.id}`);
           },
           onError: (error) => {
             toast.error('Failed to create resume');

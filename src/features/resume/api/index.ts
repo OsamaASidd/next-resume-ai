@@ -7,7 +7,7 @@ export const useCreateResume = () => {
   return useMutation({
     mutationFn: async (data: TResumeFormValues & { profileId: string }) => {
       const response = await client.resume.createResume.$post(data);
-      return response.json();
+      return await response.json();
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['resumes'] });
@@ -20,8 +20,9 @@ export const useGetResume = (id: string) => {
     queryKey: ['resume', id],
     queryFn: async () => {
       const response = await client.resume.getResume.$get({ id });
-      return response.json();
-    }
+      return await response.json();
+    },
+    enabled: !!id
   });
 };
 

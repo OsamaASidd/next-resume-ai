@@ -27,7 +27,7 @@ const languageSchema = z.object({
 });
 
 export const resumeEditFormSchema = z.object({
-  resume_id: z.number().optional(),
+  resume_id: z.string().optional(),
   personal_details: z
     .object({
       resume_job_title: z
@@ -130,4 +130,3 @@ export const resumeEditFormSchema = z.object({
 });
 
 export type TResumeEditFormValues = z.infer<typeof resumeEditFormSchema>;
-export type TResumeFormValues = z.infer<typeof resumeFormSchema>;

@@ -2,11 +2,10 @@ import { posts } from '@/server/db/schema';
 import { desc } from 'drizzle-orm';
 import { z } from 'zod';
 import { j, publicProcedure } from '../jstack';
+import { db } from '../db';
 
 export const postRouter = j.router({
   recent: publicProcedure.query(async ({ c, ctx }) => {
-    const { db } = ctx;
-
     const [recentPost] = await db
       .select()
       .from(posts)
@@ -20,7 +19,6 @@ export const postRouter = j.router({
     .input(z.object({ name: z.string().min(1) }))
     .mutation(async ({ ctx, c, input }) => {
       const { name } = input;
-      const { db } = ctx;
 
       const post = await db.insert(posts).values({ name });
 

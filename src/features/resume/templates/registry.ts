@@ -1,6 +1,7 @@
 import { ComponentType } from 'react';
 import { TResumeEditFormValues } from '../utils/form-schema';
-import dynamic from 'next/dynamic';
+import TemplateOne from './templateOne';
+import TemplateTwo from './templateTwo';
 
 export type ResumeTemplateProps = {
   formData: TResumeEditFormValues;
@@ -18,16 +19,16 @@ const templateRegistry: Record<string, TemplateConfig> = {
   'template-one': {
     id: 'template-one',
     name: 'Professional Split',
-    thumbnail: '/templates/template-one.png',
+    thumbnail: '/templates/templateone.png',
     description: 'Classic two-column layout with a professional look',
-    component: dynamic(() => import('./templateOne'))
+    component: TemplateOne
   },
   'template-two': {
     id: 'template-two',
     name: 'Modern Clean',
-    thumbnail: '/templates/template-two.png',
+    thumbnail: '/templates/templatetwo.png',
     description: 'Modern single-column design with clean typography',
-    component: dynamic(() => import('./templateTwo'))
+    component: TemplateTwo
   }
 };
 

@@ -15,7 +15,6 @@ export default function Page() {
     queryFn: async () => {
       const res = await client.auth.getDatabaseSyncStatus.$get();
       return await res.json();
-      return { isSynced: false };
     }
   });
 
