@@ -130,3 +130,8 @@ export const resumeEditFormSchema = z.object({
 });
 
 export type TResumeEditFormValues = z.infer<typeof resumeEditFormSchema>;
+export type TResumeFormValues = {
+  jd_job_title: string;
+  employer: string;
+  jd_post_details: string;
+};

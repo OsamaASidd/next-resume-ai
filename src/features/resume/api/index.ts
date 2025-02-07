@@ -45,3 +45,38 @@ export const useGetResume = (id: string) => {
 //     }
 //   });
 // };
+
+export const useGetResumes = (profileId?: string) => {
+  return useQuery({
+    queryKey: ['resumes', profileId],
+    queryFn: async () => {
+      const response = profileId
+        ? await client.resume.getProfileResumes.$get({ profileId })
+        : await client.resume.getAllResumes.$get();
+      return await response.json();
+    }
+  });
+};
+
+export const useUploadPreviewImage = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      resumeId,
+      image
+    }: {
+      resumeId: string;
+      image: string;
+    }) => {
+      const response = await client.resume.uploadPreviewImage.$post({
+        resumeId,
+        image
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resumes'] });
+    }
+  });
+};

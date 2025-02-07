@@ -3,7 +3,7 @@
 import { Icons } from '@/components/icons';
 import { BlobProvider } from '@react-pdf/renderer';
 import { memo, useState, useEffect } from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
+import { Document, Page, pdfjs, usePageContext } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import { getTemplate } from '../templates/registry';
@@ -26,7 +26,6 @@ const PdfRenderer = memo(
     const [numPages, setNumPages] = useState<number>();
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [url, setUrl] = useState<string | null>(null);
-
     if (!Template) {
       return <FallBackLoader />;
     }
@@ -77,53 +76,59 @@ const PdfRenderer = memo(
 
             return (
               <div className='space-y-4'>
-                <Document
-                  loading={<FallBackLoader />}
-                  file={pdfUrl}
-                  onLoadSuccess={onDocumentLoadSuccess}
-                  error={<div>Failed to load PDF</div>}
-                  onLoadError={(error) => {
-                    console.error('Error loading PDF:', error);
-                  }}
-                >
-                  <Page
-                    key={`page-${pageNumber}`}
-                    pageNumber={pageNumber}
+                <div id='resume-pdf-preview'>
+                  <Document
                     loading={<FallBackLoader />}
-                    renderTextLayer={false}
-                    renderAnnotationLayer={false}
-                  />
-                </Document>
-                {numPages && numPages > 0 && (
-                  <div className='flex items-center justify-between px-4'>
-                    <button
-                      onClick={onPrevPage}
-                      disabled={pageNumber <= 1}
-                      className='disabled:opacity-50'
-                    >
-                      <Icons.chevronLeft className='h-4 w-4' />
-                    </button>
-                    <span>
-                      Page {pageNumber} of {numPages}
-                    </span>
-                    <button
-                      onClick={onNextPage}
-                      disabled={pageNumber >= numPages}
-                      className='disabled:opacity-50'
-                    >
-                      <Icons.chevronRight className='h-4 w-4' />
-                    </button>
-                    {blob && (
-                      <a
-                        href={URL.createObjectURL(blob)}
-                        download='resume.pdf'
-                        className='text-primary hover:underline'
-                      >
-                        Download PDF
-                      </a>
-                    )}
-                  </div>
-                )}
+                    file={pdfUrl}
+                    onLoadSuccess={onDocumentLoadSuccess}
+                    error={<div>Failed to load PDF</div>}
+                    onLoadError={(error) => {
+                      console.error('Error loading PDF:', error);
+                    }}
+                  >
+                    <Page
+                      key={`page-${pageNumber}`}
+                      pageNumber={pageNumber}
+                      loading={<FallBackLoader />}
+                      renderTextLayer={false}
+                      renderAnnotationLayer={false}
+                    />
+                  </Document>
+                </div>
+                <div className=''>
+                  {numPages && numPages > 0 && (
+                    <div className='flex items-center justify-between px-4'>
+                      <div>
+                        <button
+                          onClick={onPrevPage}
+                          disabled={pageNumber <= 1}
+                          className='bg-black disabled:opacity-50'
+                        >
+                          <Icons.chevronLeft className='h-4 w-4' />
+                        </button>
+                        <span className='mx-1 text-primary'>
+                          Page {pageNumber} of {numPages}
+                        </span>
+                        <button
+                          onClick={onNextPage}
+                          disabled={pageNumber >= numPages}
+                          className='bg-black disabled:opacity-50'
+                        >
+                          <Icons.chevronRight className='h-4 w-4' />
+                        </button>
+                      </div>
+                      {blob && (
+                        <a
+                          href={URL.createObjectURL(blob)}
+                          download='resume.pdf'
+                          className='text-primary hover:underline'
+                        >
+                          Download PDF
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             );
           }}

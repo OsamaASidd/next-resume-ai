@@ -71,7 +71,7 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
           <div className='h-full w-full p-8'>
             <ScrollArea className='h-[calc(100vh-200px)] pr-10'>
               {mode === 'edit' ? (
-                <EditResumeForm resumeId={1} form={form} />
+                <EditResumeForm form={form} />
               ) : (
                 <TemplateSelection
                   selectedTemplate={selectedTemplate}

@@ -10,7 +10,8 @@ export const searchParams = {
   limit: parseAsInteger.withDefault(10),
   q: parseAsString,
   gender: parseAsString,
-  categories: parseAsString
+  categories: parseAsString,
+  profileId: parseAsString
 };
 
 export const searchParamsCache = createSearchParamsCache(searchParams);

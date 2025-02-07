@@ -2,13 +2,14 @@ import { z } from 'zod';
 import { j, privateProcedure } from '../jstack';
 import { db } from '../db';
 import { resumes, profiles } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import {
   resumeFormSchema,
   resumeEditFormSchema
 } from '@/features/resume/utils/form-schema';
 import { generateResumeContent } from '../services/ai-resume';
+import { uploadImageToStorage } from '../services/upload';
 
 export const resumeRouter = j.router({
   // Create a new resume
@@ -126,5 +127,43 @@ export const resumeRouter = j.router({
       });
 
       return c.json(profileResumes);
+    }),
+
+  getAllResumes: privateProcedure.query(async ({ c, ctx }) => {
+    const { user } = ctx;
+    const allResumes = await db.query.resumes.findMany({
+      orderBy: (resumes, { desc }) => [desc(resumes.createdAt)]
+    });
+    return c.json(allResumes);
+  }),
+  // Upload a preview image for a resume
+  uploadPreviewImage: privateProcedure
+    .input(
+      z.object({
+        resumeId: z
+          .union([z.string(), z.number()])
+          .transform((val) => String(val)),
+        image: z.any() // Accept any for the blob data
+      })
+    )
+    .mutation(async ({ c, ctx, input }) => {
+      const { resumeId, image } = input;
+
+      try {
+        const imageUrl = await uploadImageToStorage(image);
+        const [updated] = await db
+          .update(resumes)
+          .set({
+            previewImageUrl: imageUrl,
+            updatedAt: new Date()
+          })
+          .where(eq(resumes.id, String(resumeId)))
+          .returning();
+
+        return c.json(updated);
+      } catch (error) {
+        console.error('Error in uploadPreviewImage:', error);
+        return c.json({ error: 'Failed to upload image' }, 500);
+      }
     })
 });
