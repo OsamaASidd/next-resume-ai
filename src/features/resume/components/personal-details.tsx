@@ -14,7 +14,7 @@ interface PersonalDetailsProps {
   control: Control<TResumeEditFormValues>;
 }
 
-export const PersonalDetails = ({ control }: PersonalDetailsProps) => {
+export function PersonalDetails({ control }: PersonalDetailsProps) {
   return (
     <div className='space-y-6'>
       <h2 className='text-2xl font-semibold'>Personal Details</h2>
@@ -115,7 +115,7 @@ export const PersonalDetails = ({ control }: PersonalDetailsProps) => {
               <Textarea
                 className='min-h-[100px]'
                 {...field}
-                value={field.value || ''}
+                value={field.value ?? ''}
               />
             </FormControl>
             <FormMessage />
@@ -124,4 +124,4 @@ export const PersonalDetails = ({ control }: PersonalDetailsProps) => {
       />
     </div>
   );
-};
+}

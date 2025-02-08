@@ -8,6 +8,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import { getTemplate } from '../templates/registry';
 import { TResumeEditFormValues } from '../utils/form-schema';
+import { Button } from '@/components/ui/button';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -59,6 +60,11 @@ const PdfRenderer = memo(
       );
     }
 
+    function generateDownloadFilename() {
+      const timestamp = new Date().getTime();
+      return `next-resume-${timestamp}.pdf`;
+    }
+
     return (
       <div className='relative min-h-[500px]'>
         <BlobProvider
@@ -97,34 +103,38 @@ const PdfRenderer = memo(
                 </div>
                 <div className=''>
                   {numPages && numPages > 0 && (
-                    <div className='flex items-center justify-between px-4'>
-                      <div>
-                        <button
+                    <div className='flex items-center justify-between'>
+                      <div className='flex items-center gap-2'>
+                        <Button
+                          size={'xs'}
                           onClick={onPrevPage}
                           disabled={pageNumber <= 1}
-                          className='bg-black disabled:opacity-50'
+                          className='disabled:opacity-50'
                         >
                           <Icons.chevronLeft className='h-4 w-4' />
-                        </button>
-                        <span className='mx-1 text-primary'>
+                        </Button>
+                        <span className='text-primary'>
                           Page {pageNumber} of {numPages}
                         </span>
-                        <button
+                        <Button
+                          size={'xs'}
                           onClick={onNextPage}
                           disabled={pageNumber >= numPages}
-                          className='bg-black disabled:opacity-50'
+                          className='disabled:opacity-50'
                         >
                           <Icons.chevronRight className='h-4 w-4' />
-                        </button>
+                        </Button>
                       </div>
                       {blob && (
-                        <a
-                          href={URL.createObjectURL(blob)}
-                          download='resume.pdf'
-                          className='text-primary hover:underline'
-                        >
-                          Download PDF
-                        </a>
+                        <Button asChild>
+                          <a
+                            href={URL.createObjectURL(blob)}
+                            download={generateDownloadFilename()}
+                            className='text-primary'
+                          >
+                            Download PDF
+                          </a>
+                        </Button>
                       )}
                     </div>
                   )}

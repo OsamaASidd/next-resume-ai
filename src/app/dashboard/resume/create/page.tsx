@@ -5,6 +5,7 @@ import useMultistepForm from '@/hooks/use-multistep-form';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { ResumeCreateForm } from '@/features/resume/components/resume-create-form';
+import PageContainer from '@/components/layout/page-container';
 
 export default function CreateResumePage() {
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
@@ -24,33 +25,35 @@ export default function CreateResumePage() {
     ]);
 
   return (
-    <div className='container mx-auto py-10'>
-      <div className='mb-8'>
-        <h1 className='mb-2 text-3xl font-bold'>Create New Resume</h1>
-        <div className='flex items-center gap-2'>
-          <div
-            className={`h-2 w-2 rounded-full ${
-              currentStepIndex === 0 ? 'bg-primary' : 'bg-muted'
-            }`}
-          />
-          <div
-            className={`h-2 w-2 rounded-full ${
-              currentStepIndex === 1 ? 'bg-primary' : 'bg-muted'
-            }`}
-          />
+    <PageContainer scrollable>
+      <div className='flex flex-1 flex-col space-y-4'>
+        <div className='mb-8'>
+          <h1 className='mb-2 text-3xl font-bold'>Create New Resume</h1>
+          <div className='flex items-center gap-2'>
+            <div
+              className={`h-2 w-2 rounded-full ${
+                currentStepIndex === 0 ? 'bg-primary' : 'bg-muted'
+              }`}
+            />
+            <div
+              className={`h-2 w-2 rounded-full ${
+                currentStepIndex === 1 ? 'bg-primary' : 'bg-muted'
+              }`}
+            />
+          </div>
+        </div>
+
+        {step}
+
+        <div className='mt-6 flex justify-between'>
+          {!isFirstStep && (
+            <Button variant='outline' onClick={back}>
+              Back
+            </Button>
+          )}
+          {isFirstStep && <div />}
         </div>
       </div>
-
-      {step}
-
-      <div className='mt-6 flex justify-between'>
-        {!isFirstStep && (
-          <Button variant='outline' onClick={back}>
-            Back
-          </Button>
-        )}
-        {isFirstStep && <div />}
-      </div>
-    </div>
+    </PageContainer>
   );
 }

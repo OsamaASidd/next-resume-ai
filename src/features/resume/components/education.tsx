@@ -172,7 +172,7 @@ export const Education = ({ control }: EducationProps) => {
                   <Textarea
                     className='min-h-[100px]'
                     {...field}
-                    value={field.value || ''}
+                    value={field.value ?? ''}
                   />
                 </FormControl>
                 <FormMessage />

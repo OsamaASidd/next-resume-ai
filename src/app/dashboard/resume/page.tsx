@@ -1,3 +1,4 @@
+import PageContainer from '@/components/layout/page-container';
 import { Card, CardContent } from '@/components/ui/card';
 import { ProfileFilter } from '@/features/resume/components/profile-filter';
 import { searchParamsCache, serialize } from '@/lib/searchparams';
@@ -28,35 +29,36 @@ export default async function ResumePage({
   });
 
   return (
-    <div className='container mx-auto py-10'>
-      <div className='mb-8 flex items-center justify-between'>
-        <div>
-          <h1 className='text-3xl font-bold'>My Resumes</h1>
-          <p className='text-muted-foreground'>Manage your resumes</p>
+    <PageContainer scrollable>
+      <div className='flex flex-1 flex-col space-y-4'>
+        <div className='mb-8 flex items-center justify-between'>
+          <div>
+            <h1 className='text-3xl font-bold'>My Resumes</h1>
+            <p className='text-muted-foreground'>Manage your resumes</p>
+          </div>
         </div>
-      </div>
 
-      <ProfileFilter />
+        <ProfileFilter />
 
-      <Suspense key={key}>
-        <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-4'>
-          {/* Create New Resume Card */}
-          <Link href='/dashboard/resume/create'>
-            <Card className='group h-full cursor-pointer transition-all hover:border-primary hover:shadow-md'>
-              <CardContent className='flex h-[300px] flex-col items-center justify-center p-6'>
-                <div className='mb-4 rounded-full bg-muted/10 p-4 group-hover:bg-primary/5'>
-                  <PlusIcon className='h-8 w-8 text-muted-foreground group-hover:text-primary' />
-                </div>
-                <h3 className='text-lg font-semibold'>Create a new resume</h3>
-                <p className='mt-2 text-center text-sm text-muted-foreground'>
-                  Start building from scratch
-                </p>
-              </CardContent>
-            </Card>
-          </Link>
+        <Suspense key={key}>
+          <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-4'>
+            {/* Create New Resume Card */}
+            <Link href='/dashboard/resume/create'>
+              <Card className='group h-full cursor-pointer transition-all hover:border-primary hover:shadow-md'>
+                <CardContent className='flex h-[300px] flex-col items-center justify-center p-6'>
+                  <div className='mb-4 rounded-full bg-muted/10 p-4 group-hover:bg-primary/5'>
+                    <PlusIcon className='h-8 w-8 text-muted-foreground group-hover:text-primary' />
+                  </div>
+                  <h3 className='text-lg font-semibold'>Create a new resume</h3>
+                  <p className='mt-2 text-center text-sm text-muted-foreground'>
+                    Start building from scratch
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
 
-          {/* Import Resume Card */}
-          {/* <Link href='/dashboard/resume/import'>
+            {/* Import Resume Card */}
+            {/* <Link href='/dashboard/resume/import'>
             <Card className='h-full transition-all cursor-pointer hover:border-primary hover:shadow-md group'>
               <CardContent className='flex flex-col items-center justify-center h-[300px] p-6'>
                 <div className='p-4 mb-4 rounded-full bg-muted/10 group-hover:bg-primary/5'>
@@ -83,38 +85,44 @@ export default async function ResumePage({
             </Card>
           </Link> */}
 
-          {/* Existing Resumes */}
-          {resumesList.map((resume) => (
-            <Link key={resume.id} href={`/dashboard/resume/edit/${resume.id}`}>
-              <Card className='h-full cursor-pointer transition-all hover:border-primary hover:shadow-md'>
-                <CardContent className='h-[300px] p-0'>
-                  <div className='relative h-full w-full overflow-hidden'>
-                    <Image
-                      src={
-                        resume.previewImageUrl || '/templates/default.png' || ''
-                      }
-                      alt={resume.jdJobTitle}
-                      fill
-                      className='absolute inset-0 h-full w-full object-contain'
-                    />
-                    <div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 text-white'>
-                      <h3 className='line-clamp-1 font-medium'>
-                        {resume.jdJobTitle}
-                      </h3>
-                      <p className='mt-1 text-xs opacity-90'>
-                        Last updated{' '}
-                        {formatDistanceToNow(new Date(resume.createdAt), {
-                          addSuffix: true
-                        })}
-                      </p>
+            {/* Existing Resumes */}
+            {resumesList.map((resume) => (
+              <Link
+                key={resume.id}
+                href={`/dashboard/resume/edit/${resume.id}`}
+              >
+                <Card className='h-full cursor-pointer transition-all hover:border-primary hover:shadow-md'>
+                  <CardContent className='h-[300px] p-0'>
+                    <div className='relative h-full w-full overflow-hidden'>
+                      <Image
+                        src={
+                          resume.previewImageUrl ||
+                          '/templates/default.png' ||
+                          ''
+                        }
+                        alt={resume.jdJobTitle}
+                        fill
+                        className='absolute inset-0 h-full w-full object-contain'
+                      />
+                      <div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 text-white'>
+                        <h3 className='line-clamp-1 font-medium'>
+                          {resume.jdJobTitle}
+                        </h3>
+                        <p className='mt-1 text-xs opacity-90'>
+                          Last updated{' '}
+                          {formatDistanceToNow(new Date(resume.createdAt), {
+                            addSuffix: true
+                          })}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </Suspense>
-    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </Suspense>
+      </div>
+    </PageContainer>
   );
 }

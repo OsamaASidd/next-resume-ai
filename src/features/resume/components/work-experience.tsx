@@ -17,7 +17,7 @@ interface WorkExperienceProps {
   control: Control<TResumeEditFormValues>;
 }
 
-export const WorkExperience = ({ control }: WorkExperienceProps) => {
+export function WorkExperience({ control }: WorkExperienceProps) {
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'jobs'
@@ -157,7 +157,7 @@ export const WorkExperience = ({ control }: WorkExperienceProps) => {
                   <Textarea
                     className='min-h-[100px]'
                     {...field}
-                    value={field.value || ''}
+                    value={field.value ?? ''}
                   />
                 </FormControl>
                 <FormMessage />
@@ -168,4 +168,4 @@ export const WorkExperience = ({ control }: WorkExperienceProps) => {
       ))}
     </div>
   );
-};
+}

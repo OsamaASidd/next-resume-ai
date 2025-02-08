@@ -84,7 +84,7 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
           </div>
         </ResizablePanel>
         <ResizablePanel defaultSize={45} minSize={45}>
-          <div className='relative flex h-full justify-center bg-[#D9D9D9]'>
+          <div className='relative flex h-full justify-center bg-accent'>
             <div className='absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 scale-90'>
               <PdfRenderer
                 key={JSON.stringify(formData)}
