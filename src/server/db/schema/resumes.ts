@@ -1,11 +1,15 @@
 import { text, timestamp, integer, pgTable, jsonb } from 'drizzle-orm/pg-core';
 import { profiles } from './profiles';
+import { accounts } from './accounts';
 
 export const resumes = pgTable('resumes', {
   id: text('id').primaryKey().notNull(),
   profileId: text('profile_id')
     .notNull()
     .references(() => profiles.id),
+  userId: text('user_id')
+    .notNull()
+    .references(() => accounts.id),
   jdJobTitle: text('jd_job_title').notNull(),
   employer: text('employer').notNull(),
   jdPostDetails: text('jd_post_details').notNull(),

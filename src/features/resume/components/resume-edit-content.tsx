@@ -1,6 +1,10 @@
 'use client';
 
-import { ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup
+} from '@/components/ui/resizable';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { EditResumeForm } from '@/features/resume/components/edit-resume-form';
 import { ModeToggle } from '@/features/resume/components/mode-toggle';
@@ -95,13 +99,11 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
   // Extract PDF preview component
   const PdfPreview = () => (
     <div className='relative flex h-full justify-center bg-accent'>
-      <div className='absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 scale-90'>
-        <PdfRenderer
-          key={JSON.stringify(formData)}
-          formData={formData}
-          templateId={selectedTemplate}
-        />
-      </div>
+      <PdfRenderer
+        key={JSON.stringify(formData)}
+        formData={formData}
+        templateId={selectedTemplate}
+      />
     </div>
   );
 
@@ -121,15 +123,20 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
           direction='horizontal'
           className='h-full w-full rounded-lg border'
         >
-          <ResizablePanel defaultSize={55}>
+          <ResizablePanel defaultSize={45}>
             <div className='h-full w-full p-8'>
               <ScrollArea className='h-[calc(100vh-200px)] pr-10'>
                 {mode !== 'preview' && renderContent()}
               </ScrollArea>
             </div>
           </ResizablePanel>
-          <ResizablePanel defaultSize={45} minSize={45}>
-            <PdfPreview />
+          <ResizableHandle />
+          <ResizablePanel defaultSize={55} minSize={55}>
+            <div className='h-full w-full p-8'>
+              <ScrollArea className='h-[calc(100vh-200px)] pr-10'>
+                <PdfPreview />
+              </ScrollArea>
+            </div>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

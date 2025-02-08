@@ -3,14 +3,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ProfileFilter } from '@/features/resume/components/profile-filter';
 import { searchParamsCache, serialize } from '@/lib/searchparams';
 import { db } from '@/server/db';
-import { resumes } from '@/server/db/schema';
+import { resumes, profiles, accounts } from '@/server/db/schema';
 import { formatDistanceToNow } from 'date-fns';
-import { eq } from 'drizzle-orm';
+import { eq, inArray, and } from 'drizzle-orm';
 import { PlusIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { SearchParams } from 'nuqs/server';
 import { Suspense } from 'react';
+import { currentUser } from '@clerk/nextjs/server';
 
 export default async function ResumePage({
   searchParams
@@ -20,11 +21,28 @@ export default async function ResumePage({
   const params = await searchParams;
   searchParamsCache.parse(params);
   const key = serialize({ ...params });
-
   const { profileId } = params;
 
+  const auth = await currentUser();
+  if (!auth) {
+    throw new Error('Unauthorized');
+  }
+
+  // Get the account record first
+  const account = await db.query.accounts.findFirst({
+    where: eq(accounts.externalId, auth.id)
+  });
+
+  if (!account) {
+    throw new Error('Account not found');
+  }
+
+  // Simpler query that directly filters by userId and optionally by profileId
   const resumesList = await db.query.resumes.findMany({
-    where: profileId ? eq(resumes.profileId, String(profileId)) : undefined,
+    where: and(
+      eq(resumes.userId, account.id),
+      profileId ? eq(resumes.profileId, String(profileId)) : undefined
+    ),
     orderBy: (resumes, { desc }) => [desc(resumes.createdAt)]
   });
 

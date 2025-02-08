@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { j, privateProcedure } from '../jstack';
 import { db } from '../db';
-import { resumes, profiles } from '../db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { resumes, profiles, accounts } from '../db/schema';
+import { eq, desc, inArray, and } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import {
   resumeFormSchema,
@@ -24,9 +24,19 @@ export const resumeRouter = j.router({
       const { user } = ctx;
       const { profileId, ...resumeData } = input;
 
-      // Create new resume record
+      // Get the account record first
+      const account = await db.query.accounts.findFirst({
+        where: eq(accounts.externalId, user.id)
+      });
+
+      if (!account) {
+        throw new Error('Account not found');
+      }
+
+      // Create new resume record with correct userId
       const newResume = {
         id: nanoid(),
+        userId: account.id, // Use account.id instead of user.id
         profileId,
         jdJobTitle: resumeData.jd_job_title,
         employer: resumeData.employer,
@@ -131,9 +141,21 @@ export const resumeRouter = j.router({
 
   getAllResumes: privateProcedure.query(async ({ c, ctx }) => {
     const { user } = ctx;
+
+    // First get all profiles belonging to the user
+    const userProfiles = await db.query.profiles.findMany({
+      where: eq(profiles.userId, user.id)
+    });
+
+    // Get the profile IDs
+    const profileIds = userProfiles.map((profile) => profile.id);
+
+    // Get all resumes for these profiles
     const allResumes = await db.query.resumes.findMany({
+      where: inArray(resumes.profileId, profileIds),
       orderBy: (resumes, { desc }) => [desc(resumes.createdAt)]
     });
+
     return c.json(allResumes);
   }),
   // Upload a preview image for a resume
