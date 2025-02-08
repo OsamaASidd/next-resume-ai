@@ -9,6 +9,6 @@ export default async function Dashboard() {
   if (!userId) {
     return redirectToSignIn();
   } else {
-    redirect('/dashboard/overview');
+    redirect('/dashboard/profile');
   }
 }

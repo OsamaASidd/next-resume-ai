@@ -15,6 +15,7 @@ import {
   LayoutDashboardIcon,
   Loader2,
   LogIn,
+  LogOut,
   LucideIcon,
   LucideProps,
   LucideShoppingBag,
@@ -33,12 +34,16 @@ import {
   X
 } from 'lucide-react';
 
+import { ReadCvLogo } from '@phosphor-icons/react/dist/ssr';
+
 export type Icon = LucideIcon;
 
 export const Icons = {
   dashboard: LayoutDashboardIcon,
   logo: Command,
   login: LogIn,
+  logout: LogOut,
+  resume: ReadCvLogo,
   close: X,
   product: LucideShoppingBag,
   spinner: Loader2,

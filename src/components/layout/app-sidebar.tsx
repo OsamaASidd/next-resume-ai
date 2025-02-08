@@ -45,9 +45,9 @@ import { usePathname } from 'next/navigation';
 import { Icons } from '../icons';
 
 export const company = {
-  name: 'Acme Inc',
-  logo: GalleryVerticalEnd,
-  plan: 'Enterprise'
+  name: 'Next Resume',
+  logo: Icons.resume,
+  plan: 'Work in Progress'
 };
 
 type UserInfoProps = ReturnType<typeof useUser>['user'];
@@ -105,6 +105,7 @@ export default function AppSidebar() {
                       <SidebarMenuButton
                         tooltip={item.title}
                         isActive={pathname === item.url}
+                        className='group/menu-button rounded-lg bg-gradient-to-r hover:bg-transparent hover:from-sidebar-accent hover:to-sidebar-accent/40 data-[active=true]:from-primary/20 data-[active=true]:to-primary/5'
                       >
                         {item.icon && <Icon />}
                         <span>{item.title}</span>
@@ -135,9 +136,10 @@ export default function AppSidebar() {
                     asChild
                     tooltip={item.title}
                     isActive={pathname === item.url}
+                    className='group/menu-button rounded-lg bg-gradient-to-r hover:bg-transparent hover:from-sidebar-accent hover:to-sidebar-accent/40 data-[active=true]:from-primary/20 data-[active=true]:to-primary/5'
                   >
                     <Link href={item.url}>
-                      <Icon />
+                      <Icon className='text-muted-foreground/60 group-data-[active=true]/menu-button:text-primary' />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -189,7 +191,7 @@ export default function AppSidebar() {
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <SignOutButton>
+                  <SignOutButton redirectUrl='/sign-in'>
                     <div className='flex w-full items-center'>Log out</div>
                   </SignOutButton>
                 </DropdownMenuItem>

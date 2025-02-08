@@ -2,6 +2,7 @@
 'use client';
 import { client } from '@/lib/client';
 import { useQuery } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -20,9 +21,16 @@ export default function Page() {
 
   useEffect(() => {
     if (data?.isSynced) {
-      router.push('/dashboard/overview');
+      router.push('/dashboard/profile');
     }
   }, [data, router]);
 
-  return <div>Welcome {data?.isSynced ? 'Synced' : 'Not Synced'}</div>;
+  return (
+    <div className='flex min-h-screen flex-col items-center justify-center'>
+      <div className='flex flex-col items-center'>
+        <Loader2 className='mb-4 size-8 animate-spin' />
+        <p className='text-lg'>Syncing your account data, please wait...</p>
+      </div>
+    </div>
+  );
 }

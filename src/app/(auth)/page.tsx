@@ -1,28 +1,11 @@
-// sync auth status to database
-'use client';
-import { client } from '@/lib/client';
-import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+import React from 'react';
 
-export default function Page() {
-  const router = useRouter();
-  const { data, isLoading } = useQuery({
-    queryKey: ['get-database-sync-status'],
-    refetchInterval: (query) => {
-      return query.state.data?.isSynced ? false : 1000;
-    },
-    queryFn: async () => {
-      const res = await client.auth.getDatabaseSyncStatus.$get();
-      return await res.json();
-    }
-  });
-
-  useEffect(() => {
-    if (data?.isSynced) {
-      router.push('/dashboard/overview');
-    }
-  }, [data, router]);
-
-  return <div>Welcome {data?.isSynced ? 'Synced' : 'Not Synced'}</div>;
+export default async function page() {
+  const { userId } = await auth();
+  if (!userId) {
+    return redirect('/sign-in');
+  }
+  return redirect('/welcome');
 }

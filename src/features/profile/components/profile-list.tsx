@@ -25,7 +25,7 @@ export default function ProfileList() {
   return (
     <>
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-        <Card className='flex cursor-pointer flex-col items-center justify-center border-2 border-dashed p-8 hover:border-primary'>
+        <Card className='flex cursor-pointer flex-col items-center justify-center border-2 border-dashed bg-gradient-to-br from-sidebar/60 to-sidebar p-8 hover:border-primary'>
           <CreateProfileModal />
           <p className='mt-2 text-sm text-muted-foreground'>
             Create new profile
@@ -35,7 +35,7 @@ export default function ProfileList() {
         {profiles?.map((profile) => (
           <Card
             key={profile.id}
-            className='cursor-pointer transition-all hover:border-primary'
+            className='cursor-pointer bg-gradient-to-br from-sidebar/60 to-sidebar transition-all hover:border-primary'
             onClick={() => {
               setSelectedProfile(profile as any);
             }}

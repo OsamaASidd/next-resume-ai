@@ -44,7 +44,7 @@ export function TemplateSelection({
         )}
       </div>
 
-      <div className='grid grid-cols-2 gap-6'>
+      <div className='grid grid-cols-2 gap-6 md:grid-cols-3'>
         {templates.map((template) => (
           <Card
             key={template.id}

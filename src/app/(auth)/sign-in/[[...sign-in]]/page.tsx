@@ -24,5 +24,9 @@ export default async function Page() {
   } catch (error) {
     console.error('Error fetching GitHub stars:', error);
   }
-  return <SignIn forceRedirectUrl={'/welcome'} redirectUrl={'/welcome'} />;
+  return (
+    <div className='flex min-h-screen items-center justify-center'>
+      <SignIn signInUrl='/sign-in' forceRedirectUrl='/welcome' />
+    </div>
+  );
 }
