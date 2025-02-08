@@ -4,7 +4,6 @@ import TemplateOne from './templateOne';
 import TemplateTwo from './templateTwo';
 import TemplateThree from './templateThree';
 import TemplateFour from './templateFour';
-import TemplateFive from './templateFive';
 
 export type ResumeTemplateProps = {
   formData: TResumeEditFormValues;
