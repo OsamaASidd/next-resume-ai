@@ -24,9 +24,11 @@ export const resumeRouter = j.router({
       const { user } = ctx;
       const { profileId, ...resumeData } = input;
 
+      console.log("user from ctx",user);
+
       // Get the account record first
       const account = await db.query.accounts.findFirst({
-        where: eq(accounts.externalId, user.id)
+        where: eq(accounts.externalId, user.externalId)
       });
 
       if (!account) {
@@ -36,7 +38,7 @@ export const resumeRouter = j.router({
       // Create new resume record with correct userId
       const newResume = {
         id: nanoid(),
-        userId: account.id, // Use account.id instead of user.id
+        userId: account.externalId, // Use account.id instead of user.id
         profileId,
         jdJobTitle: resumeData.jd_job_title,
         employer: resumeData.employer,
