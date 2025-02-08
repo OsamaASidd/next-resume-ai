@@ -6,7 +6,7 @@ import { type TResumeEditFormValues } from '@/features/resume/utils/form-schema'
 import { FolderSyncIcon } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
 import { toast } from 'sonner';
-import { useUploadPreviewImage } from '../api';
+import { useUploadPreviewImage, useUpdateResume } from '../api';
 import { generatePreviewImage } from '../utils/preview-generator';
 import { Education } from './education';
 import { Languages } from './languages';
@@ -20,44 +20,50 @@ interface EditResumeFormProps {
 }
 
 export const EditResumeForm = ({ form }: EditResumeFormProps) => {
-  const { mutate: uploadPreviewImage, isPending: isLoading } =
+  const { mutateAsync: uploadPreviewImage, isPending: isLoading } =
     useUploadPreviewImage();
+  const { mutateAsync: updateResume, isPending: isUpdating } =
+    useUpdateResume();
 
   const handleResumeSnapShot = async () => {
-    try {
-      const pdfElement = document.getElementById('resume-pdf-preview');
-      if (!pdfElement) return;
-
-      const imageBlob = await generatePreviewImage(pdfElement);
-      // Convert Blob to base64
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve) => {
-        reader.onloadend = () => resolve(reader.result as string);
-      });
-      reader.readAsDataURL(imageBlob);
-      const base64Image = await base64Promise;
-
-      uploadPreviewImage(
-        {
-          resumeId: String(form.getValues('resume_id')),
-          image: base64Image
-        },
-        {
-          onSuccess: () => toast.success('Preview synced successfully'),
-          onError: (error) => {
-            toast.error('Failed to sync preview');
-            console.error('Error:', error);
-          }
-        }
-      );
-    } catch (error) {
-      console.error('Error syncing preview:', error);
-      toast.error('Failed to sync preview');
+    const pdfElement = document.getElementById('resume-pdf-preview');
+    if (!pdfElement) {
+      throw new Error('Preview element not found');
     }
+
+    const imageBlob = await generatePreviewImage(pdfElement);
+    const reader = new FileReader();
+    const base64Promise = new Promise<string>((resolve) => {
+      reader.onloadend = () => resolve(reader.result as string);
+    });
+    reader.readAsDataURL(imageBlob);
+    const base64Image = await base64Promise;
+
+    await uploadPreviewImage({
+      resumeId: String(form.getValues('resume_id')),
+      image: base64Image
+    });
   };
 
   const handleSubmit = async (values: TResumeEditFormValues) => {
-    console.log('values', values);
+    try {
+      const loadingToast = toast.loading('Saving and syncing preview...');
+
+      // Update resume data
+      await updateResume({
+        id: values.resume_id!,
+        ...values
+      });
+
+      // Generate and upload preview
+      await handleResumeSnapShot();
+
+      toast.dismiss(loadingToast);
+      toast.success('Resume synced successfully');
+    } catch (error) {
+      console.error('Error saving resume:', error);
+      toast.error('Failed to save changes. Please try again.');
+    }
   };
 
   return (
@@ -65,14 +71,12 @@ export const EditResumeForm = ({ form }: EditResumeFormProps) => {
       <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8'>
         <div className='mb-4 flex justify-end'>
           <Button
-            type='button'
-            variant='outline'
-            onClick={handleResumeSnapShot}
-            disabled={isLoading}
+            type='submit'
+            disabled={isLoading || isUpdating}
             className='gap-2'
           >
             <FolderSyncIcon className='h-4 w-4' />
-            {isLoading ? 'Syncing...' : 'Sync Preview'}
+            {isLoading || isUpdating ? 'Saving...' : 'Sync & Save'}
           </Button>
         </div>
 
@@ -82,10 +86,6 @@ export const EditResumeForm = ({ form }: EditResumeFormProps) => {
         <Skills control={form.control} />
         <Tools control={form.control} />
         <Languages control={form.control} />
-
-        <Button type='submit' className='w-full'>
-          Save Resume
-        </Button>
       </form>
     </Form>
   );

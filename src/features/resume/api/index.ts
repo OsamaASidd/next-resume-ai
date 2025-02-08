@@ -1,6 +1,6 @@
 import { client } from '@/lib/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { TResumeFormValues } from '../utils/form-schema';
+import { TResumeEditFormValues, TResumeFormValues } from '../utils/form-schema';
 
 export const useCreateResume = () => {
   const queryClient = useQueryClient();
@@ -26,25 +26,15 @@ export const useGetResume = (id: string) => {
   });
 };
 
-// export const useUpdateResume = (id: string) => {
-//   const queryClient = useQueryClient();
-//   return useMutation({
-//     mutationFn: async (data: TResumeEditFormValues) => {
-//       const response = await client.resume.updateResume.$post({
-//         json: { id, ...data }
-//       });
-//       return response.json();
-//     },
-//     onSuccess: () => {
-//       toast.success('Resume updated successfully');
-//       queryClient.invalidateQueries({ queryKey: ['resume', id] });
-//     },
-//     onError: (error) => {
-//       toast.error('Failed to update resume');
-//       console.error('Error updating resume:', error);
-//     }
-//   });
-// };
+export const useUpdateResume = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: TResumeEditFormValues & { id: string }) => {
+      const response = await client.resume.updateResume.$post(data);
+      return response.json();
+    }
+  });
+};
 
 export const useGetResumes = (profileId?: string) => {
   return useQuery({
