@@ -6,10 +6,11 @@ const tw = createTw({
   theme: {
     extend: {
       colors: {
-        primary: '#2563eb',
-        secondary: '#1e40af',
-        accent: '#3b82f6',
-        muted: '#64748b'
+        primary: '#334155',
+        secondary: '#94a3b8',
+        accent: '#0ea5e9',
+        muted: '#64748b',
+        background: '#f8fafc'
       }
     }
   }
@@ -19,27 +20,23 @@ type TResumeTemplateProps = {
   formData: TResumeEditFormValues;
 };
 
-type Item = {
-  name: string;
-};
-
-const BulletedList = ({ items }: { items: Item[] }) => (
+const BulletedList = ({ items }: { items: { name: string }[] }) => (
   <View>
     {items.map((item, index) => (
       <View
         style={tw('flex flex-row flex-wrap items-center gap-1')}
         key={index}
       >
-        <Text style={tw('text-accent')}>•</Text>
+        <Text style={tw('text-accent')}>━</Text>
         <Text style={tw('text-sm')}>{item.name}</Text>
       </View>
     ))}
   </View>
 );
 
-const HeaderSection = () => <View fixed style={tw('h-4 w-full bg-primary')} />;
-
-export default function ResumeTemplateTwo({ formData }: TResumeTemplateProps) {
+export default function ResumeTemplateThree({
+  formData
+}: TResumeTemplateProps) {
   const hasSkills = formData?.skills?.length ?? 0 > 0;
   const hasTools = formData?.tools?.length ?? 0 > 0;
   const hasLanguages = formData?.languages?.length ?? 0 > 0;
@@ -49,16 +46,14 @@ export default function ResumeTemplateTwo({ formData }: TResumeTemplateProps) {
 
   return (
     <Document>
-      <Page size='A4' style={tw('p-6')}>
-        <HeaderSection />
-
-        {/* Header Section */}
-        <View style={tw('mt-6 text-center mb-6')}>
-          <Text style={tw('text-3xl font-bold text-primary')}>
-            {formData?.personal_details?.fname ?? ''}{' '}
-            {formData?.personal_details?.lname ?? ''}
+      <Page size='A4' style={tw('p-8 bg-background')}>
+        {/* Header */}
+        <View style={tw('border-b border-secondary pb-4 mb-6')}>
+          <Text style={tw('text-4xl font-bold text-primary mb-2')}>
+            {formData?.personal_details?.fname ?? 'First Name'}{' '}
+            {formData?.personal_details?.lname ?? 'Last Name'}
           </Text>
-          <View style={tw('flex flex-row justify-center gap-4 mt-2')}>
+          <View style={tw('flex flex-row gap-4')}>
             {formData?.personal_details?.email && (
               <Text style={tw('text-sm text-muted')}>
                 {formData.personal_details.email}
@@ -82,43 +77,40 @@ export default function ResumeTemplateTwo({ formData }: TResumeTemplateProps) {
           </View>
         </View>
 
-        {/* Summary Section */}
-        {hasSummary && (
-          <View style={tw('mb-6')}>
-            <Text style={tw('text-lg font-bold text-primary mb-2')}>
-              Professional Summary
-            </Text>
-            <Text style={tw('text-sm')}>
-              {formData?.personal_details?.summary ?? ''}
-            </Text>
-          </View>
-        )}
+        {/* Main Content */}
+        <View style={tw('flex flex-row gap-8')}>
+          {/* Left Column - 70% */}
+          <View style={tw('flex-[0.7] space-y-6')}>
+            {hasSummary && (
+              <View>
+                <Text style={tw('text-lg font-bold text-accent mb-2')}>
+                  Professional Summary
+                </Text>
+                <Text style={tw('text-sm leading-relaxed')}>
+                  {formData?.personal_details?.summary ?? ''}
+                </Text>
+              </View>
+            )}
 
-        {/* Two Column Layout */}
-        <View style={tw('flex flex-row')}>
-          {/* Left Column */}
-          <View style={tw('w-2/3 pr-4')}>
-            {/* Work Experience */}
             {hasJobs && (
-              <View style={tw('mb-6')}>
-                <Text style={tw('text-lg font-bold text-primary mb-2')}>
+              <View>
+                <Text style={tw('text-lg font-bold text-accent mb-2')}>
                   Work Experience
                 </Text>
-                <View style={tw('flex flex-col gap-4')}>
+                <View style={tw('space-y-4')}>
                   {formData?.jobs?.map((job, index) => (
-                    <View wrap={false} key={index}>
-                      <Text style={tw('font-bold')}>
-                        {job?.job_title ?? ''}
+                    <View key={index} wrap={false}>
+                      <Text style={tw('font-bold text-primary')}>
+                        {job?.job_title ?? ''}{' '}
+                        {job?.employer && `| ${job.employer}`}
                       </Text>
-                      <Text style={tw('text-sm text-muted')}>
-                        {job?.employer && `${job.employer}`}
-                        {(job?.start_date || job?.end_date) && ' | '}
-                        {job?.start_date ?? ''} - {job?.end_date ?? ''}
-                      </Text>
-                      {job?.description && (
-                        <Text style={tw('text-sm mt-1')}>
-                          {job.description}
+                      {(job?.start_date || job?.end_date) && (
+                        <Text style={tw('text-sm text-muted mb-1')}>
+                          {job?.start_date ?? ''} - {job?.end_date ?? ''}
                         </Text>
+                      )}
+                      {job?.description && (
+                        <Text style={tw('text-sm')}>{job.description}</Text>
                       )}
                     </View>
                   ))}
@@ -126,27 +118,24 @@ export default function ResumeTemplateTwo({ formData }: TResumeTemplateProps) {
               </View>
             )}
 
-            {/* Education */}
             {hasEducation && (
-              <View style={tw('mb-6')}>
-                <Text style={tw('text-lg font-bold text-primary mb-2')}>
+              <View>
+                <Text style={tw('text-lg font-bold text-accent mb-2')}>
                   Education
                 </Text>
-                <View style={tw('flex flex-col gap-4')}>
+                <View style={tw('space-y-4')}>
                   {formData?.education?.map((edu, index) => (
                     <View key={index}>
-                      <Text style={tw('font-bold')}>
+                      <Text style={tw('font-bold text-primary')}>
                         {edu?.degree ?? ''} {edu?.field && `in ${edu.field}`}
                       </Text>
-                      <Text style={tw('text-sm text-muted')}>
+                      <Text style={tw('text-sm text-muted mb-1')}>
                         {edu?.school && `${edu.school}`}
                         {(edu?.start_date || edu?.end_date) && ' | '}
                         {edu?.start_date ?? ''} - {edu?.end_date ?? ''}
                       </Text>
                       {edu?.description && (
-                        <Text style={tw('text-sm mt-1')}>
-                          {edu.description}
-                        </Text>
+                        <Text style={tw('text-sm')}>{edu.description}</Text>
                       )}
                     </View>
                   ))}
@@ -155,12 +144,11 @@ export default function ResumeTemplateTwo({ formData }: TResumeTemplateProps) {
             )}
           </View>
 
-          {/* Right Column */}
-          <View style={tw('w-1/3 pl-4 border-l')}>
-            {/* Skills Section */}
+          {/* Right Column - 30% */}
+          <View style={tw('flex-[0.3] space-y-6')}>
             {hasSkills && (
-              <View style={tw('mb-6')}>
-                <Text style={tw('text-lg font-bold text-primary mb-2')}>
+              <View>
+                <Text style={tw('text-lg font-bold text-accent mb-2')}>
                   Skills
                 </Text>
                 <BulletedList
@@ -173,10 +161,9 @@ export default function ResumeTemplateTwo({ formData }: TResumeTemplateProps) {
               </View>
             )}
 
-            {/* Tools Section */}
             {hasTools && (
-              <View style={tw('mb-6')}>
-                <Text style={tw('text-lg font-bold text-primary mb-2')}>
+              <View>
+                <Text style={tw('text-lg font-bold text-accent mb-2')}>
                   Tools
                 </Text>
                 <BulletedList
@@ -189,10 +176,9 @@ export default function ResumeTemplateTwo({ formData }: TResumeTemplateProps) {
               </View>
             )}
 
-            {/* Languages Section */}
             {hasLanguages && (
-              <View style={tw('mb-6')}>
-                <Text style={tw('text-lg font-bold text-primary mb-2')}>
+              <View>
+                <Text style={tw('text-lg font-bold text-accent mb-2')}>
                   Languages
                 </Text>
                 <BulletedList

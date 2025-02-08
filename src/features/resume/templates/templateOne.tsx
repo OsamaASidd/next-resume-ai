@@ -59,7 +59,11 @@ const ResumePadding = () => {
 };
 
 export default function ResumeTemplate({ formData }: TResumeTemplateProps) {
-  console.log('Template One Rendering with data:', formData);
+  const hasSkills = formData?.skills?.length ?? 0 > 0;
+  const hasTools = formData?.tools?.length ?? 0 > 0;
+  const hasLanguages = formData?.languages?.length ?? 0 > 0;
+  const hasEducation = formData?.education?.length ?? 0 > 0;
+  const hasJobs = formData?.jobs?.length ?? 0 > 0;
 
   return (
     <Document>
@@ -72,97 +76,133 @@ export default function ResumeTemplate({ formData }: TResumeTemplateProps) {
           )}
         >
           <Text style={tw('text-2xl font-bold')}>
-            {formData.personal_details?.fname ?? 'First Name'}{' '}
-            {formData.personal_details?.lname ?? 'Last Name'}
+            {formData?.personal_details?.fname ?? ''}{' '}
+            {formData?.personal_details?.lname ?? ''}
           </Text>
-          <Text style={tw('text-sm')}>
-            <i className='fas fa-envelope icon'></i>{' '}
-            {formData.personal_details?.email ?? 'Email'}
-          </Text>
-          <Text style={tw('text-sm')}>
-            <i className='fas fa-mobile-alt icon'></i>{' '}
-            {formData.personal_details?.phone ?? 'Phone Number'}
-          </Text>
-          <Text style={tw('text-sm')}>
-            <i className='fas fa-map-marker-alt icon'></i>
-            {formData.personal_details?.city ?? 'City'},{' '}
-            {formData.personal_details?.country ?? 'Country'}
-          </Text>
-          <Text style={tw('text-[#7f7f7f]')}>Skills</Text>
-          <BulletedList
-            items={
-              formData?.skills?.map((skill) => ({
-                name: `${skill.skill_name}`
-              })) ?? []
-            }
-          />
-          <Text style={tw('text-[#7f7f7f]')}>Tools</Text>
-          <BulletedList
-            items={
-              formData?.tools?.map((tool) => ({
-                name: `${tool.tool_name}`
-              })) ?? []
-            }
-          />
-          <Text style={tw('text-[#7f7f7f]')}>Languages</Text>
-          <BulletedList
-            items={
-              formData?.languages?.map((lang) => ({
-                name: `${lang.lang_name}`
-              })) ?? []
-            }
-          />
+          {formData?.personal_details?.email && (
+            <Text style={tw('text-sm')}>
+              <i className='fas fa-envelope icon'></i>{' '}
+              {formData.personal_details.email}
+            </Text>
+          )}
+          {formData?.personal_details?.phone && (
+            <Text style={tw('text-sm')}>
+              <i className='fas fa-mobile-alt icon'></i>{' '}
+              {formData.personal_details.phone}
+            </Text>
+          )}
+          {(formData?.personal_details?.city ||
+            formData?.personal_details?.country) && (
+            <Text style={tw('text-sm')}>
+              <i className='fas fa-map-marker-alt icon'></i>
+              {formData?.personal_details?.city}
+              {formData?.personal_details?.city &&
+                formData?.personal_details?.country &&
+                ', '}
+              {formData?.personal_details?.country}
+            </Text>
+          )}
+
+          {hasSkills && (
+            <>
+              <Text style={tw('text-[#7f7f7f]')}>Skills</Text>
+              <BulletedList
+                items={
+                  formData?.skills?.map((skill) => ({
+                    name: skill.skill_name
+                  })) ?? []
+                }
+              />
+            </>
+          )}
+
+          {hasTools && (
+            <>
+              <Text style={tw('text-[#7f7f7f]')}>Tools</Text>
+              <BulletedList
+                items={
+                  formData?.tools?.map((tool) => ({
+                    name: tool.tool_name
+                  })) ?? []
+                }
+              />
+            </>
+          )}
+
+          {hasLanguages && (
+            <>
+              <Text style={tw('text-[#7f7f7f]')}>Languages</Text>
+              <BulletedList
+                items={
+                  formData?.languages?.map((lang) => ({
+                    name: lang.lang_name
+                  })) ?? []
+                }
+              />
+            </>
+          )}
         </View>
+
         {/* white section  */}
         <View style={tw('flex-1 min-w-[70%] p-5 pt-0 gap-4 flex-col bg-white')}>
-          <View style={tw('flex flex-col')}>
-            <Text style={tw('text-muted text-2xl font-bold')}>Summary</Text>
-            <Text style={tw('text-sm')}>
-              {formData.personal_details?.summary ?? 'Summary'}
-            </Text>
-          </View>
+          {formData?.personal_details?.summary && (
+            <View style={tw('flex flex-col')}>
+              <Text style={tw('text-muted text-2xl font-bold')}>Summary</Text>
+              <Text style={tw('text-sm')}>
+                {formData.personal_details.summary}
+              </Text>
+            </View>
+          )}
 
-          <View style={tw('flex flex-col')}>
-            <Text style={tw('text-muted text-2xl font-bold')}>Education</Text>
-            <View style={tw('flex flex-col gap-6')}>
-              {formData?.education?.length &&
-                formData?.education?.map((edu, index) => (
+          {hasEducation && (
+            <View style={tw('flex flex-col')}>
+              <Text style={tw('text-muted text-2xl font-bold')}>Education</Text>
+              <View style={tw('flex flex-col gap-6')}>
+                {formData?.education?.map((edu, index) => (
                   <View key={index}>
                     <Text style={tw('font-bold text-lg')}>
-                      {edu?.degree ?? 'Degree'} in {edu?.field ?? 'Field'} |{' '}
-                      {edu?.school ?? 'School'}
+                      {edu?.degree ?? ''} {edu?.field && `in ${edu.field}`}{' '}
+                      {edu?.school && `| ${edu.school}`}
                     </Text>
-                    <Text style={tw('font-bold text-lg')}>
-                      {edu?.start_date ?? 'Start Date'} -{' '}
-                      {edu?.end_date ?? 'End Date'}
-                    </Text>
-                    <Text style={tw('text-sm')}>{edu?.description ?? ''}</Text>
+                    {(edu?.start_date || edu?.end_date) && (
+                      <Text style={tw('font-bold text-lg')}>
+                        {edu?.start_date ?? ''} - {edu?.end_date ?? ''}
+                      </Text>
+                    )}
+                    {edu?.description && (
+                      <Text style={tw('text-sm')}>{edu.description}</Text>
+                    )}
                   </View>
                 ))}
+              </View>
             </View>
-          </View>
+          )}
 
-          <View style={tw('flex flex-col')}>
-            <Text style={tw('text-muted text-2xl font-bold')}>
-              Employment History
-            </Text>
-            <View style={tw('flex flex-col gap-6')}>
-              {formData?.jobs?.length &&
-                formData?.jobs?.map((job, index) => (
+          {hasJobs && (
+            <View style={tw('flex flex-col')}>
+              <Text style={tw('text-muted text-2xl font-bold')}>
+                Employment History
+              </Text>
+              <View style={tw('flex flex-col gap-6')}>
+                {formData?.jobs?.map((job, index) => (
                   <View wrap={false} key={index}>
                     <Text style={tw('font-bold text-lg')}>
-                      {job?.job_title ?? 'Job Title'} |{' '}
-                      {job?.employer ?? 'Employer'}
+                      {job?.job_title ?? ''}{' '}
+                      {job?.employer && `| ${job.employer}`}
                     </Text>
-                    <Text style={tw('font-bold text-lg')}>
-                      {job?.start_date ?? 'Start Date'} -{' '}
-                      {job?.end_date ?? 'End Date'}
-                    </Text>
-                    <Text style={tw('text-sm')}>{job?.description ?? ''}</Text>
+                    {(job?.start_date || job?.end_date) && (
+                      <Text style={tw('font-bold text-lg')}>
+                        {job?.start_date ?? ''} - {job?.end_date ?? ''}
+                      </Text>
+                    )}
+                    {job?.description && (
+                      <Text style={tw('text-sm')}>{job.description}</Text>
+                    )}
                   </View>
                 ))}
+              </View>
             </View>
-          </View>
+          )}
         </View>
       </Page>
     </Document>

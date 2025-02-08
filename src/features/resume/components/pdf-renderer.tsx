@@ -27,6 +27,7 @@ const PdfRenderer = memo(
     const [numPages, setNumPages] = useState<number>();
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [url, setUrl] = useState<string | null>(null);
+
     // Cleanup effect
     useEffect(() => {
       return () => {

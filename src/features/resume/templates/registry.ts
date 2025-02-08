@@ -2,6 +2,9 @@ import { ComponentType } from 'react';
 import { TResumeEditFormValues } from '../utils/form-schema';
 import TemplateOne from './templateOne';
 import TemplateTwo from './templateTwo';
+import TemplateThree from './templateThree';
+import TemplateFour from './templateFour';
+import TemplateFive from './templateFive';
 
 export type ResumeTemplateProps = {
   formData: TResumeEditFormValues;
@@ -29,6 +32,20 @@ const templateRegistry: Record<string, TemplateConfig> = {
     thumbnail: '/templates/templatetwo.png',
     description: 'Modern single-column design with clean typography',
     component: TemplateTwo
+  },
+  'template-three': {
+    id: 'template-three',
+    name: 'Minimalist',
+    thumbnail: '/templates/default.png',
+    description: 'Clean and minimal design with subtle accents',
+    component: TemplateThree
+  },
+  'template-four': {
+    id: 'template-four',
+    name: 'Creative Professional',
+    thumbnail: '/templates/default.png',
+    description: 'Modern design with creative layout and color accents',
+    component: TemplateFour
   }
 };
 

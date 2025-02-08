@@ -3,21 +3,37 @@ import { resumes } from '@/server/db/schema/resumes';
 import { eq } from 'drizzle-orm';
 import { ResumeEditContent } from '@/features/resume/components/resume-edit-content';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
+import EditResumeLoading from './loading';
 
 export default async function EditResumePage({
   params
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const resumeId = (await params).id;
-  const resume = await db.query.resumes.findFirst({
-    where: eq(resumes.id, resumeId)
-  });
+  try {
+    const resumeId = (await params).id;
 
-  console.log('yo resume haha', resume);
-  if (!resume) {
-    notFound();
+    if (!resumeId) {
+      notFound();
+    }
+
+    const resume = await db.query.resumes.findFirst({
+      where: eq(resumes.id, resumeId)
+    });
+
+    if (!resume) {
+      notFound();
+    }
+
+    return (
+      <Suspense fallback={<EditResumeLoading />}>
+        <ResumeEditContent resume={resume} />
+      </Suspense>
+    );
+  } catch (error) {
+    // Log the error but let it propagate to the error boundary
+    console.error('Error in EditResumePage:', error);
+    throw error;
   }
-
-  return <ResumeEditContent resume={resume} />;
 }
