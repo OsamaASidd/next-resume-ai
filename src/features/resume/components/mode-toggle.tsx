@@ -2,29 +2,39 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 
 interface ModeToggleProps {
-  mode: 'edit' | 'template';
-  onModeChange: (mode: 'edit' | 'template') => void;
+  mode: 'edit' | 'template' | 'preview' | 'zen';
+  onModeChange: (mode: 'edit' | 'template' | 'preview' | 'zen') => void;
+  isMobile?: boolean;
 }
 
-export function ModeToggle({ mode, onModeChange }: ModeToggleProps) {
+export function ModeToggle({
+  mode,
+  onModeChange,
+  isMobile = false
+}: ModeToggleProps) {
+  const modes = isMobile
+    ? [
+        { value: 'edit', label: 'Form' },
+        { value: 'template', label: 'Template' },
+        { value: 'preview', label: 'Preview' }
+      ]
+    : [
+        { value: 'edit', label: 'Edit' },
+        { value: 'template', label: 'Template' }
+      ];
+
   return (
-    <div className='mb-4 flex items-center gap-2'>
-      <Button
-        variant={mode === 'edit' ? 'default' : 'outline'}
-        size='sm'
-        onClick={() => onModeChange('edit')}
-      >
-        <Icons.page className='mr-2 h-4 w-4' />
-        Edit Mode
-      </Button>
-      <Button
-        variant={mode === 'template' ? 'default' : 'outline'}
-        size='sm'
-        onClick={() => onModeChange('template')}
-      >
-        <Icons.laptop className='mr-2 h-4 w-4' />
-        Template Mode
-      </Button>
+    <div className='mb-4 flex space-x-2'>
+      {modes.map(({ value, label }) => (
+        <Button
+          key={value}
+          variant={mode === value ? 'default' : 'outline'}
+          onClick={() => onModeChange(value as typeof mode)}
+          size={isMobile ? 'sm' : 'default'}
+        >
+          {label}
+        </Button>
+      ))}
     </div>
   );
 }

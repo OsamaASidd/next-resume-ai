@@ -21,7 +21,9 @@ interface ResumeEditContentProps {
 }
 
 export function ResumeEditContent({ resume }: ResumeEditContentProps) {
-  const [mode, setMode] = useState<'edit' | 'template'>('edit');
+  const [mode, setMode] = useState<'edit' | 'template' | 'preview' | 'zen'>(
+    'edit'
+  );
   const {
     selectedTemplate,
     currentTemplate,
@@ -60,41 +62,88 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
     setMode('edit');
   };
 
+  // Extract content rendering logic
+  const renderContent = () => {
+    if (mode === 'edit') {
+      return <EditResumeForm form={form} />;
+    }
+    if (mode === 'template') {
+      return (
+        <TemplateSelection
+          selectedTemplate={selectedTemplate}
+          onTemplateSelect={setSelectedTemplate}
+          onApplyTemplate={handleApplyTemplate}
+          currentTemplate={currentTemplate}
+        />
+      );
+    }
+    if (mode === 'preview') {
+      return (
+        <div className='relative flex h-full justify-center bg-accent pt-4'>
+          <div className='origin-top scale-75'>
+            <PdfRenderer
+              key={JSON.stringify(formData)}
+              formData={formData}
+              templateId={selectedTemplate}
+            />
+          </div>
+        </div>
+      );
+    }
+  };
+
+  // Extract PDF preview component
+  const PdfPreview = () => (
+    <div className='relative flex h-full justify-center bg-accent'>
+      <div className='absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 scale-90'>
+        <PdfRenderer
+          key={JSON.stringify(formData)}
+          formData={formData}
+          templateId={selectedTemplate}
+        />
+      </div>
+    </div>
+  );
+
   return (
     <div className='h-full p-4'>
-      <ModeToggle mode={mode} onModeChange={setMode} />
-      <ResizablePanelGroup
-        direction='horizontal'
-        className='h-full w-full rounded-lg border'
-      >
-        <ResizablePanel defaultSize={55}>
-          <div className='h-full w-full p-8'>
-            <ScrollArea className='h-[calc(100vh-200px)] pr-10'>
-              {mode === 'edit' ? (
-                <EditResumeForm form={form} />
-              ) : (
-                <TemplateSelection
-                  selectedTemplate={selectedTemplate}
-                  onTemplateSelect={setSelectedTemplate}
-                  onApplyTemplate={handleApplyTemplate}
-                  currentTemplate={currentTemplate}
-                />
-              )}
+      {/* Mode Toggle */}
+      <div className='hidden md:block'>
+        <ModeToggle mode={mode} onModeChange={setMode} />
+      </div>
+      <div className='block md:hidden'>
+        <ModeToggle mode={mode} onModeChange={setMode} isMobile={true} />
+      </div>
+
+      {/* Desktop Layout */}
+      <div className='hidden h-full md:block'>
+        <ResizablePanelGroup
+          direction='horizontal'
+          className='h-full w-full rounded-lg border'
+        >
+          <ResizablePanel defaultSize={55}>
+            <div className='h-full w-full p-8'>
+              <ScrollArea className='h-[calc(100vh-200px)] pr-10'>
+                {mode !== 'preview' && renderContent()}
+              </ScrollArea>
+            </div>
+          </ResizablePanel>
+          <ResizablePanel defaultSize={45} minSize={45}>
+            <PdfPreview />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
+
+      {/* Mobile Layout */}
+      <div className='block h-full md:hidden'>
+        <div className='h-full w-full rounded-lg border'>
+          <div className='h-full w-full p-4'>
+            <ScrollArea className='h-[calc(100vh-150px)]'>
+              {renderContent()}
             </ScrollArea>
           </div>
-        </ResizablePanel>
-        <ResizablePanel defaultSize={45} minSize={45}>
-          <div className='relative flex h-full justify-center bg-accent'>
-            <div className='absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 scale-90'>
-              <PdfRenderer
-                key={JSON.stringify(formData)}
-                formData={formData}
-                templateId={selectedTemplate}
-              />
-            </div>
-          </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+        </div>
+      </div>
     </div>
   );
 }

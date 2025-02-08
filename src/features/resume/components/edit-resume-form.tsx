@@ -1,24 +1,19 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, UseFormReturn } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
-import {
-  type TResumeEditFormValues,
-  resumeEditFormSchema
-} from '@/features/resume/utils/form-schema';
-import { useEffect } from 'react';
-import { PersonalDetails } from './personal-details';
-import { WorkExperience } from './work-experience';
+import { type TResumeEditFormValues } from '@/features/resume/utils/form-schema';
+import { FolderSyncIcon } from 'lucide-react';
+import { UseFormReturn } from 'react-hook-form';
+import { toast } from 'sonner';
+import { useUploadPreviewImage } from '../api';
+import { generatePreviewImage } from '../utils/preview-generator';
 import { Education } from './education';
+import { Languages } from './languages';
+import { PersonalDetails } from './personal-details';
 import { Skills } from './skills';
 import { Tools } from './tools';
-import { Languages } from './languages';
-import { generatePreviewImage } from '../utils/preview-generator';
-import { FolderSyncIcon } from 'lucide-react';
-import { useUploadPreviewImage } from '../api';
-import { toast } from 'sonner';
+import { WorkExperience } from './work-experience';
 
 interface EditResumeFormProps {
   form: UseFormReturn<TResumeEditFormValues, any, undefined>;
@@ -28,7 +23,7 @@ export const EditResumeForm = ({ form }: EditResumeFormProps) => {
   const { mutate: uploadPreviewImage, isPending: isLoading } =
     useUploadPreviewImage();
 
-  const handleSyncPreview = async () => {
+  const handleResumeSnapShot = async () => {
     try {
       const pdfElement = document.getElementById('resume-pdf-preview');
       if (!pdfElement) return;
@@ -72,7 +67,7 @@ export const EditResumeForm = ({ form }: EditResumeFormProps) => {
           <Button
             type='button'
             variant='outline'
-            onClick={handleSyncPreview}
+            onClick={handleResumeSnapShot}
             disabled={isLoading}
             className='gap-2'
           >
