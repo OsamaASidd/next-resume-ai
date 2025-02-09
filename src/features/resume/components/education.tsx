@@ -20,7 +20,7 @@ interface EducationProps {
 export const Education = ({ control }: EducationProps) => {
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'education'
+    name: 'educations'
   });
 
   return (
@@ -37,9 +37,8 @@ export const Education = ({ control }: EducationProps) => {
               degree: '',
               field: '',
               description: '',
-              start_date: '',
-              end_date: '',
-              country: '',
+              startDate: '',
+              endDate: '',
               city: ''
             })
           }
@@ -65,7 +64,7 @@ export const Education = ({ control }: EducationProps) => {
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
             <FormField
               control={control}
-              name={`education.${index}.school`}
+              name={`educations.${index}.school`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>School/University</FormLabel>
@@ -79,7 +78,7 @@ export const Education = ({ control }: EducationProps) => {
 
             <FormField
               control={control}
-              name={`education.${index}.degree`}
+              name={`educations.${index}.degree`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Degree</FormLabel>
@@ -93,7 +92,7 @@ export const Education = ({ control }: EducationProps) => {
 
             <FormField
               control={control}
-              name={`education.${index}.field`}
+              name={`educations.${index}.field`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Field of Study</FormLabel>
@@ -107,7 +106,7 @@ export const Education = ({ control }: EducationProps) => {
 
             <FormField
               control={control}
-              name={`education.${index}.start_date`}
+              name={`educations.${index}.startDate`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Start Date</FormLabel>
@@ -121,7 +120,7 @@ export const Education = ({ control }: EducationProps) => {
 
             <FormField
               control={control}
-              name={`education.${index}.end_date`}
+              name={`educations.${index}.endDate`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>End Date</FormLabel>
@@ -135,21 +134,7 @@ export const Education = ({ control }: EducationProps) => {
 
             <FormField
               control={control}
-              name={`education.${index}.country`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={control}
-              name={`education.${index}.city`}
+              name={`educations.${index}.city`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>City</FormLabel>
@@ -164,7 +149,7 @@ export const Education = ({ control }: EducationProps) => {
 
           <FormField
             control={control}
-            name={`education.${index}.description`}
+            name={`educations.${index}.description`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>

@@ -47,11 +47,14 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
     personal_details:
       resume?.personalDetails as TResumeEditFormValues['personal_details'],
     jobs: resume?.jobs as TResumeEditFormValues['jobs'],
-    education: resume?.education as TResumeEditFormValues['education'],
+    educations: resume?.education as TResumeEditFormValues['educations'],
     skills: resume?.skills as TResumeEditFormValues['skills'],
     tools: resume?.tools as TResumeEditFormValues['tools'],
     languages: resume?.languages as TResumeEditFormValues['languages']
   };
+
+  console.log('resume data', resume);
+  console.log('intialdata', initalData);
 
   const form = useForm<TResumeEditFormValues>({
     resolver: zodResolver(resumeEditFormSchema),

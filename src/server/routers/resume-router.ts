@@ -49,7 +49,11 @@ export const resumeRouter = j.router({
 
       // Get profile data
       const profile = await db.query.profiles.findFirst({
-        where: eq(profiles.id, profileId)
+        where: eq(profiles.id, profileId),
+        with: {
+          jobs: true,
+          educations: true
+        }
       });
 
       if (!profile) {
@@ -73,8 +77,8 @@ export const resumeRouter = j.router({
         .update(resumes)
         .set({
           personalDetails: aiGeneratedContent.personal_details,
-          jobs: aiGeneratedContent.jobs,
-          education: aiGeneratedContent.education,
+          jobs: profile.jobs,
+          education: profile.educations,
           skills: aiGeneratedContent.skills,
           tools: aiGeneratedContent.tools,
           languages: aiGeneratedContent.languages,

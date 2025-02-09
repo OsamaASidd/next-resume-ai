@@ -33,12 +33,11 @@ export function WorkExperience({ control }: WorkExperienceProps) {
           size='sm'
           onClick={() =>
             append({
-              job_title: '',
+              jobTitle: '',
               employer: '',
               description: '',
-              start_date: '',
-              end_date: '',
-              country: '',
+              startDate: '',
+              endDate: '',
               city: ''
             })
           }
@@ -64,7 +63,7 @@ export function WorkExperience({ control }: WorkExperienceProps) {
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
             <FormField
               control={control}
-              name={`jobs.${index}.job_title`}
+              name={`jobs.${index}.jobTitle`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Job Title</FormLabel>
@@ -92,7 +91,7 @@ export function WorkExperience({ control }: WorkExperienceProps) {
 
             <FormField
               control={control}
-              name={`jobs.${index}.start_date`}
+              name={`jobs.${index}.startDate`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Start Date</FormLabel>
@@ -106,26 +105,12 @@ export function WorkExperience({ control }: WorkExperienceProps) {
 
             <FormField
               control={control}
-              name={`jobs.${index}.end_date`}
+              name={`jobs.${index}.endDate`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>End Date</FormLabel>
                   <FormControl>
                     <Input type='date' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={control}
-              name={`jobs.${index}.country`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

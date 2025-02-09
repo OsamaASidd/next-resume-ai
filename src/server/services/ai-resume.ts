@@ -77,6 +77,24 @@ export async function generateResumeContent(
         : 'No work experience recorded'
     }
 
+    Education:
+    ${
+      profile?.educations && profile?.educations.length > 0
+        ? profile?.educations
+            .map((education) => {
+              // Safely handle potential undefined or null values
+              return `
+        School: ${education.school || 'Not Specified'}
+        Degree: ${education.degree || 'Not Specified'}
+        Field: ${education.field || 'Not Specified'}
+        Location: ${education.city || 'Not Specified'}
+        Duration: ${education.startDate || 'N/A'} to ${education.endDate || 'Present'}
+      `;
+            })
+            .join('\n')
+        : 'No education recorded'
+    }
+
     Instructions:
     1. Create a compelling professional summary (3-5 sentences) that:
        - Highlights the candidate's years of experience

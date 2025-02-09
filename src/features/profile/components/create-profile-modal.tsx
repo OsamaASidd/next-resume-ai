@@ -6,7 +6,7 @@ import { ProfileWithRelations } from '@/server/routers/profile-router';
 import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 import { TProfileFormValues } from '../utils/form-schema';
-import { CreateProfileForm } from './create-profile-form';
+import CreateProfileForm from './create-profile-form';
 
 interface CreateProfileModalProps {
   profile: ProfileWithRelations;

@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
+import { useRouter } from 'next/navigation';
 
 interface ModeToggleProps {
   mode: 'edit' | 'template' | 'preview' | 'zen';
@@ -12,6 +13,8 @@ export function ModeToggle({
   onModeChange,
   isMobile = false
 }: ModeToggleProps) {
+  const router = useRouter();
+
   const modes = isMobile
     ? [
         { value: 'edit', label: 'Form' },
@@ -25,6 +28,14 @@ export function ModeToggle({
 
   return (
     <div className='mb-4 flex space-x-2'>
+      <Button
+        variant='outline'
+        onClick={() => router.back()}
+        size={isMobile ? 'sm' : 'default'}
+      >
+        <Icons.chevronLeft className='mr-2 h-4 w-4' /> Back
+      </Button>
+
       {modes.map(({ value, label }) => (
         <Button
           key={value}
