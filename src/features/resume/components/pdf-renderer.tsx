@@ -67,7 +67,7 @@ const PdfRenderer = memo(
     }
 
     return (
-      <div className='relative min-h-[500px]'>
+      <div className='relative'>
         <BlobProvider
           key={`${templateId}-${JSON.stringify(formData)}`}
           document={<Template formData={formData} />}
@@ -83,25 +83,6 @@ const PdfRenderer = memo(
 
             return (
               <div className='space-y-4'>
-                <div id='resume-pdf-preview'>
-                  <Document
-                    loading={<FallBackLoader />}
-                    file={pdfUrl}
-                    onLoadSuccess={onDocumentLoadSuccess}
-                    error={<div>Failed to load PDF</div>}
-                    onLoadError={(error) => {
-                      console.error('Error loading PDF:', error);
-                    }}
-                  >
-                    <Page
-                      key={`page-${pageNumber}`}
-                      pageNumber={pageNumber}
-                      loading={<FallBackLoader />}
-                      renderTextLayer={false}
-                      renderAnnotationLayer={false}
-                    />
-                  </Document>
-                </div>
                 <div className=''>
                   {numPages && numPages > 0 && (
                     <div className='flex items-center justify-between'>
@@ -139,6 +120,25 @@ const PdfRenderer = memo(
                       )}
                     </div>
                   )}
+                </div>
+                <div id='resume-pdf-preview'>
+                  <Document
+                    loading={<FallBackLoader />}
+                    file={pdfUrl}
+                    onLoadSuccess={onDocumentLoadSuccess}
+                    error={<div>Failed to load PDF</div>}
+                    onLoadError={(error) => {
+                      console.error('Error loading PDF:', error);
+                    }}
+                  >
+                    <Page
+                      key={`page-${pageNumber}`}
+                      pageNumber={pageNumber}
+                      loading={<FallBackLoader />}
+                      renderTextLayer={false}
+                      renderAnnotationLayer={false}
+                    />
+                  </Document>
                 </div>
               </div>
             );

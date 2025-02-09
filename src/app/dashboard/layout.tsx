@@ -4,6 +4,7 @@ import Header from '@/components/layout/header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
+import LayoutWrapper from './layout.wrapper';
 
 export const metadata: Metadata = {
   title: 'Next Shadcn Dashboard Starter',
@@ -23,10 +24,10 @@ export default async function DashboardLayout({
       <SidebarProvider defaultOpen={defaultOpen}>
         <AppSidebar />
         <SidebarInset>
-          <Header />
-          {/* page main content */}
-          {children}
-          {/* page main content ends */}
+          <LayoutWrapper>
+            {/* page main content */}
+            {children}
+          </LayoutWrapper>
         </SidebarInset>
       </SidebarProvider>
     </KBar>

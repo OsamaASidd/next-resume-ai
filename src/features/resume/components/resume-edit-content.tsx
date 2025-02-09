@@ -5,7 +5,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup
 } from '@/components/ui/resizable';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { EditResumeForm } from '@/features/resume/components/edit-resume-form';
 import { ModeToggle } from '@/features/resume/components/mode-toggle';
 import PdfRenderer from '@/features/resume/components/pdf-renderer';
@@ -28,6 +28,7 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
   const [mode, setMode] = useState<'edit' | 'template' | 'preview' | 'zen'>(
     'edit'
   );
+
   const {
     selectedTemplate,
     currentTemplate,
@@ -98,7 +99,7 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
 
   // Extract PDF preview component
   const PdfPreview = () => (
-    <div className='relative flex h-full justify-center bg-accent'>
+    <div className='relative flex h-full justify-center bg-accent pt-2'>
       <PdfRenderer
         key={JSON.stringify(formData)}
         formData={formData}
@@ -110,9 +111,7 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
   return (
     <div className='h-full p-4'>
       {/* Mode Toggle */}
-      <div className='hidden md:block'>
-        <ModeToggle mode={mode} onModeChange={setMode} />
-      </div>
+
       <div className='block md:hidden'>
         <ModeToggle mode={mode} onModeChange={setMode} isMobile={true} />
       </div>
@@ -125,15 +124,18 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
         >
           <ResizablePanel defaultSize={35}>
             <div className='h-full w-full p-8'>
-              <ScrollArea className='h-[calc(100vh-200px)] pr-10'>
+              <div className='hidden md:block'>
+                <ModeToggle mode={mode} onModeChange={setMode} />
+              </div>
+              <ScrollArea className='h-[calc(100vh-120px)] pr-10'>
                 {mode !== 'preview' && renderContent()}
               </ScrollArea>
             </div>
           </ResizablePanel>
           <ResizableHandle />
           <ResizablePanel defaultSize={65} minSize={45}>
-            <div className='h-full w-full p-8'>
-              <ScrollArea className='h-[calc(100vh-200px)] pr-10'>
+            <div className='h-full w-full'>
+              <ScrollArea className='h-[calc(100vh)]'>
                 <PdfPreview />
               </ScrollArea>
             </div>
