@@ -8,14 +8,23 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ProfileWithRelations } from '@/server/routers/profile-router';
 import { useState } from 'react';
 import { useProfiles } from '../api';
-import { ProfileFormValues } from '../utils/form-schema';
 import CreateProfileModal from './create-profile-modal';
+import { PlusCircle } from 'lucide-react';
 
 export default function ProfileList() {
-  const [selectedProfile, setSelectedProfile] =
-    useState<ProfileFormValues | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<
+    ProfileWithRelations | undefined
+  >(undefined);
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const onChange = (open: boolean) => {
+    setIsOpen(open);
+  };
+
   const { data: profiles, isLoading } = useProfiles();
 
   if (isLoading) {
@@ -25,11 +34,24 @@ export default function ProfileList() {
   return (
     <>
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-        <Card className='flex cursor-pointer flex-col items-center justify-center border-2 border-dashed bg-gradient-to-br from-sidebar/60 to-sidebar p-8 hover:border-primary'>
-          <CreateProfileModal />
-          <p className='mt-2 text-sm text-muted-foreground'>
-            Create new profile
-          </p>
+        <Card
+          onClick={() => {
+            setSelectedProfile(undefined);
+            onChange(true);
+          }}
+          className='flex cursor-pointer flex-col items-center justify-center border-2 border-dashed bg-gradient-to-br from-sidebar/60 to-sidebar p-8 hover:border-primary'
+        >
+          <CreateProfileModal
+            onChange={onChange}
+            isOpen={isOpen}
+            profile={selectedProfile as ProfileWithRelations}
+          />
+          <div className='flex h-full flex-col items-center justify-center'>
+            <PlusCircle className='mx-auto h-10 w-10' />
+            <p className='mt-2 text-center text-sm text-muted-foreground'>
+              Create new profile
+            </p>
+          </div>
         </Card>
 
         {profiles?.map((profile) => (
@@ -38,6 +60,7 @@ export default function ProfileList() {
             className='cursor-pointer bg-gradient-to-br from-sidebar/60 to-sidebar transition-all hover:border-primary'
             onClick={() => {
               setSelectedProfile(profile as any);
+              onChange(true);
             }}
           >
             <CardHeader>
@@ -58,7 +81,7 @@ export default function ProfileList() {
                 </div>
                 <div className='text-sm'>
                   <span className='font-medium'>Experience:</span>{' '}
-                  {profile.jobs.length} positions
+                  {profile?.jobs?.length} positions
                 </div>
               </div>
             </CardContent>

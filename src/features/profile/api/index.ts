@@ -1,5 +1,5 @@
 import { client } from '@/lib/client';
-import { ProfileFormValues } from '../utils/form-schema';
+import { TProfileFormValues } from '../utils/form-schema';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const useProfiles = () => {
@@ -15,7 +15,7 @@ export const useProfiles = () => {
 export const useCreateProfile = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: ProfileFormValues) => {
+    mutationFn: async (data: TProfileFormValues) => {
       const response = await client.profile.createProfile.$post(data);
       return await response.json();
     },

@@ -14,12 +14,78 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { useCreateProfile } from '../api';
-import { ProfileFormValues, profileSchema } from '../utils/form-schema';
+import { TProfileFormValues, profileSchema } from '../utils/form-schema';
+import { ProfileWithRelations } from '@/server/routers/profile-router';
 
 interface CreateProfileFormProps {
-  profile?: ProfileFormValues;
+  profile?: ProfileWithRelations;
   closeModal: () => void;
 }
+
+const transformProfileToFormValues = (
+  profile?: ProfileWithRelations
+): TProfileFormValues => {
+  if (!profile) {
+    return {
+      email: 'john.doe@example.com',
+      firstname: 'John',
+      lastname: 'Doe',
+      contactno: '1234567890',
+      country: 'United States',
+      city: 'New York',
+      jobs: [
+        {
+          jobTitle: 'Software Engineer',
+          employer: 'Tech Corp',
+          city: 'New York',
+          startDate: '2020-01-01',
+          endDate: '2023-12-31',
+          description: 'Software development role'
+        }
+      ],
+      educations: [
+        {
+          school: 'University of Tech',
+          degree: 'Bachelor',
+          field: 'Computer Science',
+          city: 'New York',
+          startDate: '2018-09-01',
+          endDate: '2022-06-30',
+          description: 'Completed Bachelors in Computer Science'
+        }
+      ]
+    };
+  }
+
+  return {
+    email: profile.email,
+    firstname: profile.firstname,
+    lastname: profile.lastname,
+    contactno: profile.contactno,
+    country: profile.country,
+    city: profile.city,
+    jobs: profile.jobs.map((job) => ({
+      jobTitle: job.jobTitle || '',
+      employer: job.employer || '',
+      city: job.city || '',
+      startDate: job.startDate || '',
+      endDate: job.endDate || '',
+      description: job.description || '',
+      id: job.id
+    })),
+    educations:
+      profile.educations?.map((edu) => ({
+        school: edu.school || '',
+        degree: edu.degree || '',
+        field: edu.field || '',
+        description: edu.description || '',
+        startDate: edu.startDate || '',
+        endDate: edu.endDate || '',
+        city: edu.city || '',
+        id: edu.id
+      })) || []
+  };
+};
 
 export function CreateProfileForm({
   profile,
@@ -29,31 +95,14 @@ export function CreateProfileForm({
     useCreateProfile();
   //   const updateProfile = useUpdateProfile();
   const isPending = isCreating;
-  const form = useForm<ProfileFormValues>({
+  const form = useForm<TProfileFormValues>({
     resolver: zodResolver(profileSchema),
-    defaultValues: profile || {
-      email: 'john.doe@example.com',
-      firstname: 'John',
-      lastname: 'Doe',
-      contactno: 1234567890,
-      country: 'United States',
-      city: 'New York',
-      jobs: [
-        {
-          jobcountry: 'United States',
-          jobcity: 'New York',
-          jobtitle: 'Software Engineer',
-          employer: 'Tech Corp',
-          startdate: '2020-01-01',
-          enddate: '2023-12-31'
-        }
-      ]
-    }
+    values: transformProfileToFormValues(profile)
   });
 
   console.log('form errors', form.formState.errors);
 
-  const handleSubmit = async (data: ProfileFormValues) => {
+  const handleSubmit = async (data: TProfileFormValues) => {
     await createProfile(data, {
       onSuccess: () => {
         toast.success(

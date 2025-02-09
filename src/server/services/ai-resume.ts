@@ -6,6 +6,7 @@ import { AIChatSession } from './google-ai-model';
 import { resumeEditFormSchema } from '@/features/resume/utils/form-schema';
 import { ZodObject } from 'zod';
 import { Profile } from '@/server/db/schema/profiles';
+import { ProfileWithRelations } from '../routers/profile-router';
 
 function getSchemaStructure(schema: ZodObject<any>) {
   const shape = schema.shape;
@@ -39,7 +40,7 @@ export async function generateResumeContent(
     employer: string;
     jd_post_details: string;
   },
-  profile: Profile
+  profile: ProfileWithRelations
 ): Promise<TResumeEditFormValues> {
   const schemaStructure = getSchemaStructure(resumeEditFormSchema);
 
@@ -60,17 +61,21 @@ export async function generateResumeContent(
     Location: ${profile.city}, ${profile.country}
 
     Work History:
-    ${profile.jobs
-      .map((jobStr) => {
-        const job = JSON.parse(jobStr);
-        return `
-      - Position: ${job.jobtitle}
-        Company: ${job.employer}
-        Location: ${job.jobcity}, ${job.jobcountry}
-        Duration: ${job.startdate} to ${job.enddate}
+    ${
+      profile?.jobs && profile?.jobs.length > 0
+        ? profile?.jobs
+            .map((job) => {
+              // Safely handle potential undefined or null values
+              return `
+      - Position: ${job.jobTitle || 'Not Specified'}
+        Company: ${job.employer || 'Not Specified'}
+        Location: ${job.city || 'Not Specified'}
+        Duration: ${job.startDate || 'N/A'} to ${job.endDate || 'Present'}
       `;
-      })
-      .join('\n')}
+            })
+            .join('\n')
+        : 'No work experience recorded'
+    }
 
     Instructions:
     1. Create a compelling professional summary (3-5 sentences) that:

@@ -2,24 +2,23 @@
 
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/scrollable-dialog';
+import { ProfileWithRelations } from '@/server/routers/profile-router';
 import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
-import { ProfileFormValues } from '../utils/form-schema';
+import { TProfileFormValues } from '../utils/form-schema';
 import { CreateProfileForm } from './create-profile-form';
 
 interface CreateProfileModalProps {
-  profile?: ProfileFormValues;
+  profile: ProfileWithRelations;
+  isOpen: boolean;
+  onChange: (open: boolean) => void;
 }
 
 export default function CreateProfileModal({
-  profile
+  profile,
+  isOpen,
+  onChange
 }: CreateProfileModalProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const onChange = (open: boolean) => {
-    setIsOpen(open);
-  };
-
   return (
     <Modal
       title={profile ? 'Edit Profile' : 'Create New Profile'}
@@ -28,20 +27,8 @@ export default function CreateProfileModal({
       }
       open={isOpen}
       onOpenChange={onChange}
-      trigger={
-        <Button
-          variant='ghost'
-          className='h-20 w-20'
-          onClick={() => setIsOpen(true)}
-        >
-          <PlusCircle className='h-10 w-10' />
-        </Button>
-      }
     >
-      <CreateProfileForm
-        profile={profile}
-        closeModal={() => setIsOpen(false)}
-      />
+      <CreateProfileForm profile={profile} closeModal={() => onChange(false)} />
     </Modal>
   );
 }
