@@ -18,9 +18,13 @@ import { ProfileFormValues, profileSchema } from '../utils/form-schema';
 
 interface CreateProfileFormProps {
   profile?: ProfileFormValues;
+  closeModal: () => void;
 }
 
-export function CreateProfileForm({ profile }: CreateProfileFormProps) {
+export function CreateProfileForm({
+  profile,
+  closeModal
+}: CreateProfileFormProps) {
   const { mutateAsync: createProfile, isPending: isCreating } =
     useCreateProfile();
   //   const updateProfile = useUpdateProfile();
@@ -57,6 +61,7 @@ export function CreateProfileForm({ profile }: CreateProfileFormProps) {
             ? 'Profile updated successfully'
             : 'Profile created successfully'
         );
+        closeModal();
       },
       onError: (error) => {
         toast.error('Something went wrong');

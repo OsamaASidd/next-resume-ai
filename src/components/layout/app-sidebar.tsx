@@ -37,8 +37,7 @@ import {
   Bell,
   ChevronRight,
   ChevronsUpDown,
-  CreditCard,
-  GalleryVerticalEnd
+  CreditCard
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -55,7 +54,7 @@ type UserInfoProps = ReturnType<typeof useUser>['user'];
 const UserInfo = ({ user }: { user: UserInfoProps }) => (
   <div className='flex items-center gap-2'>
     <Avatar className='h-8 w-8 rounded-lg'>
-      <AvatarImage src={user?.imageUrl || ''} alt={user?.firstName || ''} />
+      <AvatarImage src={user?.imageUrl ?? ''} alt={user?.firstName || ''} />
       <AvatarFallback className='rounded-lg'>
         {user?.firstName?.slice(0, 2)?.toUpperCase() || 'CN'}
       </AvatarFallback>
@@ -191,7 +190,7 @@ export default function AppSidebar() {
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <SignOutButton redirectUrl='/sign-in'>
+                  <SignOutButton signOutOptions={{ redirectUrl: '/sign-in' }}>
                     <div className='flex w-full items-center'>Log out</div>
                   </SignOutButton>
                 </DropdownMenuItem>

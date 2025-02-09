@@ -86,6 +86,14 @@ export const EditResumeForm = ({ form }: EditResumeFormProps) => {
         <Skills control={form.control} />
         <Tools control={form.control} />
         <Languages control={form.control} />
+        <Button
+          type='submit'
+          disabled={isLoading || isUpdating}
+          className='w-full gap-2'
+        >
+          <FolderSyncIcon className='h-4 w-4' />
+          {isLoading || isUpdating ? 'Saving...' : 'Sync & Save'}
+        </Button>
       </form>
     </Form>
   );

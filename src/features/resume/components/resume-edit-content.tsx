@@ -123,7 +123,7 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
           direction='horizontal'
           className='h-full w-full rounded-lg border'
         >
-          <ResizablePanel defaultSize={45}>
+          <ResizablePanel defaultSize={35}>
             <div className='h-full w-full p-8'>
               <ScrollArea className='h-[calc(100vh-200px)] pr-10'>
                 {mode !== 'preview' && renderContent()}
@@ -131,7 +131,7 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
             </div>
           </ResizablePanel>
           <ResizableHandle />
-          <ResizablePanel defaultSize={55} minSize={55}>
+          <ResizablePanel defaultSize={65} minSize={45}>
             <div className='h-full w-full p-8'>
               <ScrollArea className='h-[calc(100vh-200px)] pr-10'>
                 <PdfPreview />

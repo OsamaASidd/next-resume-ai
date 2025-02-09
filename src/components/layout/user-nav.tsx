@@ -59,7 +59,7 @@ export function UserNav() {
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <SignOutButton>
+            <SignOutButton signOutOptions={{ redirectUrl: '/sign-in' }}>
               <div className='flex w-full items-center justify-between'>
                 Log out
                 <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

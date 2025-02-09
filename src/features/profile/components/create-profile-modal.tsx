@@ -38,7 +38,10 @@ export default function CreateProfileModal({
         </Button>
       }
     >
-      <CreateProfileForm profile={profile} />
+      <CreateProfileForm
+        profile={profile}
+        closeModal={() => setIsOpen(false)}
+      />
     </Modal>
   );
 }

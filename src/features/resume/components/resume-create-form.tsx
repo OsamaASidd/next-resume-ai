@@ -116,9 +116,13 @@ export function ResumeCreateForm({ profileId }: ResumeCreateFormProps) {
           />
         </div>
 
-        <UiButton type='submit' className='w-full' disabled={isPending}>
-          {isPending ? 'Creating...' : 'Create Resume'}
-        </UiButton>
+        {/* center this button
+         */}
+        <div className='flex items-center justify-center'>
+          <UiButton type='submit' disabled={isPending}>
+            {isPending ? 'Creating...' : 'Create Resume'}
+          </UiButton>
+        </div>
       </form>
     </Form>
   );
