@@ -103,11 +103,13 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
   // Extract PDF preview component
   const PdfPreview = () => (
     <div className='relative flex h-full justify-center bg-accent pt-2'>
-      <PdfRenderer
-        key={JSON.stringify(formData)}
-        formData={formData}
-        templateId={selectedTemplate}
-      />
+      <div className='scale-90'>
+        <PdfRenderer
+          key={JSON.stringify(formData)}
+          formData={formData}
+          templateId={selectedTemplate}
+        />
+      </div>
     </div>
   );
 
@@ -125,7 +127,7 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
           direction='horizontal'
           className='h-full w-full rounded-lg border'
         >
-          <ResizablePanel defaultSize={35}>
+          <ResizablePanel defaultSize={45}>
             <div className='h-full w-full p-8'>
               <div className='hidden md:block'>
                 <ModeToggle mode={mode} onModeChange={setMode} />
@@ -136,7 +138,7 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
             </div>
           </ResizablePanel>
           <ResizableHandle />
-          <ResizablePanel defaultSize={65} minSize={45}>
+          <ResizablePanel defaultSize={55} minSize={45}>
             <div className='h-full w-full'>
               <ScrollArea className='h-[calc(100vh)]'>
                 <PdfPreview />
