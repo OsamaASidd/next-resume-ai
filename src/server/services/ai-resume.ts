@@ -131,7 +131,7 @@ export async function generateResumeContent(
         summary: content.personal_details?.summary || ''
       },
       jobs: content.jobs || [],
-      education: content.education || [],
+      educations: content.educations || [],
       skills: content.skills || [],
       tools: content.tools || [],
       languages: content.languages || []
