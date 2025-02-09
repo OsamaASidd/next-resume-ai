@@ -125,16 +125,16 @@ export default function ResumeTemplate({ formData }: TResumeTemplateProps) {
           <View style={tw('flex flex-col')}>
             <Text style={tw('text-muted text-2xl font-bold')}>Education</Text>
             <View style={tw('flex flex-col gap-6')}>
-              {formData?.education?.length &&
-                formData?.education?.map((edu, index) => (
+              {formData?.educations?.length &&
+                formData?.educations?.map((edu, index) => (
                   <View key={index}>
                     <Text style={tw('font-bold text-lg')}>
                       {edu?.degree ?? 'Degree'} in {edu?.field ?? 'Field'} |{' '}
                       {edu?.school ?? 'School'}
                     </Text>
                     <Text style={tw('font-bold text-lg')}>
-                      {edu?.start_date ?? 'Start Date'} -{' '}
-                      {edu?.end_date ?? 'End Date'}
+                      {edu?.startDate ?? 'Start Date'} -{' '}
+                      {edu?.endDate ?? 'End Date'}
                     </Text>
                     <Text style={tw('text-sm')}>{edu?.description ?? ''}</Text>
                   </View>
@@ -151,12 +151,12 @@ export default function ResumeTemplate({ formData }: TResumeTemplateProps) {
                 formData?.jobs?.map((job, index) => (
                   <View wrap={false} key={index}>
                     <Text style={tw('font-bold text-lg')}>
-                      {job?.job_title ?? 'Job Title'} |{' '}
+                      {job?.jobTitle ?? 'Job Title'} |{' '}
                       {job?.employer ?? 'Employer'}
                     </Text>
                     <Text style={tw('font-bold text-lg')}>
-                      {job?.start_date ?? 'Start Date'} -{' '}
-                      {job?.end_date ?? 'End Date'}
+                      {job?.startDate ?? 'Start Date'} -{' '}
+                      {job?.endDate ?? 'End Date'}
                     </Text>
                     <Text style={tw('text-sm')}>{job?.description ?? ''}</Text>
                   </View>

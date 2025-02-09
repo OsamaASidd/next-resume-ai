@@ -40,7 +40,7 @@ export default function ResumeTemplateThree({
   const hasSkills = formData?.skills?.length ?? 0 > 0;
   const hasTools = formData?.tools?.length ?? 0 > 0;
   const hasLanguages = formData?.languages?.length ?? 0 > 0;
-  const hasEducation = formData?.education?.length ?? 0 > 0;
+  const hasEducation = formData?.educations?.length ?? 0 > 0;
   const hasJobs = formData?.jobs?.length ?? 0 > 0;
   const hasSummary = formData?.personal_details?.summary;
 
@@ -101,12 +101,12 @@ export default function ResumeTemplateThree({
                   {formData?.jobs?.map((job, index) => (
                     <View key={index} wrap={false}>
                       <Text style={tw('font-bold text-primary')}>
-                        {job?.job_title ?? ''}{' '}
+                        {job?.jobTitle ?? ''}{' '}
                         {job?.employer && `| ${job.employer}`}
                       </Text>
-                      {(job?.start_date || job?.end_date) && (
+                      {(job?.startDate || job?.endDate) && (
                         <Text style={tw('text-sm text-muted mb-1')}>
-                          {job?.start_date ?? ''} - {job?.end_date ?? ''}
+                          {job?.startDate ?? ''} - {job?.endDate ?? ''}
                         </Text>
                       )}
                       {job?.description && (
@@ -124,15 +124,15 @@ export default function ResumeTemplateThree({
                   Education
                 </Text>
                 <View style={tw('space-y-4')}>
-                  {formData?.education?.map((edu, index) => (
+                  {formData?.educations?.map((edu, index) => (
                     <View key={index}>
                       <Text style={tw('font-bold text-primary')}>
                         {edu?.degree ?? ''} {edu?.field && `in ${edu.field}`}
                       </Text>
                       <Text style={tw('text-sm text-muted mb-1')}>
                         {edu?.school && `${edu.school}`}
-                        {(edu?.start_date || edu?.end_date) && ' | '}
-                        {edu?.start_date ?? ''} - {edu?.end_date ?? ''}
+                        {(edu?.startDate || edu?.endDate) && ' | '}
+                        {edu?.startDate ?? ''} - {edu?.endDate ?? ''}
                       </Text>
                       {edu?.description && (
                         <Text style={tw('text-sm')}>{edu.description}</Text>

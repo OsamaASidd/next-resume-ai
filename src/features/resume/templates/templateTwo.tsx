@@ -90,11 +90,11 @@ export default function ResumeTemplateTwo({ formData }: TResumeTemplateProps) {
                   formData?.jobs?.map((job, index) => (
                     <View wrap={false} key={index}>
                       <Text style={tw('font-bold')}>
-                        {job?.job_title ?? 'Job Title'}
+                        {job?.jobTitle ?? 'Job Title'}
                       </Text>
                       <Text style={tw('text-sm text-muted')}>
                         {job?.employer ?? 'Employer'} |{' '}
-                        {job?.start_date ?? 'Start'} - {job?.end_date ?? 'End'}
+                        {job?.startDate ?? 'Start'} - {job?.endDate ?? 'End'}
                       </Text>
                       <Text style={tw('text-sm mt-1')}>
                         {job?.description ?? ''}
@@ -110,15 +110,15 @@ export default function ResumeTemplateTwo({ formData }: TResumeTemplateProps) {
                 Education
               </Text>
               <View style={tw('flex flex-col gap-4')}>
-                {formData?.education?.length &&
-                  formData?.education?.map((edu, index) => (
+                {formData?.educations?.length &&
+                  formData?.educations?.map((edu, index) => (
                     <View key={index}>
                       <Text style={tw('font-bold')}>
                         {edu?.degree ?? 'Degree'} in {edu?.field ?? 'Field'}
                       </Text>
                       <Text style={tw('text-sm text-muted')}>
-                        {edu?.school ?? 'School'} | {edu?.start_date ?? 'Start'}{' '}
-                        - {edu?.end_date ?? 'End'}
+                        {edu?.school ?? 'School'} | {edu?.startDate ?? 'Start'}{' '}
+                        - {edu?.endDate ?? 'End'}
                       </Text>
                       <Text style={tw('text-sm mt-1')}>
                         {edu?.description ?? ''}

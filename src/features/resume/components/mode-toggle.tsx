@@ -30,10 +30,10 @@ export function ModeToggle({
     <div className='mb-4 flex space-x-2'>
       <Button
         variant='outline'
-        onClick={() => router.back()}
+        onClick={() => router.push('/dashboard/resume')}
         size={isMobile ? 'sm' : 'default'}
       >
-        <Icons.chevronLeft className='mr-2 h-4 w-4' /> Back
+        <Icons.chevronLeft className='mr-2 h-4 w-4' /> Exit
       </Button>
 
       {modes.map(({ value, label }) => (

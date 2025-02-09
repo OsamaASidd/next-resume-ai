@@ -37,7 +37,7 @@ export default function TemplateFour({ formData }: TResumeTemplateProps) {
   const hasSkills = formData?.skills?.length ?? 0 > 0;
   const hasJobs = formData?.jobs?.length ?? 0 > 0;
   const hasTools = formData?.tools?.length ?? 0 > 0;
-  const hasEducation = formData?.education?.length ?? 0 > 0;
+  const hasEducation = formData?.educations?.length ?? 0 > 0;
 
   return (
     <Document>
@@ -98,11 +98,11 @@ export default function TemplateFour({ formData }: TResumeTemplateProps) {
                     {job?.employer ?? ''}
                   </Text>
                   <Text style={tw('text-sm text-accent')}>
-                    {job?.start_date ?? ''} - {job?.end_date ?? ''}
+                    {job?.startDate ?? ''} - {job?.endDate ?? ''}
                   </Text>
                 </View>
                 <Text style={tw('text-sm font-bold mb-1')}>
-                  {job?.job_title ?? ''}
+                  {job?.jobTitle ?? ''}
                 </Text>
                 {job?.description && <BulletPoint text={job.description} />}
               </View>
@@ -129,15 +129,15 @@ export default function TemplateFour({ formData }: TResumeTemplateProps) {
         {hasEducation && (
           <View style={tw('mb-6')}>
             <SectionTitle>Education</SectionTitle>
-            {formData?.education?.map((edu, index) => (
+            {formData?.educations?.map((edu, index) => (
               <View key={index} style={tw('mb-3')}>
                 <View style={tw('flex flex-row justify-between mb-1')}>
                   <Text style={tw('font-bold text-sm')}>
                     {edu?.degree ?? ''} {edu?.field && `in ${edu.field}`}
                   </Text>
-                  {(edu?.start_date || edu?.end_date) && (
+                  {(edu?.startDate || edu?.endDate) && (
                     <Text style={tw('text-sm text-accent')}>
-                      {edu?.start_date ?? ''} - {edu?.end_date ?? ''}
+                      {edu?.startDate ?? ''} - {edu?.endDate ?? ''}
                     </Text>
                   )}
                 </View>
