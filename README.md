@@ -1,56 +1,68 @@
-# Next Resume ✨  
-*AI-Powered, Privacy-First Resume Builder*  
-
-[![Next.js](https://img.shields.io/badge/Next.js-15-blue?logo=next.js)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-%2361DAFB?logo=react)](https://react.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/9113740/201498864-2a900c64-d88f-4ed4-b5cf-770bcb57e1f5.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/9113740/201498152-b171abb8-9225-487a-821c-6ff49ee48579.png">
+</picture>
 
 <div align="center">
-  <img src="your-demo-gif-url-here" width="800" alt="ResumeCraft Demo">
+  <h1>Next.js AI Resume Builder</h1>
+  <p>Modern resume builder with AI-powered content generation and multiple template designs</p>
 </div>
 
-## 🚀 Features  
-- **AI-Powered Tailoring**  
-  Paste a job description → Get a resume optimized for ATS and human readers.  
+## 🚀 Tech Stack
 
-- **Multi-Profile System**  
-  Create different profiles (e.g., "Frontend Dev", "Fullstack Engineer").  
+- **Framework:** [Next.js 15](https://nextjs.org/) with React 19
+- **Authentication:** [Clerk](https://clerk.com/)
+- **PDF Generation:** [@react-pdf/renderer](https://react-pdf.org/)
+- **AI Integration:** [Google AI (Gemini)](https://ai.google.dev/)
+- **Database:**
+  - [Drizzle ORM](https://orm.drizzle.team/)
+  - [Neon Database](https://neon.tech/)
+- **Styling:**
+  - [Tailwind CSS](https://tailwindcss.com)
+  - [Shadcn UI](https://ui.shadcn.com)
+- **Forms & Validation:**
+  - [React Hook Form](https://react-hook-form.com/)
+  - [Zod](https://zod.dev)
 
-- **Client-Side Magic**  
-  PDF generation happens in your browser – no data leaves your device.  
+## ✨ Key Features
 
-- **Smart Sync**  
-  Clerk authentication + PostgreSQL backend keeps your profiles secure and synced.  
+- 🤖 AI-powered resume content generation
+- 📝 Multiple professional resume templates
+- 🎨 Real-time PDF preview
+- 📱 Responsive split-pane editor
+- 👤 Profile-based resume management
+- 🔄 Multi-step resume creation flow
+- 📋 Comprehensive resume sections:
+  - Personal Details
+  - Work Experience
+  - Education
+  - Skills
+  - Tools
+  - Languages
+- 💾 Auto-save functionality
+- 📤 Export to PDF
+- 🌓 Dark/Light mode
 
-- **Stepper Workflow**  
-  Guided process: Pick profile → Add job details → AI magic → Download PDF.  
+## Getting Started
 
-## 🔧 Tech Stack  
-![Tech Stack](https://skillicons.dev/icons?i=nextjs,react,typescript,tailwind,postgres,nodejs,openai)  
+> [!NOTE]  
+> We are using **Next 15** with **React 19**, follow these steps:
 
-| Component       | Technology                          |
-|-----------------|-------------------------------------|
-| Frontend        | Next.js 13, React 18, React PDF     |
-| Authentication  | Clerk                               |
-| Backend         | Hono (Edge-ready), PostgreSQL       |
-| AI Engine       | OpenAI GPT-3.5/4                    |
-| Styling         | Tailwind CSS                        |
+Clone the repo:
 
-## ⚡ Quick Start  
+```
+git clone https://github.com/Kiranism/next-shadcn-dashboard-starter.git
+```
 
-### Prerequisites  
-- Node.js 18+  
-- PostgreSQL  
-- OpenAI API Key  
+- `pnpm install` ( we have legacy-peer-deps=true added in the .npmrc)
+- Create a `.env.local` file by copying the example environment file:
+  `cp env.example.txt .env.local`
+- Add the required environment variables to the `.env.local` file.
+- `pnpm run dev`
 
-### Installation  
-```bash
-# Clone repo
-git clone https://github.com/yourusername/resumecraft.git
+You should now be able to access the application at http://localhost:3000.
 
-# Install dependencies
-cd resumecraft
-pnpm install
+> [!WARNING]
+> After cloning or forking the repository, be cautious when pulling or syncing with the latest changes, as this may result in breaking conflicts.
 
-# Set up environment variables
-cp .env.example .env.local
+Cheers! 🥂
