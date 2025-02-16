@@ -42,7 +42,7 @@ export default async function EditResumePage({
 export async function generateMetadata({
   params
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   return {
     title: 'Edit Resume | Next Resume Builder',
