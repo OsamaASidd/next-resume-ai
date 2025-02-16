@@ -45,7 +45,7 @@ export const profileSchema = z.object({
     .min(3, { message: 'First name must be at least 3 characters' }),
   lastname: z
     .string()
-    .min(3, { message: 'Last name must be at least 3 characters' }),
+    .min(1, { message: 'Last name must be at least 1 characters' }),
   email: z.string().email({ message: 'Please enter a valid email address' }),
   contactno: z.string().refine((val) => /^\d{10}$/.test(val), {
     message: 'Contact number must be 10 digits'

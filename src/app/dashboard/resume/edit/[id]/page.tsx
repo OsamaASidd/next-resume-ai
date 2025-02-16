@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import EditResumeLoading from './loading';
+import { Metadata } from 'next';
 
 export default async function EditResumePage({
   params
@@ -36,4 +37,26 @@ export default async function EditResumePage({
     console.error('Error in EditResumePage:', error);
     throw error;
   }
+}
+
+export async function generateMetadata({
+  params
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  return {
+    title: 'Edit Resume | Next Resume Builder',
+    description:
+      'Edit and customize your resume. Fine-tune content, layout, and styling to create the perfect resume for your job application.',
+    openGraph: {
+      title: 'Edit Resume | Next Resume Builder',
+      description:
+        'Edit and customize your resume. Fine-tune content, layout, and styling to create the perfect resume for your job application.'
+    },
+    twitter: {
+      title: 'Edit Resume | Next Resume Builder',
+      description:
+        'Edit and customize your resume. Fine-tune content, layout, and styling to create the perfect resume for your job application.'
+    }
+  };
 }

@@ -9,6 +9,5 @@ const pool = new Pool({
 
 // Create a Drizzle instance
 export const db = drizzle(pool, {
-  schema,
-  logger: true
+  schema
 });

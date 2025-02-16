@@ -1,3 +1,4 @@
+
 ALTER TABLE "resumes" 
 ADD COLUMN "user_id" text NOT NULL REFERENCES "accounts"("id");
 

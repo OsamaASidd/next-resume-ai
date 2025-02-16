@@ -47,7 +47,7 @@ export async function generateResumeContent(
   console.log('schema strucutre', schemaStructure);
 
   const prompt = `
-    Generate a professional resume based on the following information:
+    Generate a professional resume based on the following information (dont mention the company name this is a job description where we wanted to apply so make it ats friendly by using above or following information):
 
     Target Position:
     Job Title: ${input.jd_job_title}

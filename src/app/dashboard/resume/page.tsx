@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import PageContainer from '@/components/layout/page-container';
 import { Card, CardContent } from '@/components/ui/card';
 import { ProfileFilter } from '@/features/resume/components/profile-filter';
@@ -12,6 +13,22 @@ import Link from 'next/link';
 import { SearchParams } from 'nuqs/server';
 import { Suspense } from 'react';
 import { currentUser } from '@clerk/nextjs/server';
+
+export const metadata: Metadata = {
+  title: 'My Resumes | Next Resume Builder',
+  description:
+    'Create, manage, and customize your resumes. Use AI-powered tools to tailor your resume for specific job descriptions.',
+  openGraph: {
+    title: 'My Resumes | Next Resume Builder',
+    description:
+      'Create, manage, and customize your resumes. Use AI-powered tools to tailor your resume for specific job descriptions.'
+  },
+  twitter: {
+    title: 'My Resumes | Next Resume Builder',
+    description:
+      'Create, manage, and customize your resumes. Use AI-powered tools to tailor your resume for specific job descriptions.'
+  }
+};
 
 export default async function ResumePage({
   searchParams

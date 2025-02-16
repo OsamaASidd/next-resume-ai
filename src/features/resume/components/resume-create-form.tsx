@@ -17,22 +17,25 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { useCreateResume } from '../api';
 import { TResumeFormValues, resumeFormSchema } from '../utils/form-schema';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 interface ResumeCreateFormProps {
   profileId: string | null;
 }
 
 export function ResumeCreateForm({ profileId }: ResumeCreateFormProps) {
-  const { mutateAsync: createResume, isPending } = useCreateResume();
+  const { mutateAsync: createResume, isPending: isCreating } =
+    useCreateResume();
   const router = useRouter();
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const form = useForm<TResumeFormValues>({
     resolver: zodResolver(resumeFormSchema),
     defaultValues: {
-      jd_job_title: 'Software Engineer',
-      employer: 'Company Name',
-      jd_post_details:
-        'We are looking for a Software Engineer to join our team. The ideal candidate will have experience with React, TypeScript, and modern web development practices.'
+      jd_job_title: '',
+      employer: '',
+      jd_post_details: ''
     }
   });
 
@@ -45,11 +48,10 @@ export function ResumeCreateForm({ profileId }: ResumeCreateFormProps) {
           ...data,
           profileId
         },
-
         {
-          onSuccess: (data) => {
-            console.log('resume data', data);
+          onSuccess: async (data) => {
             toast.success('Resume created successfully');
+            setIsNavigating(true);
             // @ts-ignore
             router.push(`/dashboard/resume/edit/${data?.id}`);
           },
@@ -116,11 +118,20 @@ export function ResumeCreateForm({ profileId }: ResumeCreateFormProps) {
           />
         </div>
 
-        {/* center this button
-         */}
         <div className='flex items-center justify-center'>
-          <UiButton type='submit' disabled={isPending}>
-            {isPending ? 'Creating...' : 'Create Resume'}
+          <UiButton
+            type='submit'
+            disabled={isCreating || isNavigating}
+            className='min-w-[150px]'
+          >
+            {(isCreating || isNavigating) && (
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+            )}
+            {isCreating
+              ? 'Creating...'
+              : isNavigating
+                ? 'Redirecting...'
+                : 'Create Resume'}
           </UiButton>
         </div>
       </form>

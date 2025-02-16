@@ -1,10 +1,23 @@
+import { Metadata } from 'next';
 import { Suspense } from 'react';
 import ProfileList from '@/features/profile/components/profile-list';
 import PageContainer from '@/components/layout/page-container';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export const metadata = {
-  title: 'Dashboard : Profiles'
+export const metadata: Metadata = {
+  title: 'My Profiles | Next Resume Builder',
+  description:
+    'Manage your professional profiles. Create and customize different profiles for various job types and industries.',
+  openGraph: {
+    title: 'My Profiles | Next Resume Builder',
+    description:
+      'Manage your professional profiles. Create and customize different profiles for various job types and industries.'
+  },
+  twitter: {
+    title: 'My Profiles | Next Resume Builder',
+    description:
+      'Manage your professional profiles. Create and customize different profiles for various job types and industries.'
+  }
 };
 
 export default function ProfilesPage() {
