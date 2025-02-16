@@ -4,7 +4,7 @@
 </picture>
 
 <div align="center">
-  <h1>Next.js AI Resume Builder</h1>
+  <h1>Next Resume Builder</h1>
   <p>Modern resume builder with AI-powered content generation and multiple template designs</p>
 </div>
 
@@ -44,9 +44,6 @@
 - 🌓 Dark/Light mode
 
 ## Getting Started
-
-> [!NOTE]  
-> We are using **Next 15** with **React 19**, follow these steps:
 
 Clone the repo:
 
