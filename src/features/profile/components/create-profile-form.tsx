@@ -1,10 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useForm, useFieldArray, SubmitHandler } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
@@ -13,13 +9,17 @@ import {
   FormLabel,
   FormMessage
 } from '@/components/ui/form';
-import { profileSchema, TProfileFormValues } from '../utils/form-schema';
-import { useCreateProfile } from '../api';
-import { ProfileWithRelations } from '@/server/routers/profile-router';
-import { cn } from '@/lib/utils';
-import { ArrowRight, ArrowLeft, Check, PlusCircle, Trash2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
+import { ProfileWithRelations } from '@/server/routers/profile-router';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowLeft, ArrowRight, Check, PlusCircle, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { useCreateProfile, useUpdateProfile } from '../api';
+import { profileSchema, TProfileFormValues } from '../utils/form-schema';
 
 interface CreateProfileFormProps {
   profile?: ProfileWithRelations;
@@ -31,33 +31,14 @@ const transformProfileToFormValues = (
 ): TProfileFormValues => {
   if (!profile) {
     return {
-      email: 'john.doe@example.com',
-      firstname: 'John',
-      lastname: 'Doe',
-      contactno: '1234567890',
-      country: 'United States',
-      city: 'New York',
-      jobs: [
-        {
-          jobTitle: 'Software Engineer',
-          employer: 'Tech Corp',
-          city: 'New York',
-          startDate: '2020-01-01',
-          endDate: '2023-12-31',
-          description: 'Software development role'
-        }
-      ],
-      educations: [
-        {
-          school: 'University of Tech',
-          degree: 'Bachelor',
-          field: 'Computer Science',
-          city: 'New York',
-          startDate: '2018-09-01',
-          endDate: '2022-06-30',
-          description: 'Completed Bachelors in Computer Science'
-        }
-      ]
+      email: '',
+      firstname: '',
+      lastname: '',
+      contactno: '',
+      country: '',
+      city: '',
+      jobs: [],
+      educations: []
     };
   }
 
@@ -98,7 +79,7 @@ export default function CreateProfileForm({
   const { mutateAsync: createProfile, isPending: isCreating } =
     useCreateProfile();
   const { mutateAsync: updateProfile, isPending: isUpdating } =
-    useCreateProfile();
+    useUpdateProfile();
   const [step, setStep] = useState(1);
   const [isReviewStep, setIsReviewStep] = useState(false);
 
@@ -128,7 +109,7 @@ export default function CreateProfileForm({
   const onSubmit: SubmitHandler<TProfileFormValues> = async (data) => {
     try {
       if (profile) {
-        // await updateProfile({ id: profile.id, ...data });
+        await updateProfile({ id: profile.id, ...data });
         toast.success('Profile updated successfully');
       } else {
         await createProfile(data);

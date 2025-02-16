@@ -1,5 +1,8 @@
 import { client } from '@/lib/client';
-import { TProfileFormValues } from '../utils/form-schema';
+import {
+  TProfileFormValues,
+  TUpdateProfileFormValues
+} from '../utils/form-schema';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const useProfiles = () => {
@@ -20,7 +23,6 @@ export const useCreateProfile = () => {
       return await response.json();
     },
     onSettled: () => {
-      // Invalidate and refetch profiles after successful submission
       queryClient.invalidateQueries({
         queryKey: ['profiles']
       });
@@ -28,23 +30,21 @@ export const useCreateProfile = () => {
   });
 };
 
-// export const useUpdateProfile = () => {
-//   return useMutation({
-//     mutationFn: async ({
-//       id,
-//       data
-//     }: {
-//       id: string;
-//       data: ProfileFormValues;
-//     }) => {
-//       const response = await client.profile.updateProfile.$post(data);
-//       return response.json();
-//     },
-//     onSuccess: () => {
-//       toast.success('Profile updated successfully');
-//     },
-//     onError: (error) => {
-//       toast.error('Failed to update profile');
-//     }
-//   });
-// };
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: TUpdateProfileFormValues) => {
+      const { id, ...rest } = data;
+      const response = await client.profile.updateProfile.$post({
+        id,
+        ...rest
+      });
+      return await response.json();
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['profiles']
+      });
+    }
+  });
+};

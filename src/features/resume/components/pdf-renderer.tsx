@@ -89,19 +89,21 @@ const PdfRenderer = ({ formData, templateId }: TPdfRendererProps) => {
           <Page key={currentPage} pageNumber={currentPage} />
         </Document>
       ) : null}
-      <Document
-        key={render.value}
-        className={shouldShowPreviousDocument ? 'absolute' : null}
-        file={render.value}
-        loading={null}
-        onLoadSuccess={onDocumentLoad}
-      >
-        <Page
-          key={currentPage}
-          pageNumber={currentPage}
-          onRenderSuccess={() => setPreviousRenderValue(render.value!)}
-        />
-      </Document>
+      <div id='resume-pdf-preview'>
+        <Document
+          key={render.value}
+          className={shouldShowPreviousDocument ? 'absolute' : null}
+          file={render.value}
+          loading={null}
+          onLoadSuccess={onDocumentLoad}
+        >
+          <Page
+            key={currentPage}
+            pageNumber={currentPage}
+            onRenderSuccess={() => setPreviousRenderValue(render.value!)}
+          />
+        </Document>
+      </div>
       <div className='my-4'>
         {numPages && numPages > 0 && (
           <div className='flex items-center justify-between'>
