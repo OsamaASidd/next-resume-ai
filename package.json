@@ -100,6 +100,7 @@
     "react-pdf-tailwind": "^2.3.0",
     "react-resizable-panels": "^2.1.7",
     "react-responsive": "^10.0.0",
+    "react-use": "^17.6.0",
     "recharts": "^2.15.0",
     "sharp": "^0.33.5",
     "sonner": "^1.7.1",

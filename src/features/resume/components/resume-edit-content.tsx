@@ -89,11 +89,7 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
       return (
         <div className='relative flex h-full justify-center bg-accent pt-4'>
           <div className='origin-top scale-75'>
-            <PdfRenderer
-              key={JSON.stringify(formData)}
-              formData={formData}
-              templateId={selectedTemplate}
-            />
+            <PdfRenderer formData={formData} templateId={selectedTemplate} />
           </div>
         </div>
       );
@@ -104,11 +100,7 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
   const PdfPreview = () => (
     <div className='relative flex h-full justify-center bg-accent pt-2'>
       <div className='scale-90'>
-        <PdfRenderer
-          key={JSON.stringify(formData)}
-          formData={formData}
-          templateId={selectedTemplate}
-        />
+        <PdfRenderer formData={formData} templateId={selectedTemplate} />
       </div>
     </div>
   );

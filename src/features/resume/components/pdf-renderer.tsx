@@ -1,13 +1,14 @@
 'use client';
 
-import { Icons } from '@/components/icons';
-import { BlobProvider } from '@react-pdf/renderer';
-import { memo, useState, useEffect } from 'react';
-import { Document, Page, pdfjs, usePageContext } from 'react-pdf';
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
-import 'react-pdf/dist/esm/Page/TextLayer.css';
-import { getTemplate } from '../templates/registry';
+import { pdf } from '@react-pdf/renderer';
+import { useEffect, useState, use } from 'react';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 import { TResumeEditFormValues } from '../utils/form-schema';
+import { getTemplate } from '../templates/registry';
+import { Icons } from '@/components/icons';
+import { useAsync } from 'react-use';
 import { Button } from '@/components/ui/button';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -20,141 +21,126 @@ type TPdfRendererProps = {
   templateId: string;
 };
 
-const PdfRenderer = memo(
-  ({ formData, templateId }: TPdfRendererProps) => {
-    const template = getTemplate(templateId);
-    const Template = template?.component;
-    const [numPages, setNumPages] = useState<number>();
-    const [pageNumber, setPageNumber] = useState<number>(1);
-    const [url, setUrl] = useState<string | null>(null);
+const PdfRenderer = ({ formData, templateId }: TPdfRendererProps) => {
+  const [numPages, setNumPages] = useState(null);
 
-    // Cleanup effect
-    useEffect(() => {
-      return () => {
-        if (url) {
-          URL.revokeObjectURL(url);
-        }
-      };
-    }, [url]);
+  const [currentPage, setCurrentPage] = useState(1);
 
-    if (!Template) {
-      return <FallBackLoader />;
-    }
+  const [previousRenderValue, setPreviousRenderValue] = useState<string | null>(
+    null
+  );
+  // const { setDownloadLink } = useResumeDownload();
 
-    function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
-      setNumPages(numPages);
-    }
+  const template = getTemplate(templateId);
+  const Template = template?.component;
 
-    function onPrevPage(): void {
-      setPageNumber((prev) => (prev - 1 > 1 ? prev - 1 : 1));
-    }
+  const render = useAsync(async () => {
+    if (!formData) return null;
 
-    function onNextPage(): void {
-      setPageNumber((prev) => (prev + 1 > numPages! ? numPages! : prev + 1));
-    }
+    const blob = await pdf(<Template formData={formData} />).toBlob();
+    const url = URL.createObjectURL(blob);
 
-    function FallBackLoader() {
-      return (
-        <div className='flex items-center justify-center'>
-          <Icons.spinner className='h-6 w-6 animate-spin' />
-        </div>
-      );
-    }
+    return url;
+  }, [formData]);
 
-    function generateDownloadFilename() {
-      const timestamp = new Date().getTime();
-      return `next-resume-${timestamp}.pdf`;
-    }
+  console.log('render=>>>>', render.value);
 
-    return (
-      <div className='relative'>
-        <BlobProvider
-          key={`${templateId}-${JSON.stringify(formData)}`}
-          document={<Template formData={formData} />}
-        >
-          {({ blob, url: pdfUrl, loading, error }) => {
-            if (loading || !pdfUrl) {
-              return <FallBackLoader />;
-            }
+  // useEffect(() => setDownloadLink(render?.value!), [render.value]);
 
-            if (error) {
-              return <div>Error generating PDF</div>;
-            }
+  // useEffect(() => onUrlChange(render?.value!), [render.value]);
 
-            return (
-              <div className='space-y-4'>
-                <div className=''>
-                  {numPages && numPages > 0 && (
-                    <div className='flex items-center justify-between'>
-                      <div className='flex items-center gap-2'>
-                        <Button
-                          size={'xs'}
-                          onClick={onPrevPage}
-                          disabled={pageNumber <= 1}
-                          className='disabled:opacity-50'
-                        >
-                          <Icons.chevronLeft className='h-4 w-4' />
-                        </Button>
-                        <span className='text-primary'>
-                          Page {pageNumber} of {numPages}
-                        </span>
-                        <Button
-                          size={'xs'}
-                          onClick={onNextPage}
-                          disabled={pageNumber >= numPages}
-                          className='disabled:opacity-50'
-                        >
-                          <Icons.chevronRight className='h-4 w-4' />
-                        </Button>
-                      </div>
-                      {blob && (
-                        <Button asChild>
-                          <a
-                            href={URL.createObjectURL(blob)}
-                            download={generateDownloadFilename()}
-                            className='text-primary'
-                          >
-                            Download PDF
-                          </a>
-                        </Button>
-                      )}
-                    </div>
-                  )}
-                </div>
-                <div id='resume-pdf-preview'>
-                  <Document
-                    loading={<FallBackLoader />}
-                    file={pdfUrl}
-                    onLoadSuccess={onDocumentLoadSuccess}
-                    error={<div>Failed to load PDF</div>}
-                    onLoadError={(error) => {
-                      console.error('Error loading PDF:', error);
-                    }}
-                  >
-                    <Page
-                      key={`page-${pageNumber}`}
-                      pageNumber={pageNumber}
-                      loading={<FallBackLoader />}
-                      renderTextLayer={false}
-                      renderAnnotationLayer={false}
-                    />
-                  </Document>
-                </div>
-              </div>
-            );
-          }}
-        </BlobProvider>
-      </div>
-    );
-  },
-  (prevProps, nextProps) => {
-    return !(
-      prevProps.templateId !== nextProps.templateId ||
-      JSON.stringify(prevProps.formData) !== JSON.stringify(nextProps.formData)
-    );
+  // useEffect(() => onRenderError(render.error), [render.error]);
+
+  const onPreviousPage = () => {
+    setCurrentPage((prev) => prev - 1);
+  };
+
+  const onNextPage = () => {
+    setCurrentPage((prev) => prev + 1);
+  };
+
+  const onDocumentLoad = (d: any) => {
+    setNumPages(d.numPages);
+    setCurrentPage((prev) => Math.min(prev, d.numPages));
+  };
+
+  const isFirstRendering = !previousRenderValue;
+
+  const isLatestValueRendered = previousRenderValue === render.value;
+  const isBusy = render.loading || !isLatestValueRendered;
+
+  const shouldShowTextLoader = isFirstRendering && isBusy;
+  const shouldShowPreviousDocument = !isFirstRendering && isBusy;
+
+  function generateDownloadFilename() {
+    const timestamp = new Date().getTime();
+    return `next-resume-${timestamp}.pdf`;
   }
-);
 
-PdfRenderer.displayName = 'PdfRenderer';
-
+  return (
+    <div className='relative flex h-full flex-1 flex-col'>
+      {shouldShowPreviousDocument && previousRenderValue ? (
+        <Document
+          key={previousRenderValue}
+          className='opacity-50'
+          file={previousRenderValue}
+          loading={null}
+        >
+          <Page key={currentPage} pageNumber={currentPage} />
+        </Document>
+      ) : null}
+      <Document
+        key={render.value}
+        className={shouldShowPreviousDocument ? 'absolute' : null}
+        file={render.value}
+        loading={null}
+        onLoadSuccess={onDocumentLoad}
+      >
+        <Page
+          key={currentPage}
+          pageNumber={currentPage}
+          onRenderSuccess={() => setPreviousRenderValue(render.value!)}
+        />
+      </Document>
+      <div className='my-4'>
+        {numPages && numPages > 0 && (
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-2'>
+              <Button
+                size={'xs'}
+                onClick={onPreviousPage}
+                disabled={currentPage <= 1}
+                className='disabled:opacity-50'
+              >
+                <Icons.chevronLeft className='h-4 w-4' />
+              </Button>
+              <span className='text-primary'>
+                Page {currentPage} of {numPages}
+              </span>
+              <Button
+                size={'xs'}
+                onClick={onNextPage}
+                disabled={currentPage >= numPages}
+                className='disabled:opacity-50'
+              >
+                <Icons.chevronRight className='h-4 w-4' />
+              </Button>
+            </div>
+            {render.value && (
+              <Button asChild>
+                <a
+                  href={render.value!}
+                  download={generateDownloadFilename()}
+                  className='text-primary'
+                >
+                  Download PDF
+                </a>
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 export default PdfRenderer;
