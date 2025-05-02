@@ -140,7 +140,7 @@ export default function CreateProfileForm({
       fields: []
     },
     {
-      title: 'ExtraCirriculars',
+      title: 'Extra Curriculars',
       fields: []
     },
     {
@@ -635,9 +635,9 @@ export default function CreateProfileForm({
           </div>
         );
       case 4:
-        return <div className='space-y-4'>certificates go here</div>;
+        return <div className='space-y-4'>Certificates</div>;
       case 5:
-        return <div className='space-y-4'>cirriculars go here</div>;
+        return <div className='space-y-4'>Extra Curriculars</div>;
       case 6:
         return (
           <div className='space-y-4'>
