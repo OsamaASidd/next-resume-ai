@@ -2,27 +2,28 @@ import { z } from 'zod';
 import { j, privateProcedure } from '../jstack';
 import { profileSchema } from '@/features/profile/utils/form-schema';
 import { db } from '../db';
-import { profiles } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import {
-  Education,
-  educations,
-  Job,
+  certificates,
+  extracurriculars,
+  profiles,
   jobs,
-  Profile
-} from '../db/schema/profiles';
+  educations
+} from '../db/schema';
+import { Education, Job, Profile } from '../db/schema/profiles';
 
 export const profileRouter = j.router({
   getProfiles: privateProcedure.query(async ({ c, ctx }) => {
     const { user } = ctx;
 
-    // Fetch profiles along with related jobs and educations
     const userProfiles = (await db.query.profiles.findMany({
       where: eq(profiles.userId, user.id),
       with: {
-        jobs: true, // Include related jobs
-        educations: true // Include related educations
+        jobs: true,
+        educations: true,
+        certificates: true,
+        extracurriculars: true
       }
     })) as ProfileWithRelations[];
 
@@ -34,9 +35,7 @@ export const profileRouter = j.router({
     .mutation(async ({ c, ctx, input }) => {
       const { user } = ctx;
 
-      // Start a transaction since we're inserting into multiple tables
       return await db.transaction(async (tx) => {
-        // Create the base profile first
         const [createdProfile] = await tx
           .insert(profiles)
           .values({
@@ -51,8 +50,7 @@ export const profileRouter = j.router({
           })
           .returning();
 
-        // Insert jobs if they exist
-        if (input.jobs && input.jobs.length > 0) {
+        if (input.jobs?.length) {
           await tx.insert(jobs).values(
             input.jobs.map((job) => ({
               profileId: createdProfile.id,
@@ -66,15 +64,14 @@ export const profileRouter = j.router({
           );
         }
 
-        // Insert education if it exists
-        if (input.educations && input.educations.length > 0) {
+        if (input.educations?.length) {
           await tx.insert(educations).values(
             input.educations.map((edu) => ({
               profileId: createdProfile.id,
               school: edu.school,
               degree: edu.degree,
               field: edu.field,
-              description: edu.description ?? null, // Using nullish coalescing
+              description: edu.description ?? null,
               startDate: edu.startDate,
               endDate: edu.endDate,
               city: edu.city
@@ -82,12 +79,42 @@ export const profileRouter = j.router({
           );
         }
 
-        // Fetch the complete profile with related data
+        if (input.certificates?.length) {
+          await tx.insert(certificates).values(
+            input.certificates.map((cert) => ({
+              profileId: createdProfile.id,
+              name: cert.name,
+              issuer: cert.issuer,
+              issueDate: cert.issueDate,
+              expirationDate: cert.expirationDate || null,
+              credentialId: cert.credentialId || null,
+              credentialUrl: cert.credentialUrl || null,
+              description: cert.description || null
+            }))
+          );
+        }
+
+        if (input.extracurriculars?.length) {
+          await tx.insert(extracurriculars).values(
+            input.extracurriculars.map((eca) => ({
+              profileId: createdProfile.id,
+              activityName: eca.activityName,
+              organization: eca.organization || null,
+              role: eca.role || null,
+              startDate: eca.startDate,
+              endDate: eca.endDate,
+              description: eca.description || null
+            }))
+          );
+        }
+
         const completeProfile = await tx.query.profiles.findFirst({
           where: (profiles, { eq }) => eq(profiles.id, createdProfile.id),
           with: {
             jobs: true,
-            educations: true
+            educations: true,
+            certificates: true,
+            extracurriculars: true
           }
         });
 
@@ -102,7 +129,6 @@ export const profileRouter = j.router({
       const { user } = ctx;
 
       return await db.transaction(async (tx) => {
-        // Update the base profile
         const [updatedProfile] = await tx
           .update(profiles)
           .set({
@@ -117,12 +143,14 @@ export const profileRouter = j.router({
           .where(eq(profiles.id, id))
           .returning();
 
-        // Delete existing jobs and education to replace with new ones
         await tx.delete(jobs).where(eq(jobs.profileId, id));
         await tx.delete(educations).where(eq(educations.profileId, id));
+        await tx.delete(certificates).where(eq(certificates.profileId, id));
+        await tx
+          .delete(extracurriculars)
+          .where(eq(extracurriculars.profileId, id));
 
-        // Insert new jobs if they exist
-        if (inputData.jobs && inputData.jobs.length > 0) {
+        if (inputData.jobs?.length) {
           await tx.insert(jobs).values(
             inputData.jobs.map((job) => ({
               profileId: id,
@@ -136,8 +164,7 @@ export const profileRouter = j.router({
           );
         }
 
-        // Insert new education if it exists
-        if (inputData.educations && inputData.educations.length > 0) {
+        if (inputData.educations?.length) {
           await tx.insert(educations).values(
             inputData.educations.map((edu) => ({
               profileId: id,
@@ -152,12 +179,42 @@ export const profileRouter = j.router({
           );
         }
 
-        // Fetch and return the complete updated profile
+        if (inputData.certificates?.length) {
+          await tx.insert(certificates).values(
+            inputData.certificates.map((cert) => ({
+              profileId: id,
+              name: cert.name,
+              issuer: cert.issuer,
+              issueDate: cert.issueDate,
+              expirationDate: cert.expirationDate || null,
+              credentialId: cert.credentialId || null,
+              credentialUrl: cert.credentialUrl || null,
+              description: cert.description || null
+            }))
+          );
+        }
+
+        if (inputData.extracurriculars?.length) {
+          await tx.insert(extracurriculars).values(
+            inputData.extracurriculars.map((eca) => ({
+              profileId: id,
+              activityName: eca.activityName,
+              organization: eca.organization || null,
+              role: eca.role || null,
+              startDate: eca.startDate,
+              endDate: eca.endDate,
+              description: eca.description || null
+            }))
+          );
+        }
+
         const completeProfile = await tx.query.profiles.findFirst({
           where: (profiles, { eq }) => eq(profiles.id, id),
           with: {
             jobs: true,
-            educations: true // Changed from 'education' to 'educations'
+            educations: true,
+            certificates: true,
+            extracurriculars: true
           }
         });
 
@@ -169,4 +226,6 @@ export const profileRouter = j.router({
 export type ProfileWithRelations = Profile & {
   jobs: Job[];
   educations: Education[];
+  certificates: Certificate[];
+  extracurriculars: Extracurricular[];
 };

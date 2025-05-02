@@ -44,8 +44,6 @@ export async function generateResumeContent(
 ): Promise<TResumeEditFormValues> {
   const schemaStructure = getSchemaStructure(resumeEditFormSchema);
 
-  console.log('schema strucutre', schemaStructure);
-
   const prompt = `
     Generate a professional resume based on the following information (dont mention the company name this is a job description where we wanted to apply so make it ats friendly by using above or following information):
 
@@ -65,7 +63,6 @@ export async function generateResumeContent(
       profile?.jobs && profile?.jobs.length > 0
         ? profile?.jobs
             .map((job) => {
-              // Safely handle potential undefined or null values
               return `
       - Position: ${job.jobTitle || 'Not Specified'}
         Company: ${job.employer || 'Not Specified'}
@@ -82,7 +79,6 @@ export async function generateResumeContent(
       profile?.educations && profile?.educations.length > 0
         ? profile?.educations
             .map((education) => {
-              // Safely handle potential undefined or null values
               return `
         School: ${education.school || 'Not Specified'}
         Degree: ${education.degree || 'Not Specified'}
@@ -93,6 +89,38 @@ export async function generateResumeContent(
             })
             .join('\n')
         : 'No education recorded'
+    }
+
+    Certifications: 
+    ${
+      profile?.certificates && profile?.certificates.length > 0
+        ? profile?.certificates
+            .map((cert) => {
+              return `
+        Name: ${cert.name || 'Not Specified'}
+        Issuer: ${cert.issuer || 'Not Specified'}
+        Issue Date: ${cert.issueDate || 'N/A'}
+        ${cert.expirationDate ? `Expiration Date: ${cert.expirationDate}` : ''}
+      `;
+            })
+            .join('\n')
+        : 'No certifications recorded'
+    }
+
+    Extracurricular Activities:
+    ${
+      profile?.extracurriculars && profile?.extracurriculars.length > 0
+        ? profile?.extracurriculars
+            .map((eca) => {
+              return `
+        Activity: ${eca.activityName || 'Not Specified'}
+        Organization: ${eca.organization || 'Not Specified'}
+        Role: ${eca.role || 'Not Specified'}
+        Duration: ${eca.startDate || 'N/A'} to ${eca.endDate || 'Present'}
+      `;
+            })
+            .join('\n')
+        : 'No extracurricular activities recorded'
     }
 
     Instructions:

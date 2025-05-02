@@ -92,6 +92,15 @@ export default function ProfileList() {
                   <span className='font-medium'>Experience:</span>{' '}
                   {profile?.jobs?.length} positions
                 </div>
+                {/* New fields */}
+                <div className='text-sm'>
+                  <span className='font-medium'>Certifications:</span>{' '}
+                  {profile?.certificates?.length || 0}
+                </div>
+                <div className='text-sm'>
+                  <span className='font-medium'>Activities:</span>{' '}
+                  {profile?.extracurriculars?.length || 0}
+                </div>
               </div>
             </CardContent>
           </Card>

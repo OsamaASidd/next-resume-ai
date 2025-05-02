@@ -20,7 +20,8 @@ import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { useCreateProfile, useUpdateProfile } from '../api';
 import { profileSchema, TProfileFormValues } from '../utils/form-schema';
-
+import { Certificates } from './certificates';
+import { Extracurriculars } from './extracurriculars';
 interface CreateProfileFormProps {
   profile?: ProfileWithRelations;
   closeModal: () => void;
@@ -38,7 +39,9 @@ const transformProfileToFormValues = (
       country: '',
       city: '',
       jobs: [],
-      educations: []
+      educations: [],
+      certificates: [],
+      extracurriculars: []
     };
   }
 
@@ -68,6 +71,27 @@ const transformProfileToFormValues = (
         endDate: edu.endDate || '',
         city: edu.city || '',
         id: edu.id
+      })) || [],
+    certificates:
+      profile.certificates?.map((cert) => ({
+        name: cert.name || '',
+        issuer: cert.issuer || '',
+        issueDate: cert.issueDate || '',
+        expirationDate: cert.expirationDate || '',
+        credentialId: cert.credentialId || '',
+        credentialUrl: cert.credentialUrl || '',
+        description: cert.description || '',
+        id: cert.id
+      })) || [],
+    extracurriculars:
+      profile.extracurriculars?.map((eca) => ({
+        activityName: eca.activityName || '',
+        organization: eca.organization || '',
+        role: eca.role || '',
+        startDate: eca.startDate || '',
+        endDate: eca.endDate || '',
+        description: eca.description || '',
+        id: eca.id
       })) || []
   };
 };
@@ -106,6 +130,24 @@ export default function CreateProfileForm({
     name: 'educations'
   });
 
+  const {
+    fields: certificateFields,
+    append: appendCertificate,
+    remove: removeCertificate
+  } = useFieldArray({
+    control: form.control,
+    name: 'certificates'
+  });
+
+  const {
+    fields: extracurricularFields,
+    append: appendExtracurricular,
+    remove: removeExtracurricular
+  } = useFieldArray({
+    control: form.control,
+    name: 'extracurriculars'
+  });
+
   const onSubmit: SubmitHandler<TProfileFormValues> = async (data) => {
     try {
       if (profile) {
@@ -137,11 +179,11 @@ export default function CreateProfileForm({
     },
     {
       title: 'Certifications',
-      fields: []
+      fields: ['certificates']
     },
     {
       title: 'Extra Curriculars',
-      fields: []
+      fields: ['extracurriculars']
     },
     {
       title: 'Review',
@@ -166,12 +208,19 @@ export default function CreateProfileForm({
         }
         return true;
       }
+      if (field === 'certificates') {
+        // Optional: make this required or not based on your needs
+        return true;
+      }
+      if (field === 'extracurriculars') {
+        // Optional: make this required or not based on your needs
+        return true;
+      }
 
       const fieldError = form.getFieldState(
         field as keyof TProfileFormValues
       ).error;
       if (fieldError) {
-        // Get the field label
         const fieldLabel =
           {
             email: 'Email',
@@ -189,7 +238,6 @@ export default function CreateProfileForm({
     });
     return isValid;
   };
-
   const handleNextStep = () => {
     if (validateStep()) {
       if (step === steps.length - 1) {
@@ -635,14 +683,23 @@ export default function CreateProfileForm({
           </div>
         );
       case 4:
-        return <div className='space-y-4'>Certificates</div>;
+        return (
+          <div className='space-y-4'>
+            <Certificates control={form.control} />
+          </div>
+        );
       case 5:
-        return <div className='space-y-4'>Extra Curriculars</div>;
+        return (
+          <div className='space-y-4'>
+            <Extracurriculars control={form.control} />
+          </div>
+        );
       case 6:
         return (
           <div className='space-y-4'>
             <h3 className='text-lg font-semibold'>Review Your Information</h3>
             <div className='rounded-lg bg-muted/50 p-4'>
+              {/* Basic Information section */}
               <h4 className='mb-2 font-semibold'>Basic Information</h4>
               <p>
                 Name: {form.getValues('firstname')} {form.getValues('lastname')}
@@ -653,6 +710,7 @@ export default function CreateProfileForm({
                 Location: {form.getValues('city')}, {form.getValues('country')}
               </p>
 
+              {/* Work Experience section */}
               <h4 className='mb-2 mt-4 font-semibold'>Work Experience</h4>
               {jobFields.map((job, index) => (
                 <div key={job.id} className='mb-2'>
@@ -663,6 +721,7 @@ export default function CreateProfileForm({
                 </div>
               ))}
 
+              {/* Education section */}
               <h4 className='mb-2 mt-4 font-semibold'>Education</h4>
               {educationFields.map((edu, index) => (
                 <div key={edu.id} className='mb-2'>
@@ -672,8 +731,31 @@ export default function CreateProfileForm({
                   </p>
                 </div>
               ))}
+
+              {/* Certificates section - new */}
               <h4 className='mb-2 mt-4 font-semibold'>Certifications</h4>
-              <h4 className='mb-2 mt-4 font-semibold'>Extra Cirriculars</h4>
+              {certificateFields.map((cert, index) => (
+                <div key={cert.id} className='mb-2'>
+                  <p>
+                    {form.getValues(`certificates.${index}.name`)} issued by{' '}
+                    {form.getValues(`certificates.${index}.issuer`)}
+                  </p>
+                </div>
+              ))}
+
+              {/* Extracurricular Activities section - new */}
+              <h4 className='mb-2 mt-4 font-semibold'>
+                Extracurricular Activities
+              </h4>
+              {extracurricularFields.map((eca, index) => (
+                <div key={eca.id} className='mb-2'>
+                  <p>
+                    {form.getValues(`extracurriculars.${index}.activityName`)}{' '}
+                    at{' '}
+                    {form.getValues(`extracurriculars.${index}.organization`)}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         );

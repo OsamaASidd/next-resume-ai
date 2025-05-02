@@ -1,7 +1,8 @@
 import { pgTable, text, timestamp, integer, serial } from 'drizzle-orm/pg-core';
 import { accounts } from './accounts';
 import { relations } from 'drizzle-orm';
-
+import { certificates } from './certificates';
+import { extracurriculars } from './extracurriculars';
 // Main profiles table
 export const profiles = pgTable('profiles', {
   id: text('id').primaryKey().notNull(),
@@ -54,8 +55,29 @@ export const educations = pgTable('educations', {
 // Define relationships for profiles
 export const profilesRelations = relations(profiles, ({ many }) => ({
   jobs: many(jobs),
-  educations: many(educations)
+  educations: many(educations),
+  certificates: many(certificates),
+  extracurriculars: many(extracurriculars)
 }));
+
+// Define relationships for certificates
+export const certificatesRelations = relations(certificates, ({ one }) => ({
+  profile: one(profiles, {
+    fields: [certificates.profileId],
+    references: [profiles.id]
+  })
+}));
+
+// Define relationships for extracurriculars
+export const extracurricularsRelations = relations(
+  extracurriculars,
+  ({ one }) => ({
+    profile: one(profiles, {
+      fields: [extracurriculars.profileId],
+      references: [profiles.id]
+    })
+  })
+);
 
 // Define relationships for jobs
 export const jobsRelations = relations(jobs, ({ one }) => ({
@@ -80,3 +102,7 @@ export type Job = typeof jobs.$inferSelect;
 export type NewJob = typeof jobs.$inferInsert;
 export type Education = typeof educations.$inferSelect;
 export type NewEducation = typeof educations.$inferInsert;
+export type Certificate = typeof certificates.$inferSelect;
+export type NewCertificate = typeof certificates.$inferInsert;
+export type Extracurricular = typeof extracurriculars.$inferSelect;
+export type NewExtracurricular = typeof extracurriculars.$inferInsert;
