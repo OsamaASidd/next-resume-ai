@@ -6,6 +6,7 @@ import { Lato } from 'next/font/google';
 import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
+import NavBar from '@/components/layout/navBar';
 
 export const metadata: Metadata = {
   title: 'Next Resume Builder',
@@ -95,6 +96,7 @@ export default async function RootLayout({
   return (
     <html lang='en' className={`${lato.className}`} suppressHydrationWarning>
       <body className={'overflow-hidden'}>
+        <NavBar /> {/* Top global header */}
         <NextTopLoader showSpinner={false} />
         <ClerkProvider
           signInUrl='/sign-in'

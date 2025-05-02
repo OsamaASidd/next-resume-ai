@@ -25,6 +25,7 @@ import {
   Plus,
   Settings,
   SunMedium,
+  Share,
   Trash,
   Twitter,
   User,
@@ -68,6 +69,7 @@ export const Icons = {
   pizza: Pizza,
   sun: SunMedium,
   moon: Moon,
+  share: Share,
   laptop: Laptop,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
