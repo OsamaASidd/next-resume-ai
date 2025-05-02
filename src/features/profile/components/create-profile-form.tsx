@@ -136,6 +136,14 @@ export default function CreateProfileForm({
       fields: ['educations']
     },
     {
+      title: 'Certifications',
+      fields: []
+    },
+    {
+      title: 'ExtraCirriculars',
+      fields: []
+    },
+    {
       title: 'Review',
       fields: []
     }
@@ -627,6 +635,10 @@ export default function CreateProfileForm({
           </div>
         );
       case 4:
+        return <div className='space-y-4'>certificates go here</div>;
+      case 5:
+        return <div className='space-y-4'>cirriculars go here</div>;
+      case 6:
         return (
           <div className='space-y-4'>
             <h3 className='text-lg font-semibold'>Review Your Information</h3>
@@ -695,7 +707,7 @@ export default function CreateProfileForm({
             </Button>
           )}
 
-          {step < steps.length - 1 ? (
+          {step < steps.length ? (
             <Button type='button' onClick={handleNextStep} className='ml-auto'>
               Next <ArrowRight className='ml-2' />
             </Button>
