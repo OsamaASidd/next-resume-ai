@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { getAllTemplates } from '../templates/registry';
 import type { TemplateConfig } from '../templates/registry';
+import { useRouter } from 'next/navigation';
 
 interface MarketplaceTemplateProps {
   selectedTemplate: string;
@@ -19,7 +20,7 @@ export function MarketplaceTemplate({
   currentTemplate
 }: MarketplaceTemplateProps) {
   const templates = getAllTemplates();
-
+  const router = useRouter();
   return (
     <div className='space-y-3 md:space-y-6'>
       <div className='flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-3'>
@@ -44,7 +45,7 @@ export function MarketplaceTemplate({
               className='h-8 text-xs md:h-10 md:text-sm'
               onClick={() => onApplyTemplate(selectedTemplate)}
             >
-              Use Template
+              Apply Template
             </Button> */}
           </div>
         )}
@@ -55,8 +56,8 @@ export function MarketplaceTemplate({
           <Card
             key={template.id}
             className={cn(
-              'cursor-pointer transition-all hover:border-blue-600',
-              selectedTemplate === template.id && 'border-2 border-blue-600',
+              'relative cursor-pointer transition-all hover:border-blue-600',
+              selectedTemplate === template.id && 'border-blue-600',
               currentTemplate === template.id && 'bg-muted/10'
             )}
             onClick={() => onTemplateSelect(template.id)}
@@ -84,6 +85,15 @@ export function MarketplaceTemplate({
                 )} */}
               </div>
             </CardContent>
+            <button
+              className='absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-md bg-blue-600 px-3 py-1 text-center text-[10px] font-medium text-white md:text-xs'
+              onClick={() => {
+                onApplyTemplate(selectedTemplate);
+                router.push(`/dashboard/resume/create`);
+              }}
+            >
+              Use
+            </button>
           </Card>
         ))}
       </div>

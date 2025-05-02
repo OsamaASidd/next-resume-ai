@@ -14,7 +14,7 @@ export default function NavBar() {
   ];
 
   return (
-    <header className='mb-2 flex items-center justify-between border bg-white px-6 py-5 shadow'>
+    <header className='mb-2 flex items-center justify-between border px-6 py-5 shadow'>
       {/* Logo */}
       <div className='ms-[30px] flex items-center space-x-2'>
         {/* <Link className='ms-[30px] text-xl font-thin' href='/'>
