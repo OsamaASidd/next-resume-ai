@@ -672,6 +672,8 @@ export default function CreateProfileForm({
                   </p>
                 </div>
               ))}
+              <h4 className='mb-2 mt-4 font-semibold'>Certifications</h4>
+              <h4 className='mb-2 mt-4 font-semibold'>Extra Cirriculars</h4>
             </div>
           </div>
         );
