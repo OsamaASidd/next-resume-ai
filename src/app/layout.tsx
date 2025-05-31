@@ -96,13 +96,13 @@ export default async function RootLayout({
   return (
     <html lang='en' className={`${lato.className}`} suppressHydrationWarning>
       <body className={'overflow-hidden'}>
-        <NavBar /> {/* Top global header */}
         <NextTopLoader showSpinner={false} />
         <ClerkProvider
           signInUrl='/sign-in'
           signUpUrl='/sign-up'
           afterSignOutUrl={'/sign-in'}
         >
+          <NavBar /> {/* Top global header */}
           <NuqsAdapter>
             <Providers>
               <Toaster />
