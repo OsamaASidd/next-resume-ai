@@ -12,7 +12,7 @@ const LandingPage: React.FC = () => {
   const router = useRouter();
   const handleTryClick = () => {
     // console.log('TRY RESUME ');
-    router.push('/chatbot');
+    router.push('/chatbot/0');
   };
   return (
     <div className='min-h-screen font-sans'>

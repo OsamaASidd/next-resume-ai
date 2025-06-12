@@ -18,8 +18,9 @@ export default function NavBar() {
 
   const links = [
     { href: '/welcome', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/marketplace', label: 'Market Place' }
+    { href: '/chatbot/0', label: 'AI Chat' },
+    { href: '/marketplace', label: 'Market Place' },
+    { href: '/about', label: 'About' }
   ];
 
   return (
