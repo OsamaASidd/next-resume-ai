@@ -11,8 +11,8 @@ const LandingPage: React.FC = () => {
   const { userId } = useAuth();
   const router = useRouter();
   const handleTryClick = () => {
-    console.log('TRY RESUME ');
-    // return redirect('/sign-in');
+    // console.log('TRY RESUME ');
+    router.push('/chatbot');
   };
   return (
     <div className='min-h-screen font-sans'>
