@@ -6,7 +6,7 @@ import { useGetResumes } from '@/features/resume/api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Upload } from 'lucide-react';
 import { useAuth } from '@clerk/nextjs';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
@@ -18,17 +18,27 @@ interface ProfileSelectionStepTestProps {
 export function ProfileSelectionStepTest({
   onProfileSelect
 }: ProfileSelectionStepTestProps) {
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const { userId } = useAuth();
   const { data: profiles, isLoading: isProfileLoading } = useProfiles();
   const { data: resumes, isLoading: isResumeLoading } = useGetResumes();
-  useEffect(() => {
-    console.log(resumes);
-    console.log('resumes');
-  }, [resumes]);
+
   if (userId && (isProfileLoading || isResumeLoading)) {
     return <Skeleton className='h-[400px] w-full' />;
   }
 
+  const handleFileChange = async (e) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile || selectedFile.type !== 'application/pdf') {
+      alert('Please upload a valid PDF file.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('pdf', selectedFile);
+    console.log('selectefFile', formData.get('pdf'));
+  };
   return (
     <div className='space-y-4'>
       <h2 className='font-semibold'>
@@ -41,10 +51,19 @@ export function ProfileSelectionStepTest({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='flex flex-col items-center text-gray-500'>
-            <Upload />
-            <div>Upload PDF</div>
-          </div>
+          <label htmlFor='pdf-upload' className='cursor-pointer'>
+            <div className='flex flex-col items-center text-gray-500'>
+              <Upload />
+              <div>Upload PDF</div>
+              <input
+                type='file'
+                id='pdf-upload'
+                accept='application/pdf'
+                className='hidden'
+                onChange={handleFileChange}
+              />
+            </div>
+          </label>
         </CardContent>
       </Card>
       {userId ? (
