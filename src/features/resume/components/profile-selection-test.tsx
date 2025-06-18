@@ -28,6 +28,18 @@ export function ProfileSelectionStepTest({
     return <Skeleton className='h-[400px] w-full' />;
   }
 
+  // const handleFileChange = async (e) => {
+  //   const selectedFile = e.target.files[0];
+  //   if (!selectedFile || selectedFile.type !== 'application/pdf') {
+  //     alert('Please upload a valid PDF file.');
+  //     return;
+  //   }
+
+  //   const formData = new FormData();
+  //   formData.append('pdf', selectedFile);
+  //   console.log('selectefFile', formData.get('pdf'));
+  // };
+
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile || selectedFile.type !== 'application/pdf') {
@@ -36,8 +48,36 @@ export function ProfileSelectionStepTest({
     }
 
     const formData = new FormData();
-    formData.append('pdf', selectedFile);
-    console.log('selectefFile', formData.get('pdf'));
+    formData.append('pdf', selectedFile); // Make sure key is 'pdf'
+    console.log('selectedFile', formData.get('pdf'));
+
+    try {
+      // Show loading state
+      console.log('Uploading and parsing resume...');
+
+      const response = await fetch('http://localhost:5001/api/parse-resume', {
+        method: 'POST',
+        body: formData
+        // Don't set Content-Type header - let browser set it with boundary for multipart/form-data
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        console.log('Resume parsed successfully:', result.data);
+        // Handle the parsed resume data
+        console.log('Resume Data Result : ', result.data);
+        // handleResumeData(result.data);
+      } else {
+        console.error('Error parsing resume:', result.error);
+        alert(`Error: ${result.message || result.error}`);
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+      alert(
+        'Failed to upload file. Please check your connection and try again.'
+      );
+    }
   };
   return (
     <div className='space-y-4'>
