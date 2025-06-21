@@ -77,7 +77,7 @@ export default function ChatInterface() {
         <ScrollArea className='h-[calc(100vh)]'>
           <div className='relative flex h-full justify-center bg-accent pb-8'>
             <div className='scale-90'>
-              {!isLoading && (
+              {!isLoading && !isOpen && (
                 <PdfRenderer
                   formData={formData}
                   templateId={selectedTemplate}

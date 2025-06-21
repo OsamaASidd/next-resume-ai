@@ -3,13 +3,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProfiles } from '@/features/profile/api';
 import { useGetResumes } from '@/features/resume/api';
+import { useCreateProfile } from '@/features/profile/api';
+import { ProfileWithRelations } from '@/server/routers/profile-router';
+import { profileSchema, TProfileFormValues } from '../utils/form-schema';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Upload } from 'lucide-react';
 import { useAuth } from '@clerk/nextjs';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
+import { useForm } from 'react-hook-form';
 
 interface ProfileSelectionStepTestProps {
   onProfileSelect: (profile: any) => void;
@@ -18,27 +23,11 @@ interface ProfileSelectionStepTestProps {
 export function ProfileSelectionStepTest({
   onProfileSelect
 }: ProfileSelectionStepTestProps) {
-  const [file, setFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
   const { userId } = useAuth();
   const { data: profiles, isLoading: isProfileLoading } = useProfiles();
   const { data: resumes, isLoading: isResumeLoading } = useGetResumes();
-
-  if (userId && (isProfileLoading || isResumeLoading)) {
-    return <Skeleton className='h-[400px] w-full' />;
-  }
-
-  // const handleFileChange = async (e) => {
-  //   const selectedFile = e.target.files[0];
-  //   if (!selectedFile || selectedFile.type !== 'application/pdf') {
-  //     alert('Please upload a valid PDF file.');
-  //     return;
-  //   }
-
-  //   const formData = new FormData();
-  //   formData.append('pdf', selectedFile);
-  //   console.log('selectefFile', formData.get('pdf'));
-  // };
+  const { mutateAsync: createProfile, isPending: isCreating } =
+    useCreateProfile();
 
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
@@ -46,41 +35,45 @@ export function ProfileSelectionStepTest({
       alert('Please upload a valid PDF file.');
       return;
     }
-
     const formData = new FormData();
     formData.append('pdf', selectedFile); // Make sure key is 'pdf'
     console.log('selectedFile', formData.get('pdf'));
-
     try {
-      // Show loading state
-      console.log('Uploading and parsing resume...');
-
       const response = await fetch('http://localhost:5001/api/parse-resume', {
         method: 'POST',
         body: formData
         // Don't set Content-Type header - let browser set it with boundary for multipart/form-data
       });
-
       const result = await response.json();
-
       if (response.ok && result.success) {
+        // PARSED DATA is in same format as Profile Schema
         console.log('Resume parsed successfully:', result.data);
-        // Handle the parsed resume data
-        console.log('Resume Data Result : ', result.data);
-        // handleResumeData(result.data);
+        if (userId) {
+          //if user logged in, create profile
+          const profile = await createProfile(
+            result.data as TProfileFormValues //Still error in this API call,
+          );
+          onProfileSelect(profile);
+        } else {
+          //else handle the unsigned user later
+          alert('cant create profile of unisigned user');
+        }
       } else {
         console.error('Error parsing resume:', result.error);
         alert(`Error: ${result.message || result.error}`);
       }
     } catch (error) {
       console.error('Network error:', error);
-      alert(
-        'Failed to upload file. Please check your connection and try again.'
-      );
     }
   };
+
+  if (userId && (isProfileLoading || isResumeLoading)) {
+    return <Skeleton className='h-[400px] w-full' />;
+  }
+
   return (
     <div className='space-y-4'>
+      {/* Upload pdf */}
       <h2 className='font-semibold'>
         Select a Profile or Upload existing Resume to continue
       </h2>
@@ -109,6 +102,7 @@ export function ProfileSelectionStepTest({
       {userId ? (
         <>
           <div className='grid gap-4 md:grid-cols-2'>
+            {/* Profiles */}
             {profiles?.map((profile) => (
               <Card
                 key={profile.id}
@@ -140,6 +134,7 @@ export function ProfileSelectionStepTest({
             ))}
           </div>
           <h2 className='font-semibold'>Select Existing Resume to continue</h2>
+          {/* Resumes */}
           <div className='grid gap-4 md:grid-cols-2'>
             {resumes?.map((resume) => (
               <Link key={resume.id} href={`/chatbot/${resume.id}`}>

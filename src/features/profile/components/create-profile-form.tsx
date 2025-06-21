@@ -154,7 +154,8 @@ export default function CreateProfileForm({
         await updateProfile({ id: profile.id, ...data });
         toast.success('Profile updated successfully');
       } else {
-        await createProfile(data);
+        const response = await createProfile(data);
+        console.log('profile', data);
         toast.success('Profile created successfully');
       }
       closeModal();
