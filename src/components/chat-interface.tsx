@@ -20,8 +20,18 @@ import { useTemplateStore } from '@/features/resume/store/use-template-store';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import Messages from './messages';
+import { TemplateSelection } from '@/features/resume/components/template-selection';
+import { EditResumeForm } from '@/features/resume/components/edit-resume-form';
+import { ModeToggle } from '@/features/resume/components/mode-toggle';
 
 export default function ChatInterface() {
+  const [messages, setMessages] = useState<{ role: string; content: string }[]>(
+    []
+  );
+
+  const [mode, setMode] = useState<'edit' | 'template' | 'preview' | 'zen'>(
+    'preview'
+  );
   const params = useParams<{ id: string }>();
   const resumeId = params?.id;
   const { data: resume, isLoading } = useGetResume(resumeId);
@@ -31,9 +41,11 @@ export default function ChatInterface() {
     setSelectedTemplate,
     applyTemplate
   } = useTemplateStore();
-  const [messages, setMessages] = useState<{ role: string; content: string }[]>(
-    []
-  );
+
+  const handleApplyTemplate = (templateId: string) => {
+    applyTemplate(templateId);
+    setMode('preview');
+  };
   const [isOpen, setIsOpen] = useState(resumeId === '0' ? true : false);
 
   //form control
@@ -67,14 +79,47 @@ export default function ChatInterface() {
 
   const formData = form.watch();
 
+  const renderContent = () => {
+    if (mode === 'edit') {
+      return <EditResumeForm form={form} />;
+    }
+    if (mode === 'template') {
+      return (
+        <TemplateSelection
+          selectedTemplate={selectedTemplate}
+          onTemplateSelect={setSelectedTemplate}
+          onApplyTemplate={handleApplyTemplate}
+          currentTemplate={currentTemplate}
+        />
+      );
+    }
+    if (mode === 'preview') {
+      return (
+        <div className='relative flex h-full justify-center bg-accent pt-4'>
+          <div className='origin-top scale-75'>
+            <PdfRenderer formData={formData} templateId={selectedTemplate} />
+          </div>
+        </div>
+      );
+    }
+  };
   return (
     <div className='flex h-full w-full flex-row'>
       <PreChatModal setIsOpen={setIsOpen} isOpen={isOpen} />
 
-      <div className='border-r border-secondary'></div>
-      <Messages />
-      <div className='h-full w-3/6'>
-        <ScrollArea className='h-[calc(100vh)]'>
+      <div className='h-full w-1/2 px-3'>
+        <Messages />
+      </div>
+      <div className='h-full w-1/2'>
+        <div>
+          <ModeToggle
+            mode={mode}
+            onModeChange={setMode}
+            isMobile={true}
+            showExit={false}
+          />
+        </div>
+        {/* <ScrollArea className='h-[calc(100vh)]'>
           <div className='relative flex h-full justify-center bg-accent pb-8'>
             <div className='scale-90'>
               {!isLoading && !isOpen && (
@@ -84,8 +129,18 @@ export default function ChatInterface() {
                 />
               )}
             </div>
+          </div> 
+        </ScrollArea> */}
+
+        <div className='block h-full px-2'>
+          <div className='h-full w-full rounded-lg border'>
+            <div className='h-full w-full p-4'>
+              <ScrollArea className='h-[calc(100vh-150px)] pe-2'>
+                {renderContent()}
+              </ScrollArea>
+            </div>
           </div>
-        </ScrollArea>
+        </div>
       </div>
     </div>
   );

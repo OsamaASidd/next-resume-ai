@@ -6,12 +6,14 @@ interface ModeToggleProps {
   mode: 'edit' | 'template' | 'preview' | 'zen';
   onModeChange: (mode: 'edit' | 'template' | 'preview' | 'zen') => void;
   isMobile?: boolean;
+  showExit?: boolean;
 }
 
 export function ModeToggle({
   mode,
   onModeChange,
-  isMobile = false
+  isMobile = false,
+  showExit = true
 }: ModeToggleProps) {
   const router = useRouter();
 
@@ -28,13 +30,15 @@ export function ModeToggle({
 
   return (
     <div className='mb-4 flex space-x-2'>
-      <Button
-        variant='outline'
-        onClick={() => router.push('/dashboard/resume')}
-        size={isMobile ? 'sm' : 'default'}
-      >
-        <Icons.chevronLeft className='mr-2 h-4 w-4' /> Exit
-      </Button>
+      {showExit && (
+        <Button
+          variant='outline'
+          onClick={() => router.push('/dashboard/resume')}
+          size={isMobile ? 'sm' : 'default'}
+        >
+          <Icons.chevronLeft className='mr-2 h-4 w-4' /> Exit
+        </Button>
+      )}
 
       {modes.map(({ value, label }) => (
         <Button
