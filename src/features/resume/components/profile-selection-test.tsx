@@ -56,7 +56,7 @@ export function ProfileSelectionStepTest({
           onProfileSelect(profile);
         } else {
           //else handle the unsigned user later
-          alert('cant create profile of unisigned user');
+          onProfileSelect(result.data);
         }
       } else {
         console.error('Error parsing resume:', result.error);

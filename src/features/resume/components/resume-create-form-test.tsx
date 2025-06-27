@@ -1,5 +1,5 @@
 'use client';
-
+import { generateGuestResumeContent } from '@/server/services/ai-resume';
 import { Button as UiButton } from '@/components/ui/button';
 import {
   Form,
@@ -21,18 +21,21 @@ import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface ResumeCreateFormTestProps {
+  selectedProfile?: any | null;
   profileId: string | null;
   setIsOpen: (prev: boolean) => void;
 }
 
 export function ResumeCreateFormTest({
-  profileId,
-  setIsOpen
+  profileId = null,
+  setIsOpen,
+  selectedProfile = null
 }: ResumeCreateFormTestProps) {
   const { mutateAsync: createResume, isPending: isCreating } =
     useCreateResume();
   const router = useRouter();
   const [isNavigating, setIsNavigating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const form = useForm<TResumeFormValues>({
     resolver: zodResolver(resumeFormSchema),
@@ -44,34 +47,81 @@ export function ResumeCreateFormTest({
   });
 
   const onSubmit = async (data: TResumeFormValues) => {
-    if (!profileId) return;
+    if (!profileId && !selectedProfile) {
+      toast.error('Profile data is required');
+      return;
+    }
 
-    try {
-      const resume = await createResume(
-        {
-          ...data,
-          profileId
-        },
-        {
-          onSuccess: async (data) => {
-            toast.success('Resume created successfully');
-            setIsNavigating(true);
-            setIsOpen(false);
-
-            // @ts-ignore
-            router.push(`/chatbot/${data?.id}`);
+    // Case 1: User is logged in
+    if (profileId) {
+      try {
+        const resume = await createResume(
+          {
+            ...data,
+            profileId
           },
-          onError: (error) => {
-            toast.error('Failed to create resume');
-            console.error('Error creating resume:', error);
+          {
+            onSuccess: async (data) => {
+              toast.success('Resume created successfully');
+              setIsNavigating(true);
+              setIsOpen(false);
+
+              // @ts-ignore
+              router.push(`/chatbot/${data?.id}`);
+            },
+            onError: (error) => {
+              toast.error('Failed to create resume');
+              console.error('Error creating resume:', error);
+            }
           }
-        }
-      );
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      toast.error('Failed to create resume');
+        );
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        toast.error('Failed to create resume');
+      }
+    }
+    // Case 2: Guest user (not signed in)
+    else {
+      try {
+        setIsGenerating(true);
+
+        // Generate AI content for guest user without database interaction
+        const aiGeneratedContent = await generateGuestResumeContent(
+          {
+            jd_job_title: data.jd_job_title,
+            employer: data.employer,
+            jd_post_details: data.jd_post_details
+          },
+          selectedProfile
+        );
+
+        console.log('AI generated content for guest:', aiGeneratedContent);
+
+        // Create a temporary resume object for guest
+        const guestResume = {
+          id: `guest`, // Temporary ID
+          ...data,
+          ...aiGeneratedContent,
+          isGuest: true,
+          createdAt: new Date().toISOString()
+        };
+
+        // Store in localStorage for guest access
+        localStorage.setItem('guestResume', JSON.stringify(guestResume));
+        toast.success('Resume generated successfully!');
+        setIsOpen(false);
+        // Redirect to a guest resume view or handle differently
+        router.push(`/chatbot/${guestResume.id}`);
+      } catch (error) {
+        console.error('Error generating guest resume:', error);
+        toast.error('Failed to generate resume. Please try again.');
+      } finally {
+        setIsGenerating(false);
+      }
     }
   };
+
+  const isLoading = isCreating || isNavigating || isGenerating;
 
   return (
     <Form {...form}>
@@ -127,17 +177,19 @@ export function ResumeCreateFormTest({
         <div className='flex items-center justify-center'>
           <UiButton
             type='submit'
-            disabled={isCreating || isNavigating}
+            disabled={isLoading}
             className='min-w-[150px]'
           >
-            {(isCreating || isNavigating) && (
-              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-            )}
+            {isLoading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
             {isCreating
               ? 'Creating...'
               : isNavigating
                 ? 'Redirecting...'
-                : 'Create Resume'}
+                : isGenerating
+                  ? 'Generating...'
+                  : profileId
+                    ? 'Create Resume'
+                    : 'Generate Resume'}
           </UiButton>
         </div>
       </form>

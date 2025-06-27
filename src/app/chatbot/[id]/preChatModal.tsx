@@ -27,6 +27,7 @@ export default function PreChatModal({ setIsOpen, isOpen }: PreChatModalProps) {
         key='resume-form'
         profileId={selectedProfile?.id}
         setIsOpen={setIsOpen}
+        selectedProfile={selectedProfile}
       />
     ]);
   return (
