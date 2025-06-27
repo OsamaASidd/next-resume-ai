@@ -274,7 +274,7 @@ export async function generateGuestResumeContent(
         summary: content.personal_details?.summary || ''
       },
       jobs: content.jobs || parsedProfile.jobs || [],
-      educations: content.educations || parsedProfile.educations || [],
+      educations: content.educations || parsedProfile.education || [], // Fixed: Use parsedProfile.education instead of parsedProfile.educations
       skills: content.skills || parsedProfile.skills || [],
       tools: content.tools || [],
       languages: content.languages || []
@@ -295,7 +295,7 @@ export async function generateGuestResumeContent(
         summary: `Experienced professional seeking ${input.jd_job_title} position at ${input.employer}.`
       },
       jobs: parsedProfile.jobs || [],
-      educations: parsedProfile.educations || [],
+      educations: parsedProfile.education || [], // Fixed: Use parsedProfile.education instead of parsedProfile.educations
       skills: parsedProfile.skills || [],
       tools: [],
       languages: []

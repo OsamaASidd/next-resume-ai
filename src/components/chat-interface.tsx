@@ -28,19 +28,38 @@ export default function ChatInterface() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>(
     []
   );
+  const [guestResume, setGuestResume] = useState(null);
 
   const [mode, setMode] = useState<'edit' | 'template' | 'preview' | 'zen'>(
     'preview'
   );
   const params = useParams<{ id: string }>();
   const resumeId = params?.id;
-  const { data: resume, isLoading } = useGetResume(resumeId);
+  const isGuest = resumeId === 'guest';
+
+  // Only call API if not guest
+  const { data: resume, isLoading } = useGetResume(isGuest ? null : resumeId);
+
   const {
     selectedTemplate,
     currentTemplate,
     setSelectedTemplate,
     applyTemplate
   } = useTemplateStore();
+
+  // Load guest resume from localStorage
+  useEffect(() => {
+    if (isGuest) {
+      try {
+        const storedGuestResume = localStorage.getItem('guestResume');
+        if (storedGuestResume) {
+          setGuestResume(JSON.parse(storedGuestResume));
+        }
+      } catch (error) {
+        console.error('Error loading guest resume from localStorage:', error);
+      }
+    }
+  }, [isGuest]);
 
   const handleApplyTemplate = (templateId: string) => {
     applyTemplate(templateId);
@@ -67,15 +86,24 @@ export default function ChatInterface() {
     shouldFocusError: false
   });
 
+  // Get the appropriate resume data based on whether it's guest or not
+  const currentResume = isGuest ? guestResume : resume;
+  const currentIsLoading = isGuest ? false : isLoading;
+
   // Reset form when resume data is loaded
   useEffect(() => {
-    if (resume && !isLoading) {
-      const newData = createInitialData(resume);
-      console.log('Resetting form with resume data:', resume);
+    if (currentResume && !currentIsLoading) {
+      let newData: TResumeEditFormValues;
+      if (!isGuest) {
+        newData = createInitialData(currentResume);
+      } else {
+        newData = guestResume;
+      }
+      console.log('Resetting form with resume data:', currentResume);
       console.log('New form data:', newData);
       form.reset(newData);
     }
-  }, [resume, isLoading, form]);
+  }, [currentResume, currentIsLoading, form]);
 
   const formData = form.watch();
 
@@ -103,6 +131,7 @@ export default function ChatInterface() {
       );
     }
   };
+
   return (
     <div className='flex h-full w-full flex-row'>
       <PreChatModal setIsOpen={setIsOpen} isOpen={isOpen} />
@@ -119,24 +148,12 @@ export default function ChatInterface() {
             showExit={false}
           />
         </div>
-        {/* <ScrollArea className='h-[calc(100vh)]'>
-          <div className='relative flex h-full justify-center bg-accent pb-8'>
-            <div className='scale-90'>
-              {!isLoading && !isOpen && (
-                <PdfRenderer
-                  formData={formData}
-                  templateId={selectedTemplate}
-                />
-              )}
-            </div>
-          </div> 
-        </ScrollArea> */}
 
         <div className='block h-full px-2'>
           <div className='h-full w-full rounded-lg border'>
             <div className='h-full w-full p-4'>
               <ScrollArea className='h-[calc(100vh-150px)] pe-2'>
-                {renderContent()}
+                {!currentIsLoading && !isOpen && renderContent()}
               </ScrollArea>
             </div>
           </div>
