@@ -29,39 +29,77 @@ export const EditResumeForm = ({ form }: EditResumeFormProps) => {
 
   const handleResumeSnapShot = async () => {
     const pdfElement = document.getElementById('resume-pdf-preview');
+
+    // Check if the preview element exists
     if (!pdfElement) {
-      throw new Error('Preview element not found');
+      console.warn(
+        'PDF preview element not found, skipping preview generation'
+      );
+      return false; // Return false to indicate preview wasn't generated
     }
 
-    const imageBlob = await generatePreviewImage(pdfElement);
-    const reader = new FileReader();
-    const base64Promise = new Promise<string>((resolve) => {
-      reader.onloadend = () => resolve(reader.result as string);
-    });
-    reader.readAsDataURL(imageBlob);
-    const base64Image = await base64Promise;
+    try {
+      const imageBlob = await generatePreviewImage(pdfElement);
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve) => {
+        reader.onloadend = () => resolve(reader.result as string);
+      });
+      reader.readAsDataURL(imageBlob);
+      const base64Image = await base64Promise;
 
-    await uploadPreviewImage({
-      resumeId: String(form.getValues('resume_id')),
-      image: base64Image
-    });
+      await uploadPreviewImage({
+        resumeId: String(form.getValues('resume_id')),
+        image: base64Image
+      });
+
+      return true; // Return true to indicate preview was generated successfully
+    } catch (error) {
+      console.error('Error generating preview:', error);
+      return false;
+    }
   };
 
-  const handleSubmit = async (values: TResumeEditFormValues) => {
+  // Handle save without preview
+  const handleSave = async (values: TResumeEditFormValues) => {
     try {
-      const loadingToast = toast.loading('Saving and syncing preview...');
+      const loadingToast = toast.loading('Saving resume...');
 
-      // Update resume data
       await updateResume({
         id: values.resume_id!,
         ...values
       });
 
-      // Generate and upload preview
-      await handleResumeSnapShot();
+      toast.dismiss(loadingToast);
+      toast.success('Resume saved successfully');
+    } catch (error) {
+      console.error('Error saving resume:', error);
+      toast.error('Failed to save changes. Please try again.');
+    }
+  };
+
+  // Handle save with preview sync
+  const handleSaveAndSync = async (values: TResumeEditFormValues) => {
+    try {
+      const loadingToast = toast.loading('Saving and syncing preview...');
+
+      // Update resume data first
+      await updateResume({
+        id: values.resume_id!,
+        ...values
+      });
+
+      // Try to generate and upload preview
+      const previewGenerated = await handleResumeSnapShot();
 
       toast.dismiss(loadingToast);
-      toast.success('Resume synced successfully');
+
+      if (previewGenerated) {
+        toast.success('Resume saved and preview synced successfully');
+      } else {
+        toast.warning(
+          'Resume saved, but preview sync failed. Make sure PDF preview is visible.'
+        );
+      }
     } catch (error) {
       console.error('Error saving resume:', error);
       toast.error('Failed to save changes. Please try again.');
@@ -70,16 +108,26 @@ export const EditResumeForm = ({ form }: EditResumeFormProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8'>
+      <form onSubmit={form.handleSubmit(handleSave)} className='space-y-8'>
         {userId && (
-          <div className='mb-4 flex justify-end'>
+          <div className='mb-4 flex justify-end gap-2'>
             <Button
               type='submit'
+              variant='outline'
               disabled={isLoading || isUpdating}
               className='gap-2'
             >
               <FolderSyncIcon className='h-4 w-4' />
-              {isLoading || isUpdating ? 'Saving...' : 'Sync & Save'}
+              {isUpdating ? 'Saving...' : 'Save'}
+            </Button>
+            <Button
+              type='button'
+              onClick={form.handleSubmit(handleSaveAndSync)}
+              disabled={isLoading || isUpdating}
+              className='gap-2'
+            >
+              <FolderSyncIcon className='h-4 w-4' />
+              {isLoading || isUpdating ? 'Syncing...' : 'Save & Sync Preview'}
             </Button>
           </div>
         )}
@@ -89,16 +137,28 @@ export const EditResumeForm = ({ form }: EditResumeFormProps) => {
         <Skills control={form.control} />
         <Tools control={form.control} />
         <Languages control={form.control} />
-        {userId && (
-          <Button
-            type='submit'
-            disabled={isLoading || isUpdating}
-            className='w-full gap-2'
-          >
-            <FolderSyncIcon className='h-4 w-4' />
-            {isLoading || isUpdating ? 'Saving...' : 'Sync & Save'}
-          </Button>
-        )}
+        {/* {userId && (
+          <div className='flex gap-2'>
+            <Button
+              type='submit'
+              variant='outline'
+              disabled={isLoading || isUpdating}
+              className='flex-1 gap-2'
+            >
+              <FolderSyncIcon className='h-4 w-4' />
+              {isUpdating ? 'Saving...' : 'Save'}
+            </Button>
+            <Button
+              type='button'
+              onClick={form.handleSubmit(handleSaveAndSync)}
+              disabled={isLoading || isUpdating}
+              className='flex-1 gap-2'
+            >
+              <FolderSyncIcon className='h-4 w-4' />
+              {isLoading || isUpdating ? 'Syncing...' : 'Save & Sync Preview'}
+            </Button>
+          </div>
+        )} */}
       </form>
     </Form>
   );

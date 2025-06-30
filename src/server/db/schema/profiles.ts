@@ -1,8 +1,10 @@
+// src/server/db/schema/profiles.ts
 import { pgTable, text, timestamp, integer, serial } from 'drizzle-orm/pg-core';
 import { accounts } from './accounts';
 import { relations } from 'drizzle-orm';
 import { certificates } from './certificates';
 import { extracurriculars } from './extracurriculars';
+
 // Main profiles table
 export const profiles = pgTable('profiles', {
   id: text('id').primaryKey().notNull(),
@@ -12,42 +14,42 @@ export const profiles = pgTable('profiles', {
   firstname: text('firstname').notNull(),
   lastname: text('lastname').notNull(),
   email: text('email').notNull(),
-  contactno: text('contact_no').notNull(),
-  country: text('country').notNull(),
-  city: text('city').notNull(),
+  contactno: text('contact_no'), // Removed .notNull()
+  country: text('country'), // Removed .notNull()
+  city: text('city'), // Removed .notNull()
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull()
 });
 
-// Jobs table with reference to profile
+// Jobs table with reference to profile - made all fields nullable except required ones
 export const jobs = pgTable('jobs', {
   id: serial('id').primaryKey(),
   profileId: text('profile_id')
     .notNull()
     .references(() => profiles.id),
-  jobTitle: text('job_title'),
-  employer: text('employer'),
-  description: text('description'),
-  startDate: text('start_date'), // Using text to match your YYYY-MM-DD format
-  endDate: text('end_date'), // Using text to match your YYYY-MM-DD format
-  city: text('city'),
+  jobTitle: text('job_title'), // Already nullable
+  employer: text('employer'), // Already nullable
+  description: text('description'), // Already nullable
+  startDate: text('start_date'), // Already nullable
+  endDate: text('end_date'), // Already nullable
+  city: text('city'), // Already nullable
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull()
 });
 
-// Education table with reference to profile
+// Education table with reference to profile - made all fields nullable except required ones
 export const educations = pgTable('educations', {
   id: serial('id').primaryKey(),
   profileId: text('profile_id')
     .notNull()
     .references(() => profiles.id, { onDelete: 'cascade' }),
-  school: text('school'),
-  degree: text('degree'),
-  field: text('field'),
-  description: text('description'),
-  startDate: text('start_date'), // Using text to match your YYYY-MM-DD format
-  endDate: text('end_date'), // Using text to match your YYYY-MM-DD format
-  city: text('city'),
+  school: text('school'), // Already nullable
+  degree: text('degree'), // Already nullable
+  field: text('field'), // Already nullable
+  description: text('description'), // Already nullable
+  startDate: text('start_date'), // Already nullable
+  endDate: text('end_date'), // Already nullable
+  city: text('city'), // Already nullable
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull()
 });

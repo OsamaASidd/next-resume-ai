@@ -1,3 +1,4 @@
+// src/server/routers/profile-router.ts
 import { z } from 'zod';
 import { j, privateProcedure } from '../jstack';
 import { profileSchema } from '@/features/profile/utils/form-schema';
@@ -44,9 +45,9 @@ export const profileRouter = j.router({
             firstname: input.firstname,
             lastname: input.lastname,
             email: input.email,
-            contactno: input.contactno,
-            country: input.country,
-            city: input.city
+            contactno: input.contactno || null,
+            country: input.country || null,
+            city: input.city || null
           })
           .returning();
 
@@ -54,12 +55,12 @@ export const profileRouter = j.router({
           await tx.insert(jobs).values(
             input.jobs.map((job) => ({
               profileId: createdProfile.id,
-              jobTitle: job.jobTitle,
-              employer: job.employer,
-              description: job.description ?? null,
-              startDate: job.startDate,
-              endDate: job.endDate,
-              city: job.city
+              jobTitle: job.jobTitle || null,
+              employer: job.employer || null,
+              description: job.description || null,
+              startDate: job.startDate || null,
+              endDate: job.endDate || null,
+              city: job.city || null
             }))
           );
         }
@@ -68,13 +69,13 @@ export const profileRouter = j.router({
           await tx.insert(educations).values(
             input.educations.map((edu) => ({
               profileId: createdProfile.id,
-              school: edu.school,
-              degree: edu.degree,
-              field: edu.field,
-              description: edu.description ?? null,
-              startDate: edu.startDate,
-              endDate: edu.endDate,
-              city: edu.city
+              school: edu.school || null,
+              degree: edu.degree || null,
+              field: edu.field || null,
+              description: edu.description || null,
+              startDate: edu.startDate || null,
+              endDate: edu.endDate || null,
+              city: edu.city || null
             }))
           );
         }
@@ -83,9 +84,9 @@ export const profileRouter = j.router({
           await tx.insert(certificates).values(
             input.certificates.map((cert) => ({
               profileId: createdProfile.id,
-              name: cert.name,
-              issuer: cert.issuer,
-              issueDate: cert.issueDate,
+              name: cert.name || null,
+              issuer: cert.issuer || null,
+              issueDate: cert.issueDate || null,
               expirationDate: cert.expirationDate || null,
               credentialId: cert.credentialId || null,
               credentialUrl: cert.credentialUrl || null,
@@ -98,11 +99,11 @@ export const profileRouter = j.router({
           await tx.insert(extracurriculars).values(
             input.extracurriculars.map((eca) => ({
               profileId: createdProfile.id,
-              activityName: eca.activityName,
+              activityName: eca.activityName || null,
               organization: eca.organization || null,
               role: eca.role || null,
-              startDate: eca.startDate,
-              endDate: eca.endDate,
+              startDate: eca.startDate || null,
+              endDate: eca.endDate || null,
               description: eca.description || null
             }))
           );
@@ -135,9 +136,9 @@ export const profileRouter = j.router({
             firstname: inputData.firstname,
             lastname: inputData.lastname,
             email: inputData.email,
-            contactno: inputData.contactno,
-            country: inputData.country,
-            city: inputData.city,
+            contactno: inputData.contactno || null,
+            country: inputData.country || null,
+            city: inputData.city || null,
             updatedAt: new Date()
           })
           .where(eq(profiles.id, id))
@@ -154,12 +155,12 @@ export const profileRouter = j.router({
           await tx.insert(jobs).values(
             inputData.jobs.map((job) => ({
               profileId: id,
-              jobTitle: job.jobTitle,
-              employer: job.employer,
-              description: job.description ?? null,
-              startDate: job.startDate,
-              endDate: job.endDate,
-              city: job.city
+              jobTitle: job.jobTitle || null,
+              employer: job.employer || null,
+              description: job.description || null,
+              startDate: job.startDate || null,
+              endDate: job.endDate || null,
+              city: job.city || null
             }))
           );
         }
@@ -168,13 +169,13 @@ export const profileRouter = j.router({
           await tx.insert(educations).values(
             inputData.educations.map((edu) => ({
               profileId: id,
-              school: edu.school,
-              degree: edu.degree,
-              field: edu.field,
-              description: edu.description ?? null,
-              startDate: edu.startDate,
-              endDate: edu.endDate,
-              city: edu.city
+              school: edu.school || null,
+              degree: edu.degree || null,
+              field: edu.field || null,
+              description: edu.description || null,
+              startDate: edu.startDate || null,
+              endDate: edu.endDate || null,
+              city: edu.city || null
             }))
           );
         }
@@ -183,9 +184,9 @@ export const profileRouter = j.router({
           await tx.insert(certificates).values(
             inputData.certificates.map((cert) => ({
               profileId: id,
-              name: cert.name,
-              issuer: cert.issuer,
-              issueDate: cert.issueDate,
+              name: cert.name || null,
+              issuer: cert.issuer || null,
+              issueDate: cert.issueDate || null,
               expirationDate: cert.expirationDate || null,
               credentialId: cert.credentialId || null,
               credentialUrl: cert.credentialUrl || null,
@@ -198,11 +199,11 @@ export const profileRouter = j.router({
           await tx.insert(extracurriculars).values(
             inputData.extracurriculars.map((eca) => ({
               profileId: id,
-              activityName: eca.activityName,
+              activityName: eca.activityName || null,
               organization: eca.organization || null,
               role: eca.role || null,
-              startDate: eca.startDate,
-              endDate: eca.endDate,
+              startDate: eca.startDate || null,
+              endDate: eca.endDate || null,
               description: eca.description || null
             }))
           );

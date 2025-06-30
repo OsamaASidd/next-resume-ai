@@ -1,105 +1,142 @@
+// src/features/profile/utils/form-schema.ts
 import { z } from 'zod';
 
 export const jobSchema = z.object({
   id: z.number().optional(), // For existing jobs during updates
   jobTitle: z
     .string()
-    .min(3, { message: 'Job title must be at least 3 characters' }),
+    .min(1, { message: 'Job title is required' })
+    .optional()
+    .or(z.literal('')),
   employer: z
     .string()
-    .min(3, { message: 'Employer must be at least 3 characters' }),
-  description: z.string().optional(),
-  startDate: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
-    message: 'Start date should be in the format YYYY-MM-DD'
-  }),
-  endDate: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
-    message: 'End date should be in the format YYYY-MM-DD'
-  }),
-  city: z.string().min(1, { message: 'Please select a city' })
+    .min(1, { message: 'Employer is required' })
+    .optional()
+    .or(z.literal('')),
+  description: z.string().optional().nullable(),
+  startDate: z
+    .string()
+    .optional()
+    .nullable()
+    .refine(
+      (value) => !value || value === '' || /^\d{4}-\d{2}-\d{2}$/.test(value),
+      {
+        message: 'Start date should be in the format YYYY-MM-DD or empty'
+      }
+    ),
+  endDate: z
+    .string()
+    .optional()
+    .nullable()
+    .refine(
+      (value) => !value || value === '' || /^\d{4}-\d{2}-\d{2}$/.test(value),
+      {
+        message: 'End date should be in the format YYYY-MM-DD or empty'
+      }
+    ),
+  city: z.string().optional().nullable()
 });
 
 export const educationSchema = z.object({
   id: z.number().optional(),
-  school: z
+  school: z.string().optional().nullable(),
+  degree: z.string().optional().nullable(),
+  field: z.string().optional().nullable(), // Made optional and nullable
+  description: z.string().optional().nullable(),
+  startDate: z
     .string()
-    .min(3, { message: 'School name must be at least 3 characters' }),
-  degree: z
+    .optional()
+    .nullable()
+    .refine(
+      (value) => !value || value === '' || /^\d{4}-\d{2}-\d{2}$/.test(value),
+      {
+        message: 'Start date should be in the format YYYY-MM-DD or empty'
+      }
+    ),
+  endDate: z
     .string()
-    .min(3, { message: 'Degree name must be at least 3 characters' }),
-  field: z
-    .string()
-    .min(3, { message: 'Field name must be at least 3 characters' }),
-  description: z.string().optional(),
-  startDate: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
-    message: 'Start date should be in the format YYYY-MM-DD'
-  }),
-  endDate: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
-    message: 'End date should be in the format YYYY-MM-DD'
-  }),
-  city: z.string().min(1, { message: 'Please select a city' })
+    .optional()
+    .nullable()
+    .refine(
+      (value) => !value || value === '' || /^\d{4}-\d{2}-\d{2}$/.test(value),
+      {
+        message: 'End date should be in the format YYYY-MM-DD or empty'
+      }
+    ),
+  city: z.string().optional().nullable() // Made optional and nullable
 });
 
 // Add these new schemas
 export const certificateSchema = z.object({
   id: z.number().optional(),
-  name: z
+  name: z.string().optional().nullable(),
+  issuer: z.string().optional().nullable(),
+  issueDate: z
     .string()
-    .min(3, { message: 'Certificate name must be at least 3 characters' }),
-  issuer: z
-    .string()
-    .min(3, { message: 'Issuer name must be at least 3 characters' }),
-  issueDate: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
-    message: 'Issue date should be in the format YYYY-MM-DD'
-  }),
-  expirationDate: z.string().optional(),
-  credentialId: z.string().optional(),
+    .optional()
+    .nullable()
+    .refine(
+      (value) => !value || value === '' || /^\d{4}-\d{2}-\d{2}$/.test(value),
+      {
+        message: 'Issue date should be in the format YYYY-MM-DD or empty'
+      }
+    ),
+  expirationDate: z.string().optional().nullable(),
+  credentialId: z.string().optional().nullable(),
   credentialUrl: z
     .string()
     .url('Please enter a valid URL')
     .optional()
-    .nullable(),
-  description: z.string().optional()
+    .nullable()
+    .or(z.literal('')), // Allow empty string
+  description: z.string().optional().nullable()
 });
 
 export const extracurricularSchema = z.object({
   id: z.number().optional(),
-  activityName: z
+  activityName: z.string().optional().nullable(),
+  organization: z.string().optional().nullable(),
+  role: z.string().optional().nullable(),
+  startDate: z
     .string()
-    .min(3, { message: 'Activity name must be at least 3 characters' }),
-  organization: z.string().min(1, { message: 'Organization is required' }),
-  role: z.string().optional(),
-  startDate: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
-    message: 'Start date should be in the format YYYY-MM-DD'
-  }),
-  endDate: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
-    message: 'End date should be in the format YYYY-MM-DD'
-  }),
-  description: z.string().optional()
+    .optional()
+    .nullable()
+    .refine(
+      (value) => !value || value === '' || /^\d{4}-\d{2}-\d{2}$/.test(value),
+      {
+        message: 'Start date should be in the format YYYY-MM-DD or empty'
+      }
+    ),
+  endDate: z
+    .string()
+    .optional()
+    .nullable()
+    .refine(
+      (value) => !value || value === '' || /^\d{4}-\d{2}-\d{2}$/.test(value),
+      {
+        message: 'End date should be in the format YYYY-MM-DD or empty'
+      }
+    ),
+  description: z.string().optional().nullable()
 });
 
-// Update the profile schema to include the new arrays
+// Update the profile schema to be more flexible
 export const profileSchema = z.object({
-  firstname: z
-    .string()
-    .min(3, { message: 'First name must be at least 3 characters' }),
-  lastname: z
-    .string()
-    .min(1, { message: 'Last name must be at least 1 characters long' }),
+  firstname: z.string().min(1, { message: 'First name is required' }),
+  lastname: z.string().min(1, { message: 'Last name is required' }),
   email: z.string().email({ message: 'Please enter a valid email address' }),
-  contactno: z.string().refine((val) => /^\d{10}$/.test(val), {
-    message: 'Contact number must be 10 digits'
-  }),
-  country: z.string().min(1, { message: 'Please select a country' }),
-  city: z.string().min(1, { message: 'Please select a city' }),
-  jobs: z.array(jobSchema),
-  educations: z.array(educationSchema),
-  certificates: z.array(certificateSchema),
-  extracurriculars: z.array(extracurricularSchema)
+  contactno: z
+    .string()
+    .min(1, { message: 'Contact number is required' })
+    .optional()
+    .or(z.literal('')), // Allow empty string
+  country: z.string().optional().nullable(),
+  city: z.string().optional().nullable(),
+  jobs: z.array(jobSchema).default([]),
+  educations: z.array(educationSchema).default([]),
+  certificates: z.array(certificateSchema).default([]),
+  extracurriculars: z.array(extracurricularSchema).default([])
 });
-
-// Type definitions
-export type TCertificateFormValues = z.infer<typeof certificateSchema>;
-export type TExtracurricularFormValues = z.infer<typeof extracurricularSchema>;
 
 // For updates, we need an ID
 export const updateProfileSchema = profileSchema.extend({
@@ -110,3 +147,5 @@ export type TProfileFormValues = z.infer<typeof profileSchema>;
 export type TUpdateProfileFormValues = z.infer<typeof updateProfileSchema>;
 export type TJobFormValues = z.infer<typeof jobSchema>;
 export type TEducationFormValues = z.infer<typeof educationSchema>;
+export type TCertificateFormValues = z.infer<typeof certificateSchema>;
+export type TExtracurricularFormValues = z.infer<typeof extracurricularSchema>;
