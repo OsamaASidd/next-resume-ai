@@ -57,6 +57,10 @@ const ResumePadding = () => (
 );
 
 export default function ResumeTemplate({ formData }: TResumeTemplateProps) {
+  // Provide safe fallbacks for optional arrays
+  const certificates = formData.certificates ?? [];
+  const extracurriculars = formData.extracurriculars ?? [];
+
   return (
     <Document>
       <Page size='A4' style={tw('flex flex-row flex-wrap')}>
@@ -86,27 +90,23 @@ export default function ResumeTemplate({ formData }: TResumeTemplateProps) {
           <Text style={tw('text-muted')}>Skills</Text>
           <BulletedList
             items={
-              formData?.skills?.map((skill) => ({
-                name: `${skill.skill_name}`
-              })) ?? []
+              formData.skills?.map((skill) => ({ name: skill.skill_name })) ??
+              []
             }
           />
 
           <Text style={tw('text-muted')}>Tools</Text>
           <BulletedList
             items={
-              formData?.tools?.map((tool) => ({
-                name: `${tool.tool_name}`
-              })) ?? []
+              formData.tools?.map((tool) => ({ name: tool.tool_name })) ?? []
             }
           />
 
           <Text style={tw('text-muted')}>Languages</Text>
           <BulletedList
             items={
-              formData?.languages?.map((lang) => ({
-                name: `${lang.lang_name}`
-              })) ?? []
+              formData.languages?.map((lang) => ({ name: lang.lang_name })) ??
+              []
             }
           />
         </View>
@@ -125,17 +125,15 @@ export default function ResumeTemplate({ formData }: TResumeTemplateProps) {
           <View style={tw('flex flex-col')}>
             <Text style={tw('text-muted text-2xl font-bold')}>Education</Text>
             <View style={tw('flex flex-col gap-6')}>
-              {formData?.educations?.map((edu, index) => (
+              {formData.educations?.map((edu, index) => (
                 <View key={index}>
                   <Text style={tw('font-bold text-lg')}>
-                    {edu?.degree ?? 'Degree'} in {edu?.field ?? 'Field'} |{' '}
-                    {edu?.school ?? 'School'}
+                    {edu.degree} in {edu.field} | {edu.school}
                   </Text>
                   <Text style={tw('font-bold text-lg')}>
-                    {edu?.startDate ?? 'Start Date'} -{' '}
-                    {edu?.endDate ?? 'End Date'}
+                    {edu.startDate} - {edu.endDate}
                   </Text>
-                  <Text style={tw('text-sm')}>{edu?.description ?? ''}</Text>
+                  <Text style={tw('text-sm')}>{edu.description}</Text>
                 </View>
               ))}
             </View>
@@ -147,38 +145,36 @@ export default function ResumeTemplate({ formData }: TResumeTemplateProps) {
               Employment History
             </Text>
             <View style={tw('flex flex-col gap-6')}>
-              {formData?.jobs?.map((job, index) => (
+              {formData.jobs?.map((job, index) => (
                 <View wrap={false} key={index}>
                   <Text style={tw('font-bold text-lg')}>
-                    {job?.jobTitle ?? 'Job Title'} |{' '}
-                    {job?.employer ?? 'Employer'}
+                    {job.jobTitle} | {job.employer}
                   </Text>
                   <Text style={tw('font-bold text-lg')}>
-                    {job?.startDate ?? 'Start Date'} -{' '}
-                    {job?.endDate ?? 'End Date'}
+                    {job.startDate} - {job.endDate}
                   </Text>
-                  <Text style={tw('text-sm')}>{job?.description ?? ''}</Text>
+                  <Text style={tw('text-sm')}>{job.description}</Text>
                 </View>
               ))}
             </View>
           </View>
 
           {/* Certificates */}
-          {formData?.certificates?.length > 0 && (
+          {certificates.length > 0 && (
             <View style={tw('flex flex-col')}>
               <Text style={tw('text-muted text-2xl font-bold')}>
                 Certifications
               </Text>
               <View style={tw('flex flex-col gap-6')}>
-                {formData.certificates.map((cert, index) => (
+                {certificates.map((cert, index) => (
                   <View key={index}>
                     <Text style={tw('font-bold text-lg')}>
-                      {cert?.name ?? 'Certificate'} | {cert?.issuer ?? 'Issuer'}
+                      {cert.name} | {cert.issuer}
                     </Text>
                     <Text style={tw('font-bold text-lg')}>
-                      {cert?.issueDate ?? 'Issue Date'}
+                      {cert.issueDate}
                     </Text>
-                    <Text style={tw('text-sm')}>{cert?.description ?? ''}</Text>
+                    <Text style={tw('text-sm')}>{cert.description}</Text>
                   </View>
                 ))}
               </View>
@@ -186,23 +182,21 @@ export default function ResumeTemplate({ formData }: TResumeTemplateProps) {
           )}
 
           {/* Extracurricular Activities */}
-          {formData?.extracurriculars?.length > 0 && (
+          {extracurriculars.length > 0 && (
             <View style={tw('flex flex-col')}>
               <Text style={tw('text-muted text-2xl font-bold')}>
                 Extracurricular Activities
               </Text>
               <View style={tw('flex flex-col gap-6')}>
-                {formData.extracurriculars.map((eca, index) => (
+                {extracurriculars.map((eca, index) => (
                   <View key={index}>
                     <Text style={tw('font-bold text-lg')}>
-                      {eca?.activityName ?? 'Activity'} |{' '}
-                      {eca?.organization ?? 'Organization'}
+                      {eca.activityName} | {eca.organization}
                     </Text>
                     <Text style={tw('font-bold text-lg')}>
-                      {eca?.startDate ?? 'Start Date'} -{' '}
-                      {eca?.endDate ?? 'End Date'}
+                      {eca.startDate} - {eca.endDate}
                     </Text>
-                    <Text style={tw('text-sm')}>{eca?.description ?? ''}</Text>
+                    <Text style={tw('text-sm')}>{eca.description}</Text>
                   </View>
                 ))}
               </View>
