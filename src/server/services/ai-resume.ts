@@ -220,8 +220,8 @@ export async function generateGuestResumeContent(
 
     Education:
     ${
-      parsedProfile?.educations && parsedProfile?.educations.length > 0
-        ? parsedProfile?.educations
+      parsedProfile?.education && parsedProfile?.education.length > 0
+        ? parsedProfile?.education
             .map((education: any) => {
               return `
         School: ${education.school || 'Not Specified'}

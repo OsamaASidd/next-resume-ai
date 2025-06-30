@@ -1,5 +1,4 @@
 'use client';
-import { generateGuestResumeContent } from '@/server/services/ai-resume';
 import { Button as UiButton } from '@/components/ui/button';
 import {
   Form,
@@ -19,6 +18,7 @@ import { useCreateResume } from '../api';
 import { TResumeFormValues, resumeFormSchema } from '../utils/form-schema';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import { generateGuestResumeAction } from '../../../server/routers/guest-resume'; // Import the server action
 
 interface ResumeCreateFormTestProps {
   selectedProfile?: any | null;
@@ -85,8 +85,8 @@ export function ResumeCreateFormTest({
       try {
         setIsGenerating(true);
 
-        // Generate AI content for guest user without database interaction
-        const aiGeneratedContent = await generateGuestResumeContent(
+        // Call server action instead of direct function call
+        const result = await generateGuestResumeAction(
           {
             jd_job_title: data.jd_job_title,
             employer: data.employer,
@@ -95,13 +95,17 @@ export function ResumeCreateFormTest({
           selectedProfile
         );
 
-        console.log('AI generated content for guest:', aiGeneratedContent);
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to generate resume');
+        }
+
+        console.log('AI generated content for guest:', result.data);
 
         // Create a temporary resume object for guest
         const guestResume = {
-          id: `guest`, // Temporary ID
+          id: `guest`,
           ...data,
-          ...aiGeneratedContent,
+          ...result.data,
           isGuest: true,
           createdAt: new Date().toISOString()
         };
