@@ -69,7 +69,7 @@ export const Certificates = ({ control }: CertificatesProps) => {
                 <FormItem>
                   <FormLabel>Certificate Name</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} value={field.value || ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -83,7 +83,7 @@ export const Certificates = ({ control }: CertificatesProps) => {
                 <FormItem>
                   <FormLabel>Issuer</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} value={field.value || ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -97,7 +97,7 @@ export const Certificates = ({ control }: CertificatesProps) => {
                 <FormItem>
                   <FormLabel>Issue Date</FormLabel>
                   <FormControl>
-                    <Input type='date' {...field} />
+                    <Input type='date' {...field} value={field.value || ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
