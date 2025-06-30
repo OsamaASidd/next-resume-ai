@@ -372,7 +372,11 @@ export default function CreateProfileForm({
                 <FormItem>
                   <FormLabel>Country</FormLabel>
                   <FormControl>
-                    <Input placeholder='Enter country' {...field} />
+                    <Input
+                      placeholder='Enter country'
+                      {...field}
+                      value={field.value || ''}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -385,7 +389,11 @@ export default function CreateProfileForm({
                 <FormItem>
                   <FormLabel>City</FormLabel>
                   <FormControl>
-                    <Input placeholder='Enter city' {...field} />
+                    <Input
+                      placeholder='Enter City'
+                      {...field}
+                      value={field.value || ''}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -476,7 +484,11 @@ export default function CreateProfileForm({
                         <FormItem>
                           <FormLabel>City</FormLabel>
                           <FormControl>
-                            <Input placeholder='Enter city' {...inputField} />
+                            <Input
+                              placeholder='Enter City'
+                              {...inputField}
+                              value={inputField.value || ''}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -489,7 +501,11 @@ export default function CreateProfileForm({
                         <FormItem>
                           <FormLabel>Start Date</FormLabel>
                           <FormControl>
-                            <Input type='date' {...inputField} />
+                            <Input
+                              type='date'
+                              {...inputField}
+                              value={inputField.value || ''}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -502,7 +518,11 @@ export default function CreateProfileForm({
                         <FormItem>
                           <FormLabel>End Date</FormLabel>
                           <FormControl>
-                            <Input type='date' {...inputField} />
+                            <Input
+                              type='date'
+                              {...inputField}
+                              value={inputField.value || ''}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -519,6 +539,7 @@ export default function CreateProfileForm({
                               placeholder='Enter job description'
                               {...inputField}
                               className='min-h-[100px]'
+                              value={inputField.value || ''}
                             />
                           </FormControl>
                           <FormMessage />
@@ -586,6 +607,7 @@ export default function CreateProfileForm({
                             <Input
                               placeholder='Enter school name'
                               {...inputField}
+                              value={inputField.value || ''}
                             />
                           </FormControl>
                           <FormMessage />
@@ -599,7 +621,11 @@ export default function CreateProfileForm({
                         <FormItem>
                           <FormLabel>Degree</FormLabel>
                           <FormControl>
-                            <Input placeholder='Enter degree' {...inputField} />
+                            <Input
+                              placeholder='Enter degree'
+                              {...inputField}
+                              value={inputField.value || ''}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -615,6 +641,7 @@ export default function CreateProfileForm({
                             <Input
                               placeholder='Enter field of study'
                               {...inputField}
+                              value={inputField.value || ''}
                             />
                           </FormControl>
                           <FormMessage />
@@ -628,7 +655,11 @@ export default function CreateProfileForm({
                         <FormItem>
                           <FormLabel>Start Date</FormLabel>
                           <FormControl>
-                            <Input type='date' {...inputField} />
+                            <Input
+                              type='date'
+                              {...inputField}
+                              value={inputField.value || ''}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -641,7 +672,11 @@ export default function CreateProfileForm({
                         <FormItem>
                           <FormLabel>End Date</FormLabel>
                           <FormControl>
-                            <Input type='date' {...inputField} />
+                            <Input
+                              type='date'
+                              {...inputField}
+                              value={inputField.value || ''}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -654,7 +689,11 @@ export default function CreateProfileForm({
                         <FormItem>
                           <FormLabel>City</FormLabel>
                           <FormControl>
-                            <Input placeholder='Enter city' {...inputField} />
+                            <Input
+                              placeholder='Enter city'
+                              {...inputField}
+                              value={inputField.value || ''}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -671,6 +710,7 @@ export default function CreateProfileForm({
                               placeholder='Enter education description'
                               {...inputField}
                               className='min-h-[100px]'
+                              value={inputField.value || ''}
                             />
                           </FormControl>
                           <FormMessage />
