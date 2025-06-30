@@ -17,24 +17,24 @@ export type ProfileWithRelations = Profile & {
   jobs: Job[];
   educations: Education[];
   certificates: Array<{
-    id: string;
+    id: number;
     profileId: string;
     name: string;
     issuer: string;
-    issueDate: Date;
-    expirationDate: Date | null;
+    issueDate: string;
+    expirationDate: string | null;
     credentialId: string | null;
     credentialUrl: string | null;
     description: string | null;
   }>;
   extracurriculars: Array<{
-    id: string;
+    id: number;
     profileId: string;
     activityName: string;
     organization: string;
     role: string | null;
-    startDate: Date;
-    endDate: Date;
+    startDate: string;
+    endDate: string;
     description: string | null;
   }>;
 };
