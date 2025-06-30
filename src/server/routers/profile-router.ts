@@ -1,4 +1,3 @@
-// src/server/routers/profile-router.ts
 import { z } from 'zod';
 import { j, privateProcedure } from '../jstack';
 import { profileSchema } from '@/features/profile/utils/form-schema';
@@ -14,10 +13,35 @@ import {
 } from '../db/schema';
 import { Education, Job, Profile } from '../db/schema/profiles';
 
+export type ProfileWithRelations = Profile & {
+  jobs: Job[];
+  educations: Education[];
+  certificates: Array<{
+    id: string;
+    profileId: string;
+    name: string;
+    issuer: string;
+    issueDate: Date;
+    expirationDate: Date | null;
+    credentialId: string | null;
+    credentialUrl: string | null;
+    description: string | null;
+  }>;
+  extracurriculars: Array<{
+    id: string;
+    profileId: string;
+    activityName: string;
+    organization: string;
+    role: string | null;
+    startDate: Date;
+    endDate: Date;
+    description: string | null;
+  }>;
+};
+
 export const profileRouter = j.router({
   getProfiles: privateProcedure.query(async ({ c, ctx }) => {
     const { user } = ctx;
-
     const userProfiles = (await db.query.profiles.findMany({
       where: eq(profiles.userId, user.id),
       with: {
@@ -35,7 +59,6 @@ export const profileRouter = j.router({
     .input(profileSchema)
     .mutation(async ({ c, ctx, input }) => {
       const { user } = ctx;
-
       return await db.transaction(async (tx) => {
         const [createdProfile] = await tx
           .insert(profiles)
@@ -53,41 +76,43 @@ export const profileRouter = j.router({
 
         if (input.jobs?.length) {
           await tx.insert(jobs).values(
-            input.jobs.map((job) => ({
+            ...input.jobs.map((job) => ({
               profileId: createdProfile.id,
-              jobTitle: job.jobTitle || null,
-              employer: job.employer || null,
-              description: job.description || null,
-              startDate: job.startDate || null,
-              endDate: job.endDate || null,
-              city: job.city || null
+              jobTitle: job.jobTitle,
+              employer: job.employer,
+              description: job.description,
+              startDate: job.startDate,
+              endDate: job.endDate,
+              city: job.city
             }))
           );
         }
 
         if (input.educations?.length) {
           await tx.insert(educations).values(
-            input.educations.map((edu) => ({
+            ...input.educations.map((edu) => ({
               profileId: createdProfile.id,
-              school: edu.school || null,
-              degree: edu.degree || null,
-              field: edu.field || null,
-              description: edu.description || null,
-              startDate: edu.startDate || null,
-              endDate: edu.endDate || null,
-              city: edu.city || null
+              school: edu.school,
+              degree: edu.degree,
+              field: edu.field,
+              description: edu.description,
+              startDate: edu.startDate,
+              endDate: edu.endDate,
+              city: edu.city
             }))
           );
         }
 
         if (input.certificates?.length) {
           await tx.insert(certificates).values(
-            input.certificates.map((cert) => ({
+            ...input.certificates.map((cert) => ({
               profileId: createdProfile.id,
-              name: cert.name || null,
-              issuer: cert.issuer || null,
-              issueDate: cert.issueDate || null,
-              expirationDate: cert.expirationDate || null,
+              name: cert.name!,
+              issuer: cert.issuer!,
+              issueDate: new Date(cert.issueDate!),
+              expirationDate: cert.expirationDate
+                ? new Date(cert.expirationDate)
+                : null,
               credentialId: cert.credentialId || null,
               credentialUrl: cert.credentialUrl || null,
               description: cert.description || null
@@ -97,13 +122,13 @@ export const profileRouter = j.router({
 
         if (input.extracurriculars?.length) {
           await tx.insert(extracurriculars).values(
-            input.extracurriculars.map((eca) => ({
+            ...input.extracurriculars.map((eca) => ({
               profileId: createdProfile.id,
-              activityName: eca.activityName || null,
-              organization: eca.organization || null,
+              activityName: eca.activityName!,
+              organization: eca.organization!,
               role: eca.role || null,
-              startDate: eca.startDate || null,
-              endDate: eca.endDate || null,
+              startDate: new Date(eca.startDate!),
+              endDate: new Date(eca.endDate!),
               description: eca.description || null
             }))
           );
@@ -118,7 +143,6 @@ export const profileRouter = j.router({
             extracurriculars: true
           }
         });
-
         return c.json(completeProfile);
       });
     }),
@@ -128,7 +152,6 @@ export const profileRouter = j.router({
     .mutation(async ({ c, ctx, input }) => {
       const { id, ...inputData } = input;
       const { user } = ctx;
-
       return await db.transaction(async (tx) => {
         const [updatedProfile] = await tx
           .update(profiles)
@@ -153,41 +176,43 @@ export const profileRouter = j.router({
 
         if (inputData.jobs?.length) {
           await tx.insert(jobs).values(
-            inputData.jobs.map((job) => ({
+            ...inputData.jobs.map((job) => ({
               profileId: id,
-              jobTitle: job.jobTitle || null,
-              employer: job.employer || null,
-              description: job.description || null,
-              startDate: job.startDate || null,
-              endDate: job.endDate || null,
-              city: job.city || null
+              jobTitle: job.jobTitle,
+              employer: job.employer,
+              description: job.description,
+              startDate: job.startDate,
+              endDate: job.endDate,
+              city: job.city
             }))
           );
         }
 
         if (inputData.educations?.length) {
           await tx.insert(educations).values(
-            inputData.educations.map((edu) => ({
+            ...inputData.educations.map((edu) => ({
               profileId: id,
-              school: edu.school || null,
-              degree: edu.degree || null,
-              field: edu.field || null,
-              description: edu.description || null,
-              startDate: edu.startDate || null,
-              endDate: edu.endDate || null,
-              city: edu.city || null
+              school: edu.school,
+              degree: edu.degree,
+              field: edu.field,
+              description: edu.description,
+              startDate: edu.startDate,
+              endDate: edu.endDate,
+              city: edu.city
             }))
           );
         }
 
         if (inputData.certificates?.length) {
           await tx.insert(certificates).values(
-            inputData.certificates.map((cert) => ({
+            ...inputData.certificates.map((cert) => ({
               profileId: id,
-              name: cert.name || null,
-              issuer: cert.issuer || null,
-              issueDate: cert.issueDate || null,
-              expirationDate: cert.expirationDate || null,
+              name: cert.name!,
+              issuer: cert.issuer!,
+              issueDate: new Date(cert.issueDate!),
+              expirationDate: cert.expirationDate
+                ? new Date(cert.expirationDate)
+                : null,
               credentialId: cert.credentialId || null,
               credentialUrl: cert.credentialUrl || null,
               description: cert.description || null
@@ -197,13 +222,13 @@ export const profileRouter = j.router({
 
         if (inputData.extracurriculars?.length) {
           await tx.insert(extracurriculars).values(
-            inputData.extracurriculars.map((eca) => ({
+            ...inputData.extracurriculars.map((eca) => ({
               profileId: id,
-              activityName: eca.activityName || null,
-              organization: eca.organization || null,
+              activityName: eca.activityName!,
+              organization: eca.organization!,
               role: eca.role || null,
-              startDate: eca.startDate || null,
-              endDate: eca.endDate || null,
+              startDate: new Date(eca.startDate!),
+              endDate: new Date(eca.endDate!),
               description: eca.description || null
             }))
           );
@@ -218,15 +243,7 @@ export const profileRouter = j.router({
             extracurriculars: true
           }
         });
-
         return c.json(completeProfile);
       });
     })
 });
-
-export type ProfileWithRelations = Profile & {
-  jobs: Job[];
-  educations: Education[];
-  certificates: Certificate[];
-  extracurriculars: Extracurricular[];
-};
