@@ -39,11 +39,14 @@ export function ProfileSelectionStepTest({
     formData.append('pdf', selectedFile); // Make sure key is 'pdf'
     console.log('selectedFile', formData.get('pdf'));
     try {
-      const response = await fetch('http://localhost:5001/api/parse-resume', {
-        method: 'POST',
-        body: formData
-        // Don't set Content-Type header - let browser set it with boundary for multipart/form-data
-      });
+      const response = await fetch(
+        'https://nlp-resume-parser-1-q5gk.onrender.com/api/parse-resume',
+        {
+          method: 'POST',
+          body: formData
+          // Don't set Content-Type header - let browser set it with boundary for multipart/form-data
+        }
+      );
       const result = await response.json();
       if (response.ok && result.success) {
         // PARSED DATA is in same format as Profile Schema

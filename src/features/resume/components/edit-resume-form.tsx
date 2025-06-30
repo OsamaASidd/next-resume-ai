@@ -14,12 +14,14 @@ import { PersonalDetails } from './personal-details';
 import { Skills } from './skills';
 import { Tools } from './tools';
 import { WorkExperience } from './work-experience';
+import { useAuth } from '@clerk/nextjs';
 
 interface EditResumeFormProps {
   form: UseFormReturn<TResumeEditFormValues, any, undefined>;
 }
 
 export const EditResumeForm = ({ form }: EditResumeFormProps) => {
+  const { userId } = useAuth();
   const { mutateAsync: uploadPreviewImage, isPending: isLoading } =
     useUploadPreviewImage();
   const { mutateAsync: updateResume, isPending: isUpdating } =
@@ -69,31 +71,34 @@ export const EditResumeForm = ({ form }: EditResumeFormProps) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8'>
-        <div className='mb-4 flex justify-end'>
-          <Button
-            type='submit'
-            disabled={isLoading || isUpdating}
-            className='gap-2'
-          >
-            <FolderSyncIcon className='h-4 w-4' />
-            {isLoading || isUpdating ? 'Saving...' : 'Sync & Save'}
-          </Button>
-        </div>
-
+        {userId && (
+          <div className='mb-4 flex justify-end'>
+            <Button
+              type='submit'
+              disabled={isLoading || isUpdating}
+              className='gap-2'
+            >
+              <FolderSyncIcon className='h-4 w-4' />
+              {isLoading || isUpdating ? 'Saving...' : 'Sync & Save'}
+            </Button>
+          </div>
+        )}
         <PersonalDetails control={form.control} />
         <WorkExperience control={form.control} />
         <Education control={form.control} />
         <Skills control={form.control} />
         <Tools control={form.control} />
         <Languages control={form.control} />
-        <Button
-          type='submit'
-          disabled={isLoading || isUpdating}
-          className='w-full gap-2'
-        >
-          <FolderSyncIcon className='h-4 w-4' />
-          {isLoading || isUpdating ? 'Saving...' : 'Sync & Save'}
-        </Button>
+        {userId && (
+          <Button
+            type='submit'
+            disabled={isLoading || isUpdating}
+            className='w-full gap-2'
+          >
+            <FolderSyncIcon className='h-4 w-4' />
+            {isLoading || isUpdating ? 'Saving...' : 'Sync & Save'}
+          </Button>
+        )}
       </form>
     </Form>
   );
