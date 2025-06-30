@@ -38,7 +38,7 @@ export default function ChatInterface() {
   const isGuest = resumeId === 'guest';
 
   // Only call API if not guest
-  const { data: resume, isLoading } = useGetResume(isGuest ? null : resumeId);
+  const { data: resume, isLoading } = useGetResume(resumeId || '');
 
   const {
     selectedTemplate,
