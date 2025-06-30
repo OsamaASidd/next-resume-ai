@@ -78,17 +78,37 @@ export default function Messages() {
       <div className='sticky bottom-0 left-0 w-full p-4'>
         {!messages.length && (
           <div className='animate__animated animate__fadeInUp mb-4 flex justify-center gap-4'>
-            <button className='rounded-lg border px-4 py-2 text-sm hover:shadow'>
-              What are the advantages of using Next.js?
+            <button
+              className='rounded-lg border px-4 py-2 text-sm hover:shadow'
+              onClick={() =>
+                setInput('Help me write a compelling professional summary')
+              }
+            >
+              Help me write a compelling professional summary
             </button>
-            <button className='rounded-lg border px-4 py-2 text-sm hover:shadow'>
-              Help me write an essay about Silicon Valley
+            <button
+              className='rounded-lg border px-4 py-2 text-sm hover:shadow'
+              onClick={() =>
+                setInput(
+                  'What skills should I highlight for a software engineer role?'
+                )
+              }
+            >
+              What skills should I highlight for a software engineer role?
             </button>
-            <button className='rounded-lg border px-4 py-2 text-sm hover:shadow'>
-              Write code to demonstrate Dijkstra's algorithm
+            <button
+              className='rounded-lg border px-4 py-2 text-sm hover:shadow'
+              onClick={() => setInput('How do I make my resume ATS-friendly?')}
+            >
+              How do I make my resume ATS-friendly?
             </button>
-            <button className='rounded-lg border px-4 py-2 text-sm hover:shadow'>
-              What is the weather in San Francisco?
+            <button
+              className='rounded-lg border px-4 py-2 text-sm hover:shadow'
+              onClick={() =>
+                setInput('Suggest action verbs for my work experience section')
+              }
+            >
+              Suggest action verbs for my work experience section
             </button>
           </div>
         )}
