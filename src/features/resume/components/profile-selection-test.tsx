@@ -25,12 +25,20 @@ interface ProfileSelectionStepTestProps {
   onProfileSelect: (profile: any) => void;
 }
 
+interface Resume {
+  id: any;
+  previewImageUrl: any;
+  jdJobTitle: any;
+  createdAt: any;
+}
+
 export function ProfileSelectionStepTest({
   onProfileSelect
 }: ProfileSelectionStepTestProps) {
   const { userId } = useAuth();
   const { data: profiles, isLoading: isProfileLoading } = useProfiles();
-  const { data: resumes, isLoading: isResumeLoading } = useGetResumes();
+  const { data: maybeResumes, isLoading: isResumeLoading } = useGetResumes();
+  const resumes = maybeResumes as Resume[] | undefined;
   const { mutateAsync: createProfile, isPending: isCreating } =
     useCreateProfile();
   const [isUploading, setIsUploading] = useState(false);
