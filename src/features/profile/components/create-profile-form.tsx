@@ -49,7 +49,7 @@ const transformProfileToFormValues = (
     email: profile.email,
     firstname: profile.firstname,
     lastname: profile.lastname,
-    contactno: profile.contactno,
+    contactno: profile.contactno || '',
     country: profile.country,
     city: profile.city,
     jobs: profile.jobs.map((job) => ({

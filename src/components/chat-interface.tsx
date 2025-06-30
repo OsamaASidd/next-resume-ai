@@ -28,7 +28,7 @@ export default function ChatInterface() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>(
     []
   );
-  const [guestResume, setGuestResume] = useState(null);
+  const [guestResume, setGuestResume] = useState({});
 
   const [mode, setMode] = useState<'edit' | 'template' | 'preview' | 'zen'>(
     'preview'
