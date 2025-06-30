@@ -27,7 +27,7 @@ const languageSchema = z.object({
 });
 
 export const jobSchema = z.object({
-  id: z.number().optional(), // For existing jobs during updates
+  id: z.number().optional(),
   jobTitle: z
     .string()
     .min(3, { message: 'Job title must be at least 3 characters' }),
@@ -35,12 +35,14 @@ export const jobSchema = z.object({
     .string()
     .min(3, { message: 'Employer must be at least 3 characters' }),
   description: z.string().optional(),
-  startDate: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
-    message: 'Start date should be in the format YYYY-MM-DD'
-  }),
-  endDate: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
-    message: 'End date should be in the format YYYY-MM-DD'
-  }),
+  startDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, {
+      message: 'Start date should be YYYY-MM-DD'
+    }),
+  endDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'End date should be YYYY-MM-DD' }),
   city: z.string().min(1, { message: 'Please select a city' })
 });
 
@@ -56,53 +58,77 @@ export const educationSchema = z.object({
     .string()
     .min(3, { message: 'Field name must be at least 3 characters' }),
   description: z.string().optional(),
-  startDate: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
-    message: 'Start date should be in the format YYYY-MM-DD'
-  }),
-  endDate: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
-    message: 'End date should be in the format YYYY-MM-DD'
-  }),
+  startDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, {
+      message: 'Start date should be YYYY-MM-DD'
+    }),
+  endDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'End date should be YYYY-MM-DD' }),
   city: z.string().min(1, { message: 'Please select a city' })
 });
 
+// — NEW: certificateSchema & extracurricularSchema —
+export const certificateSchema = z.object({
+  name: z.string().min(1, { message: 'Certificate name required' }),
+  issuer: z.string().min(1, { message: 'Issuer required' }),
+  issueDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, {
+      message: 'Issue date should be YYYY-MM-DD'
+    }),
+  expirationDate: z.string().optional(),
+  credentialId: z.string().optional(),
+  credentialUrl: z.string().url().optional(),
+  description: z.string().optional()
+});
+
+export const extracurricularSchema = z.object({
+  activityName: z.string().min(1, { message: 'Activity name required' }),
+  organization: z.string().min(1, { message: 'Organization required' }),
+  role: z.string().optional(),
+  startDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, {
+      message: 'Start date should be YYYY-MM-DD'
+    }),
+  endDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'End date should be YYYY-MM-DD' }),
+  description: z.string().optional()
+});
+
+// — UPDATED resumeEditFormSchema —
 export const resumeEditFormSchema = z.object({
   resume_id: z.string().optional(),
   personal_details: z
     .object({
-      resume_job_title: z
-        .string()
-        .min(3, { message: 'Please enter job title' })
-        .optional(),
-      fname: z
-        .string()
-        .min(3, { message: "Please enter user's first name" })
-        .optional(),
-      lname: z
-        .string()
-        .min(1, { message: 'Last name must be at least 1 characters long' })
-        .optional(),
-      email: z
-        .string()
-        .email({ message: 'Please enter a valid email' })
-        .optional(),
-      phone: z.string().optional(), // Adjusted to string since it's a phone number
+      resume_job_title: z.string().min(3).optional(),
+      fname: z.string().min(3).optional(),
+      lname: z.string().min(1).optional(),
+      email: z.string().email().optional(),
+      phone: z.string().optional(),
       country: z.string().optional(),
       city: z.string().optional(),
-      summary: z
-        .string()
-        .min(3, { message: 'Please enter a summary' })
-        .optional()
-        .nullable()
+      summary: z.string().min(3).optional().nullable()
     })
     .optional(),
+
   jobs: z.array(jobSchema).optional(),
   educations: z.array(educationSchema).optional(),
   skills: z.array(proficiencyLevelSchema).optional(),
   tools: z.array(toolSchema).optional(),
-  languages: z.array(languageSchema).optional()
+  languages: z.array(languageSchema).optional(),
+
+  // ← newly added:
+  certificates: z.array(certificateSchema).optional(),
+  extracurriculars: z.array(extracurricularSchema).optional()
 });
 
+// only infer once, remove any duplicate manual type
 export type TResumeEditFormValues = z.infer<typeof resumeEditFormSchema>;
+
 export type TResumeFormValues = {
   jd_job_title: string;
   employer: string;
