@@ -48,7 +48,7 @@ const templateRegistry: Record<string, TemplateConfig> = {
   }
 };
 
-export const getTemplate = (templateId: string): TemplateConfig => {
+export const getTemplate = (templateId: string): TemplateConfig | undefined => {
   return templateRegistry[templateId];
 };
 

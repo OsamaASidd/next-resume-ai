@@ -18,10 +18,12 @@ export type ProfileWithRelations = Profile & {
   educations: Education[];
   certificates: Array<{
     id: number;
-    profileId: string;
     name: string;
+    createdAt: Date;
+    updatedAt: Date;
+    profileId: string;
     issuer: string;
-    issueDate: string;
+    issueDate: string | null;
     expirationDate: string | null;
     credentialId: string | null;
     credentialUrl: string | null;
@@ -29,12 +31,14 @@ export type ProfileWithRelations = Profile & {
   }>;
   extracurriculars: Array<{
     id: number;
+    createdAt: Date;
+    updatedAt: Date;
     profileId: string;
     activityName: string;
     organization: string;
     role: string | null;
-    startDate: string;
-    endDate: string;
+    startDate: string | null;
+    endDate: string | null;
     description: string | null;
   }>;
 };
@@ -76,7 +80,7 @@ export const profileRouter = j.router({
 
         if (input.jobs?.length) {
           await tx.insert(jobs).values(
-            ...input.jobs.map((job) => ({
+            input.jobs.map((job) => ({
               profileId: createdProfile.id,
               jobTitle: job.jobTitle,
               employer: job.employer,
@@ -90,7 +94,7 @@ export const profileRouter = j.router({
 
         if (input.educations?.length) {
           await tx.insert(educations).values(
-            ...input.educations.map((edu) => ({
+            input.educations.map((edu) => ({
               profileId: createdProfile.id,
               school: edu.school,
               degree: edu.degree,
@@ -105,14 +109,12 @@ export const profileRouter = j.router({
 
         if (input.certificates?.length) {
           await tx.insert(certificates).values(
-            ...input.certificates.map((cert) => ({
+            input.certificates.map((cert) => ({
               profileId: createdProfile.id,
               name: cert.name!,
               issuer: cert.issuer!,
-              issueDate: new Date(cert.issueDate!),
-              expirationDate: cert.expirationDate
-                ? new Date(cert.expirationDate)
-                : null,
+              issueDate: cert.issueDate!, // Keep as string
+              expirationDate: cert.expirationDate || null, // Keep as string
               credentialId: cert.credentialId || null,
               credentialUrl: cert.credentialUrl || null,
               description: cert.description || null
@@ -122,13 +124,13 @@ export const profileRouter = j.router({
 
         if (input.extracurriculars?.length) {
           await tx.insert(extracurriculars).values(
-            ...input.extracurriculars.map((eca) => ({
+            input.extracurriculars.map((eca) => ({
               profileId: createdProfile.id,
               activityName: eca.activityName!,
               organization: eca.organization!,
               role: eca.role || null,
-              startDate: new Date(eca.startDate!),
-              endDate: new Date(eca.endDate!),
+              startDate: eca.startDate!, // Keep as string
+              endDate: eca.endDate!, // Keep as string
               description: eca.description || null
             }))
           );
@@ -176,7 +178,7 @@ export const profileRouter = j.router({
 
         if (inputData.jobs?.length) {
           await tx.insert(jobs).values(
-            ...inputData.jobs.map((job) => ({
+            inputData.jobs.map((job) => ({
               profileId: id,
               jobTitle: job.jobTitle,
               employer: job.employer,
@@ -190,7 +192,7 @@ export const profileRouter = j.router({
 
         if (inputData.educations?.length) {
           await tx.insert(educations).values(
-            ...inputData.educations.map((edu) => ({
+            inputData.educations.map((edu) => ({
               profileId: id,
               school: edu.school,
               degree: edu.degree,
@@ -205,14 +207,12 @@ export const profileRouter = j.router({
 
         if (inputData.certificates?.length) {
           await tx.insert(certificates).values(
-            ...inputData.certificates.map((cert) => ({
+            inputData.certificates.map((cert) => ({
               profileId: id,
               name: cert.name!,
               issuer: cert.issuer!,
-              issueDate: new Date(cert.issueDate!),
-              expirationDate: cert.expirationDate
-                ? new Date(cert.expirationDate)
-                : null,
+              issueDate: cert.issueDate!, // Keep as string
+              expirationDate: cert.expirationDate || null, // Keep as string
               credentialId: cert.credentialId || null,
               credentialUrl: cert.credentialUrl || null,
               description: cert.description || null
@@ -222,13 +222,13 @@ export const profileRouter = j.router({
 
         if (inputData.extracurriculars?.length) {
           await tx.insert(extracurriculars).values(
-            ...inputData.extracurriculars.map((eca) => ({
+            inputData.extracurriculars.map((eca) => ({
               profileId: id,
               activityName: eca.activityName!,
               organization: eca.organization!,
               role: eca.role || null,
-              startDate: new Date(eca.startDate!),
-              endDate: new Date(eca.endDate!),
+              startDate: eca.startDate!, // Keep as string
+              endDate: eca.endDate!, // Keep as string
               description: eca.description || null
             }))
           );

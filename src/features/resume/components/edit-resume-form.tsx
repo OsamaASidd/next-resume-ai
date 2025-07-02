@@ -17,7 +17,7 @@ import { WorkExperience } from './work-experience';
 import { useAuth } from '@clerk/nextjs';
 
 interface EditResumeFormProps {
-  form: UseFormReturn<TResumeEditFormValues, any, undefined>;
+  form: UseFormReturn<TResumeEditFormValues>;
 }
 
 export const EditResumeForm = ({ form }: EditResumeFormProps) => {
@@ -137,28 +137,6 @@ export const EditResumeForm = ({ form }: EditResumeFormProps) => {
         <Skills control={form.control} />
         <Tools control={form.control} />
         <Languages control={form.control} />
-        {/* {userId && (
-          <div className='flex gap-2'>
-            <Button
-              type='submit'
-              variant='outline'
-              disabled={isLoading || isUpdating}
-              className='flex-1 gap-2'
-            >
-              <FolderSyncIcon className='h-4 w-4' />
-              {isUpdating ? 'Saving...' : 'Save'}
-            </Button>
-            <Button
-              type='button'
-              onClick={form.handleSubmit(handleSaveAndSync)}
-              disabled={isLoading || isUpdating}
-              className='flex-1 gap-2'
-            >
-              <FolderSyncIcon className='h-4 w-4' />
-              {isLoading || isUpdating ? 'Syncing...' : 'Save & Sync Preview'}
-            </Button>
-          </div>
-        )} */}
       </form>
     </Form>
   );

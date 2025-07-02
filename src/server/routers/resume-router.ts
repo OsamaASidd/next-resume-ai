@@ -10,6 +10,8 @@ import {
 } from '@/features/resume/utils/form-schema';
 import { generateResumeContent } from '../services/ai-resume';
 import { uploadImageToStorage } from '../services/upload';
+// Import the ProfileWithRelations type from profile-router instead of defining it here
+import { ProfileWithRelations } from './profile-router';
 
 export const resumeRouter = j.router({
   // Create a new resume
@@ -47,12 +49,14 @@ export const resumeRouter = j.router({
         jdPostDetails: resumeData.jd_post_details
       };
 
-      // Get profile data
+      // Get profile data with all required relations
       const profile = await db.query.profiles.findFirst({
         where: eq(profiles.id, profileId),
         with: {
           jobs: true,
-          educations: true
+          educations: true,
+          certificates: true,
+          extracurriculars: true
         }
       });
 
@@ -69,7 +73,7 @@ export const resumeRouter = j.router({
           ...resumeData,
           profileId: input.profileId
         },
-        profile
+        profile as ProfileWithRelations
       );
 
       // Update resume with AI generated content

@@ -18,7 +18,7 @@ import {
 } from '@/features/resume/utils/form-schema';
 import { useTemplateStore } from '@/features/resume/store/use-template-store';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, UseFormReturn } from 'react-hook-form';
 import Messages from './messages';
 import { TemplateSelection } from '@/features/resume/components/template-selection';
 import { EditResumeForm } from '@/features/resume/components/edit-resume-form';
@@ -97,19 +97,20 @@ export default function ChatInterface() {
       if (!isGuest) {
         newData = createInitialData(currentResume);
       } else {
-        newData = guestResume;
+        newData = guestResume as TResumeEditFormValues;
       }
       console.log('Resetting form with resume data:', currentResume);
       console.log('New form data:', newData);
       form.reset(newData);
     }
-  }, [currentResume, currentIsLoading, form]);
+  }, [currentResume, currentIsLoading, form, guestResume, isGuest]);
 
   const formData = form.watch();
 
   const renderContent = () => {
     if (mode === 'edit') {
-      return <EditResumeForm form={form} />;
+      // Type assertion to fix the compatibility issue
+      return <EditResumeForm form={form as UseFormReturn<any>} />;
     }
     if (mode === 'template') {
       return (

@@ -1,7 +1,7 @@
 'use client';
 
 import { pdf } from '@react-pdf/renderer';
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -22,34 +22,23 @@ type TPdfRendererProps = {
 };
 
 const PdfRenderer = ({ formData, templateId }: TPdfRendererProps) => {
-  const [numPages, setNumPages] = useState(null);
-
+  const [numPages, setNumPages] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-
   const [previousRenderValue, setPreviousRenderValue] = useState<string | null>(
     null
   );
-  // const { setDownloadLink } = useResumeDownload();
 
   const template = getTemplate(templateId);
   const Template = template?.component;
 
   const render = useAsync(async () => {
-    if (!formData) return null;
+    if (!formData || !Template) return null;
 
     const blob = await pdf(<Template formData={formData} />).toBlob();
     const url = URL.createObjectURL(blob);
 
     return url;
-  }, [formData]);
-
-  console.log('render=>>>>', render.value);
-
-  // useEffect(() => setDownloadLink(render?.value!), [render.value]);
-
-  // useEffect(() => onUrlChange(render?.value!), [render.value]);
-
-  // useEffect(() => onRenderError(render.error), [render.error]);
+  }, [formData, Template]);
 
   const onPreviousPage = () => {
     setCurrentPage((prev) => prev - 1);
@@ -59,22 +48,24 @@ const PdfRenderer = ({ formData, templateId }: TPdfRendererProps) => {
     setCurrentPage((prev) => prev + 1);
   };
 
-  const onDocumentLoad = (d: any) => {
+  const onDocumentLoad = (d: { numPages: number }) => {
     setNumPages(d.numPages);
     setCurrentPage((prev) => Math.min(prev, d.numPages));
   };
 
   const isFirstRendering = !previousRenderValue;
-
   const isLatestValueRendered = previousRenderValue === render.value;
   const isBusy = render.loading || !isLatestValueRendered;
-
   const shouldShowTextLoader = isFirstRendering && isBusy;
   const shouldShowPreviousDocument = !isFirstRendering && isBusy;
 
   function generateDownloadFilename() {
     const timestamp = new Date().getTime();
     return `next-resume-${timestamp}.pdf`;
+  }
+
+  if (!Template) {
+    return <div>Template not found</div>;
   }
 
   return (
@@ -92,7 +83,7 @@ const PdfRenderer = ({ formData, templateId }: TPdfRendererProps) => {
       <div id='resume-pdf-preview'>
         <Document
           key={render.value}
-          className={shouldShowPreviousDocument ? 'absolute' : null}
+          className={shouldShowPreviousDocument ? 'absolute' : undefined}
           file={render.value}
           loading={null}
           onLoadSuccess={onDocumentLoad}
@@ -109,7 +100,7 @@ const PdfRenderer = ({ formData, templateId }: TPdfRendererProps) => {
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-2'>
               <Button
-                size={'xs'}
+                size={'sm'}
                 onClick={onPreviousPage}
                 disabled={currentPage <= 1}
                 className='disabled:opacity-50'
@@ -120,7 +111,7 @@ const PdfRenderer = ({ formData, templateId }: TPdfRendererProps) => {
                 Page {currentPage} of {numPages}
               </span>
               <Button
-                size={'xs'}
+                size={'sm'}
                 onClick={onNextPage}
                 disabled={currentPage >= numPages}
                 className='disabled:opacity-50'
@@ -145,4 +136,5 @@ const PdfRenderer = ({ formData, templateId }: TPdfRendererProps) => {
     </div>
   );
 };
+
 export default PdfRenderer;

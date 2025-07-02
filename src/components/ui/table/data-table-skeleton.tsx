@@ -9,13 +9,21 @@ import {
 } from '@/components/ui/table';
 import { ScrollArea, ScrollBar } from '../scroll-area';
 
+interface DataTableSkeletonProps {
+  columnCount?: number;
+  rowCount?: number;
+  searchableColumnCount?: number;
+  filterableColumnCount?: number;
+  showViewOptions?: boolean;
+}
+
 export function DataTableSkeleton({
   columnCount = 1,
   rowCount = 10,
   searchableColumnCount = 0,
   filterableColumnCount = 0,
   showViewOptions = false
-}) {
+}: DataTableSkeletonProps) {
   return (
     <div className='flex flex-1 flex-col space-y-3 overflow-auto'>
       {searchableColumnCount > 0 || filterableColumnCount > 0 ? (
