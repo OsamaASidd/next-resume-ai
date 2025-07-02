@@ -6,5 +6,7 @@ import { createClient } from 'jstack';
  * @see https://jstack.app/docs/backend/api-client
  */
 export const client = createClient<AppRouter>({
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'
+  baseUrl:
+    process.env.NEXT_PUBLIC_API_URL ||
+    'https://next-resume-ai-qacs.vercel.app/api'
 });
