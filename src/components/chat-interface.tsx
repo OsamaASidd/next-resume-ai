@@ -1,3 +1,4 @@
+// src/components/chat-interface.tsx
 'use client';
 import 'animate.css';
 import React, {
@@ -25,14 +26,11 @@ import { EditResumeForm } from '@/features/resume/components/edit-resume-form';
 import { ModeToggle } from '@/features/resume/components/mode-toggle';
 
 export default function ChatInterface() {
-  const [messages, setMessages] = useState<{ role: string; content: string }[]>(
-    []
-  );
-  const [guestResume, setGuestResume] = useState({});
-
+  const [guestResume, setGuestResume] = useState<any>({});
   const [mode, setMode] = useState<'edit' | 'template' | 'preview' | 'zen'>(
     'preview'
   );
+
   const params = useParams<{ id: string }>();
   const resumeId = params?.id;
   const isGuest = resumeId === 'guest';
@@ -61,30 +59,46 @@ export default function ChatInterface() {
     }
   }, [isGuest]);
 
-  const handleApplyTemplate = (templateId: string) => {
-    applyTemplate(templateId);
-    setMode('preview');
-  };
-  const [isOpen, setIsOpen] = useState(resumeId === '0' ? true : false);
+  const handleApplyTemplate = useCallback(
+    (templateId: string) => {
+      applyTemplate(templateId);
+      setMode('preview');
+    },
+    [applyTemplate]
+  );
 
-  //form control
-  const createInitialData = (resumeData: any): TResumeEditFormValues => ({
-    resume_id: resumeData?.id || '',
-    personal_details:
-      resumeData?.personalDetails as TResumeEditFormValues['personal_details'],
-    jobs: resumeData?.jobs as TResumeEditFormValues['jobs'],
-    educations: resumeData?.education as TResumeEditFormValues['educations'],
-    skills: resumeData?.skills as TResumeEditFormValues['skills'],
-    tools: resumeData?.tools as TResumeEditFormValues['tools'],
-    languages: resumeData?.languages as TResumeEditFormValues['languages']
-  });
+  const [isOpen, setIsOpen] = useState(resumeId === '0');
 
-  const form = useForm<TResumeEditFormValues>({
-    resolver: zodResolver(resumeEditFormSchema),
-    defaultValues: createInitialData(null), // Start with empty defaults
-    mode: 'onChange',
-    shouldFocusError: false
-  });
+  // Form control
+  const createInitialData = useCallback(
+    (resumeData: any): TResumeEditFormValues => ({
+      resume_id: resumeData?.id || '',
+      personal_details: resumeData?.personalDetails || {
+        resume_job_title: '',
+        fname: '',
+        lname: '',
+        email: '',
+        phone: '',
+        country: '',
+        city: '',
+        summary: ''
+      },
+      jobs: resumeData?.jobs || [],
+      educations: resumeData?.education || [],
+      skills: resumeData?.skills || [],
+      tools: resumeData?.tools || [],
+      languages: resumeData?.languages || []
+    }),
+    []
+  );
+
+  const form: UseFormReturn<TResumeEditFormValues> =
+    useForm<TResumeEditFormValues>({
+      resolver: zodResolver(resumeEditFormSchema),
+      defaultValues: createInitialData(null),
+      mode: 'onChange',
+      shouldFocusError: false
+    });
 
   // Get the appropriate resume data based on whether it's guest or not
   const currentResume = isGuest ? guestResume : resume;
@@ -93,24 +107,97 @@ export default function ChatInterface() {
   // Reset form when resume data is loaded
   useEffect(() => {
     if (currentResume && !currentIsLoading) {
-      let newData: TResumeEditFormValues;
-      if (!isGuest) {
-        newData = createInitialData(currentResume);
-      } else {
-        newData = guestResume as TResumeEditFormValues;
-      }
+      const newData = isGuest
+        ? (guestResume as TResumeEditFormValues)
+        : createInitialData(currentResume);
+
       console.log('Resetting form with resume data:', currentResume);
       console.log('New form data:', newData);
       form.reset(newData);
     }
-  }, [currentResume, currentIsLoading, form, guestResume, isGuest]);
+  }, [
+    currentResume,
+    currentIsLoading,
+    form,
+    guestResume,
+    isGuest,
+    createInitialData
+  ]);
 
   const formData = form.watch();
 
-  const renderContent = () => {
+  // Handle applying AI suggestions to the form
+  const handleApplyChanges = useCallback(
+    (changes: any[]) => {
+      console.log('Applying changes:', changes);
+
+      changes.forEach((change) => {
+        const { section, action, index, data } = change;
+
+        switch (action) {
+          case 'update':
+            if (
+              typeof index === 'number' &&
+              Array.isArray(formData[section as keyof typeof formData])
+            ) {
+              // Update specific array item
+              const currentArray =
+                (form.getValues(
+                  section as keyof TResumeEditFormValues
+                ) as any[]) || [];
+              if (currentArray[index]) {
+                currentArray[index] = { ...currentArray[index], ...data };
+                form.setValue(
+                  section as keyof TResumeEditFormValues,
+                  currentArray as any
+                );
+              }
+            } else {
+              // Update entire section or object property
+              if (section === 'personal_details') {
+                const currentPersonalDetails =
+                  form.getValues('personal_details') || {};
+                form.setValue('personal_details', {
+                  ...currentPersonalDetails,
+                  ...data
+                });
+              } else {
+                form.setValue(section as keyof TResumeEditFormValues, data);
+              }
+            }
+            break;
+
+          case 'add':
+            if (Array.isArray(formData[section as keyof typeof formData])) {
+              const currentArray =
+                (form.getValues(
+                  section as keyof TResumeEditFormValues
+                ) as any[]) || [];
+              form.setValue(
+                section as keyof TResumeEditFormValues,
+                [...currentArray, data] as any
+              );
+            }
+            break;
+
+          default:
+            console.warn('Unknown action:', action);
+        }
+      });
+
+      // If guest user, also update localStorage
+      if (isGuest) {
+        const updatedGuestResume = form.getValues();
+        localStorage.setItem('guestResume', JSON.stringify(updatedGuestResume));
+        setGuestResume(updatedGuestResume);
+      }
+    },
+    [form, formData, isGuest]
+  );
+
+  const renderContent = useCallback(() => {
     if (mode === 'edit') {
-      // Type assertion to fix the compatibility issue
-      return <EditResumeForm form={form as UseFormReturn<any>} />;
+      return <EditResumeForm form={form} />;
     }
     if (mode === 'template') {
       return (
@@ -131,15 +218,24 @@ export default function ChatInterface() {
         </div>
       );
     }
-  };
+    return null;
+  }, [
+    mode,
+    form,
+    selectedTemplate,
+    handleApplyTemplate,
+    currentTemplate,
+    formData
+  ]);
 
   return (
     <div className='flex h-full w-full flex-row'>
       <PreChatModal setIsOpen={setIsOpen} isOpen={isOpen} />
 
       <div className='h-full w-1/2 px-3'>
-        <Messages />
+        <Messages formData={formData} onApplyChanges={handleApplyChanges} />
       </div>
+
       <div className='h-full w-1/2'>
         <div>
           <ModeToggle
