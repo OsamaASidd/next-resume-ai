@@ -64,6 +64,7 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
     setLoading(true);
 
     try {
+      // Fixed: Use the correct API endpoint
       const response = await fetch('/api/chat/sendMessage', {
         method: 'POST',
         headers: {
