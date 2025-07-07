@@ -60,11 +60,11 @@ export default function NavBar() {
       {isClient ? (
         userId ? (
           <div className='flex items-center space-x-3'>
-            {/* <button className='flex gap-2 rounded-lg border border-blue-600 px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white'>
+            <button className='flex gap-2 rounded-lg border border-blue-600 px-2 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white'>
               <div>Share</div>
               <Icons.share size={16} strokeWidth={0.85} />
-            </button> */}
-            <ThemeToggle />
+            </button>
+            {/* <ThemeToggle /> */}
             <UserNav />
           </div>
         ) : (
