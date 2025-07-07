@@ -1,3 +1,4 @@
+// src/components/chat-interface.tsx
 'use client';
 import 'animate.css';
 import React, {
@@ -107,6 +108,63 @@ export default function ChatInterface() {
 
   const formData = form.watch();
 
+  // Handle applying AI suggestions to the form
+  const handleApplyChanges = useCallback(
+    (changes: any[]) => {
+      console.log('Applying changes:', changes);
+
+      changes.forEach((change) => {
+        const { section, action, index, data } = change;
+
+        switch (action) {
+          case 'update':
+            if (typeof index === 'number' && Array.isArray(formData[section])) {
+              // Update specific array item
+              const currentArray = form.getValues(section) || [];
+              currentArray[index] = { ...currentArray[index], ...data };
+              form.setValue(section, currentArray);
+            } else {
+              // Update entire section or object property
+              if (section === 'personal_details') {
+                const currentPersonalDetails =
+                  form.getValues('personal_details') || {};
+                form.setValue('personal_details', {
+                  ...currentPersonalDetails,
+                  ...data
+                });
+              } else {
+                form.setValue(section, data);
+              }
+            }
+            break;
+
+          case 'add':
+            if (Array.isArray(formData[section])) {
+              const currentArray = form.getValues(section) || [];
+              form.setValue(section, [...currentArray, data]);
+            }
+            break;
+
+          case 'remove':
+            if (typeof index === 'number' && Array.isArray(formData[section])) {
+              const currentArray = form.getValues(section) || [];
+              const newArray = currentArray.filter((_, i) => i !== index);
+              form.setValue(section, newArray);
+            }
+            break;
+        }
+      });
+
+      // If guest user, also update localStorage
+      if (isGuest) {
+        const updatedGuestResume = form.getValues();
+        localStorage.setItem('guestResume', JSON.stringify(updatedGuestResume));
+        setGuestResume(updatedGuestResume);
+      }
+    },
+    [form, formData, isGuest]
+  );
+
   const renderContent = () => {
     if (mode === 'edit') {
       // Type assertion to fix the compatibility issue
@@ -138,7 +196,7 @@ export default function ChatInterface() {
       <PreChatModal setIsOpen={setIsOpen} isOpen={isOpen} />
 
       <div className='h-full w-1/2 px-3'>
-        <Messages />
+        <Messages formData={formData} onApplyChanges={handleApplyChanges} />
       </div>
       <div className='h-full w-1/2'>
         <div>
