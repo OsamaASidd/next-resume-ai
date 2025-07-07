@@ -5,6 +5,8 @@ import { Icons } from '../icons';
 import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
+import { UserNav } from './user-nav';
+import ThemeToggle from './ThemeToggle/theme-toggle';
 
 export default function NavBar() {
   const pathname = usePathname();
@@ -57,20 +59,32 @@ export default function NavBar() {
       {/* Share/Login button */}
       {isClient ? (
         userId ? (
-          <button className='flex gap-2 rounded-lg border border-blue-600 px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white'>
-            <div>Share</div>
-            <Icons.share size={16} strokeWidth={0.85} />
-          </button>
+          <div className='flex items-center space-x-3'>
+            {/* <button className='flex gap-2 rounded-lg border border-blue-600 px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white'>
+              <div>Share</div>
+              <Icons.share size={16} strokeWidth={0.85} />
+            </button> */}
+            <ThemeToggle />
+            <UserNav />
+          </div>
         ) : (
-          <button className='flex gap-2 rounded-lg border border-blue-600 px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white'>
+          <Link
+            href='/sign-in'
+            // onClick={() => router.push('/sign-in')}
+            className='flex gap-2 rounded-lg border border-blue-600 px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white'
+          >
             <div>Log In</div>
-          </button>
+          </Link>
         )
       ) : (
         // Fallback button during SSR
-        <button className='flex gap-2 rounded-lg border border-blue-600 px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white'>
+        <Link
+          href='/sign-in'
+          // onClick={() => router.push('/sign-in')}
+          className='flex gap-2 rounded-lg border border-blue-600 px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white'
+        >
           <div>Log In</div>
-        </button>
+        </Link>
       )}
     </header>
   );

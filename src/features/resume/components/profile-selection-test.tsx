@@ -160,6 +160,15 @@ export function ProfileSelectionStepTest({
   if (userId && (isProfileLoading || isResumeLoading)) {
     return <Skeleton className='h-[400px] w-full' />;
   }
+  if (isUploading) {
+    return (
+      <div className='space-y-6 p-6'>
+        <Skeleton className='h-[30px] w-full' />
+        <Skeleton className='h-[30px] w-full' />
+        <Skeleton className='h-[250px] w-full' />
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-4'>
