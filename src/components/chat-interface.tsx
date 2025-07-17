@@ -24,12 +24,14 @@ import Messages from './messages';
 import { TemplateSelection } from '@/features/resume/components/template-selection';
 import { EditResumeForm } from '@/features/resume/components/edit-resume-form';
 import { ModeToggle } from '@/features/resume/components/mode-toggle';
+import { Icons } from '@/components/icons';
 
 export default function ChatInterface() {
   const [guestResume, setGuestResume] = useState<any>({});
   const [mode, setMode] = useState<'edit' | 'template' | 'preview' | 'zen'>(
     'preview'
   );
+  const [showPreview, setShowPreview] = useState(true);
 
   const params = useParams<{ id: string }>();
   const resumeId = params?.id;
@@ -211,8 +213,8 @@ export default function ChatInterface() {
     }
     if (mode === 'preview') {
       return (
-        <div className='relative flex h-full justify-center bg-accent pt-4'>
-          <div className='origin-top scale-75'>
+        <div className='relative mx-auto flex h-screen w-[90vw] justify-center bg-accent py-4 md:w-full'>
+          <div className='origin-top scale-[47%] md:scale-75'>
             <PdfRenderer formData={formData} templateId={selectedTemplate} />
           </div>
         </div>
@@ -229,27 +231,48 @@ export default function ChatInterface() {
   ]);
 
   return (
-    <div className='flex h-full w-full flex-row'>
+    <div className='flex h-full w-full flex-col md:flex-row'>
       <PreChatModal setIsOpen={setIsOpen} isOpen={isOpen} />
 
-      <div className='h-full w-1/2 px-3'>
+      {/* Chat/Messaging Section - Primary on mobile */}
+      <div
+        className={`h-full w-full px-3 ${showPreview ? 'hidden md:block md:w-1/2' : 'md:w-1/2'}`}
+      >
+        <div className='mb-2 flex items-center justify-end md:hidden'>
+          <button
+            onClick={() => setShowPreview(!showPreview)}
+            className='rounded-md bg-primary px-3 py-2 text-xs text-primary-foreground'
+          >
+            Preview
+          </button>
+        </div>
         <Messages formData={formData} onApplyChanges={handleApplyChanges} />
       </div>
 
-      <div className='h-full w-1/2'>
-        <div>
+      {/* Preview Section - Secondary on mobile */}
+      <div
+        className={`h-full w-full md:w-1/2 ${showPreview ? 'block' : 'hidden md:block'}`}
+      >
+        <div className='mx-2 mb-2 flex items-center justify-between'>
           <ModeToggle
             mode={mode}
             onModeChange={setMode}
             isMobile={true}
             showExit={false}
           />
+          <button
+            onClick={() => setShowPreview(!showPreview)}
+            className='mb-4 flex items-center rounded-md bg-secondary px-3 py-2 text-sm text-secondary-foreground md:hidden'
+          >
+            <Icons.chevronLeft className='mr-2 h-4 w-4' />
+            <div>Exit</div>
+          </button>
         </div>
 
         <div className='block h-full px-2'>
           <div className='h-full w-full rounded-lg border'>
-            <div className='h-full w-full p-4'>
-              <ScrollArea className='h-[calc(100vh-150px)] pe-2'>
+            <div className='h-full w-full p-2 md:p-4'>
+              <ScrollArea className='h-[calc(100vh-120px)] md:h-[calc(100vh-150px)] md:pe-2'>
                 {!currentIsLoading && !isOpen && renderContent()}
               </ScrollArea>
             </div>

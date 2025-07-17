@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function ChatBot() {
   return (
-    <div className='min-h-screen'>
+    <div className='min-h-[calc(100dvh-52px)]'>
       <ChatInterface />
     </div>
   );
