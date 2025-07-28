@@ -238,7 +238,8 @@ export default function ChatInterface() {
       <div
         className={`h-full w-full px-3 ${showPreview ? 'hidden md:block md:w-1/2' : 'md:w-1/2'}`}
       >
-        <div className='mb-2 flex items-center justify-end md:hidden'>
+        {/* Add top padding and safe area for mobile */}
+        <div className='mb-2 mt-4 flex items-center justify-end md:mt-0 md:hidden'>
           <button
             onClick={() => setShowPreview(!showPreview)}
             className='rounded-md bg-primary px-3 py-2 text-xs text-primary-foreground'
@@ -253,7 +254,8 @@ export default function ChatInterface() {
       <div
         className={`h-full w-full md:w-1/2 ${showPreview ? 'block' : 'hidden md:block'}`}
       >
-        <div className='mx-2 mb-2 flex items-center justify-between'>
+        {/* Add top padding and safe area for mobile */}
+        <div className='mx-2 mb-2 mt-4 flex items-center justify-between'>
           <ModeToggle
             mode={mode}
             onModeChange={setMode}
@@ -272,7 +274,8 @@ export default function ChatInterface() {
         <div className='block h-full px-2'>
           <div className='h-full w-full rounded-lg border'>
             <div className='h-full w-full p-2 md:p-4'>
-              <ScrollArea className='h-[calc(100vh-120px)] md:h-[calc(100vh-150px)] md:pe-2'>
+              {/* Adjust ScrollArea height to account for the button spacing */}
+              <ScrollArea className='h-[calc(100vh-140px)] md:h-[calc(100vh-150px)] md:pe-2'>
                 {!currentIsLoading && !isOpen && renderContent()}
               </ScrollArea>
             </div>
