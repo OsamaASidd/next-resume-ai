@@ -54,10 +54,10 @@ export default function ProfileList() {
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
         <Card
           onClick={handleCreateClick}
-          className='flex cursor-pointer flex-col items-center justify-center border-2 border-dashed bg-gradient-to-br from-sidebar/60 to-sidebar p-8 hover:border-primary'
+          className='flex cursor-pointer flex-col items-center justify-center border-2 border-dashed bg-gradient-to-br from-sidebar/60 to-sidebar p-8 transition-all duration-500 hover:scale-[103%] hover:border-primary'
         >
           <div className='flex h-full flex-col items-center justify-center'>
-            <PlusCircle className='mx-auto h-10 w-10' />
+            <PlusCircle className='mx-auto h-10 w-10 text-primary' />
             <p className='mt-2 text-center text-sm text-muted-foreground'>
               Create new profile
             </p>
