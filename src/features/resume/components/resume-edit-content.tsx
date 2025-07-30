@@ -124,7 +124,7 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
               <div className='hidden md:block'>
                 <ModeToggle mode={mode} onModeChange={setMode} />
               </div>
-              <ScrollArea className='h-[calc(100vh-120px)] pr-10'>
+              <ScrollArea className='h-[calc(100vh-160px)] pr-10'>
                 {mode !== 'preview' && renderContent()}
               </ScrollArea>
             </div>
@@ -132,7 +132,7 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
           <ResizableHandle />
           <ResizablePanel defaultSize={55} minSize={45}>
             <div className='h-full w-full'>
-              <ScrollArea className='h-[calc(100vh)]'>
+              <ScrollArea className='h-[calc(100vh-50px)]'>
                 <PdfPreview />
               </ScrollArea>
             </div>
