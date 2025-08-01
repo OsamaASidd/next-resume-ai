@@ -39,7 +39,7 @@ const LandingPage: React.FC = () => {
                 onClick={handleTryClick}
                 className='mt-8 w-fit rounded-lg bg-blue-700 px-6 py-3 text-lg text-white hover:bg-blue-800'
               >
-                Try Resume.AI for Free
+                Start From CV
               </button>
               <button
                 onClick={() => router.push('/sign-in')}
