@@ -44,7 +44,7 @@ export function TemplateSelection({
               className='h-8 text-xs md:h-10 md:text-sm'
               onClick={() => onApplyTemplate(selectedTemplate)}
             >
-              Apply Template
+              Apply
             </Button>
           </div>
         )}

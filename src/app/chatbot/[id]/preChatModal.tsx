@@ -5,6 +5,8 @@ import useMultistepForm from '@/hooks/use-multistep-form';
 import { ProfileSelectionStepTest } from '@/features/resume/components/profile-selection-test';
 import { ResumeCreateFormTest } from '@/features/resume/components/resume-create-form-test';
 import { useState } from 'react';
+import { TemplateSelection } from '@/features/resume/components/template-selection';
+import { useTemplateStore } from '@/features/resume/store/use-template-store';
 
 interface PreChatModalProps {
   isOpen: boolean;
@@ -12,6 +14,12 @@ interface PreChatModalProps {
 }
 
 export default function PreChatModal({ setIsOpen, isOpen }: PreChatModalProps) {
+  const {
+    selectedTemplate,
+    currentTemplate,
+    setSelectedTemplate,
+    applyTemplate
+  } = useTemplateStore();
   const [selectedProfile, setSelectedProfile] = useState<any | null>(null);
   const { steps, currentStepIndex, step, isFirstStep, isLastStep, back, next } =
     useMultistepForm([
@@ -22,6 +30,15 @@ export default function PreChatModal({ setIsOpen, isOpen }: PreChatModalProps) {
           console.log(profile);
           next();
         }}
+      />,
+      <TemplateSelection
+        selectedTemplate={selectedTemplate}
+        onTemplateSelect={setSelectedTemplate}
+        onApplyTemplate={(templateId: string) => {
+          applyTemplate(templateId);
+          next();
+        }}
+        currentTemplate={currentTemplate}
       />,
       <ResumeCreateFormTest
         key='resume-form'
