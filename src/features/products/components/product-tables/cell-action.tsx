@@ -31,6 +31,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         onClose={() => setOpen(false)}
         onConfirm={onConfirm}
         loading={loading}
+        description='This action cannot be undone'
       />
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>

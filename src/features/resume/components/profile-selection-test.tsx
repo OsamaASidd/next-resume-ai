@@ -294,9 +294,9 @@ export function ProfileSelectionStepTest({
 
       <div className='relative space-y-4'>
         {/* Upload pdf */}
-        <h2 className='font-semibold'>
+        {/* <h2 className='font-semibold'>
           Select a Profile or Upload existing Resume to continue
-        </h2>
+        </h2> */}
         <Card
           className={`cursor-pointer border border-dashed transition-all duration-500 hover:scale-[103%] hover:border-primary ${
             isDragOver ? 'scale-[103%] border-primary bg-primary/5' : ''
