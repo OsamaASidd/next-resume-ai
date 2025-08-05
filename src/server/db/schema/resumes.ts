@@ -13,6 +13,7 @@ export const resumes = pgTable('resumes', {
   jdJobTitle: text('jd_job_title').notNull(),
   employer: text('employer').notNull(),
   jdPostDetails: text('jd_post_details').notNull(),
+  templateId: text('template_id'),
   previewImageUrl: text('preview_image_url'),
   personalDetails: jsonb('personal_details'),
   jobs: jsonb('jobs').array(),

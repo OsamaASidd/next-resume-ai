@@ -22,9 +22,13 @@ import { useState } from 'react';
 
 interface ResumeCreateFormProps {
   profileId: string | null;
+  templateId: string;
 }
 
-export function ResumeCreateForm({ profileId }: ResumeCreateFormProps) {
+export function ResumeCreateForm({
+  profileId,
+  templateId
+}: ResumeCreateFormProps) {
   const { mutateAsync: createResume, isPending: isCreating } =
     useCreateResume();
   const router = useRouter();
@@ -46,7 +50,8 @@ export function ResumeCreateForm({ profileId }: ResumeCreateFormProps) {
       const resume = await createResume(
         {
           ...data,
-          profileId
+          profileId,
+          templateId
         },
         {
           onSuccess: async (data) => {

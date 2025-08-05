@@ -19,13 +19,13 @@ export const resumeRouter = j.router({
     .input(
       z.object({
         profileId: z.string(),
+        templateId: z.string(),
         ...resumeFormSchema.shape
       })
     )
     .mutation(async ({ c, ctx, input }) => {
       const { user } = ctx;
-      const { profileId, ...resumeData } = input;
-
+      const { profileId, templateId, ...resumeData } = input;
       console.log('user from ctx', user);
 
       // Get the account record first
@@ -44,6 +44,7 @@ export const resumeRouter = j.router({
         id: nanoid(),
         userId: account.id, // Use account.id instead of user.id
         profileId,
+        templateId,
         jdJobTitle: resumeData.jd_job_title,
         employer: resumeData.employer,
         jdPostDetails: resumeData.jd_post_details

@@ -5,7 +5,9 @@ import { TResumeEditFormValues, TResumeFormValues } from '../utils/form-schema';
 export const useCreateResume = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: TResumeFormValues & { profileId: string }) => {
+    mutationFn: async (
+      data: TResumeFormValues & { profileId: string } & { templateId: string }
+    ) => {
       const response = await client.resume.createResume.$post(data);
       return await response.json();
     },

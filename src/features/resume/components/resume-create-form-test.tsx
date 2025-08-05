@@ -23,11 +23,13 @@ import { generateGuestResumeAction } from '../../../server/routers/guest-resume'
 interface ResumeCreateFormTestProps {
   selectedProfile?: any | null;
   profileId: string | null;
+  templateId: string;
   setIsOpen: (prev: boolean) => void;
 }
 
 export function ResumeCreateFormTest({
   profileId = null,
+  templateId = '',
   setIsOpen,
   selectedProfile = null
 }: ResumeCreateFormTestProps) {
@@ -58,7 +60,8 @@ export function ResumeCreateFormTest({
         const resume = await createResume(
           {
             ...data,
-            profileId
+            profileId,
+            templateId
           },
           {
             onSuccess: async (data) => {
