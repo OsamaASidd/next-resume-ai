@@ -123,15 +123,17 @@ export const resumeRouter = j.router({
     .input(
       z.object({
         id: z.string(),
+        templateId: z.string(),
         ...resumeEditFormSchema.shape
       })
     )
     .mutation(async ({ c, ctx, input }) => {
-      const { id, ...updateData } = input;
+      const { id, templateId, ...updateData } = input;
 
       const [updated] = await db
         .update(resumes)
         .set({
+          templateId,
           ...updateData,
           updatedAt: new Date()
         })
