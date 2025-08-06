@@ -27,7 +27,7 @@ interface ResumeCreateFormProps {
 
 export function ResumeCreateForm({
   profileId,
-  templateId
+  templateId = 'template-one'
 }: ResumeCreateFormProps) {
   const { mutateAsync: createResume, isPending: isCreating } =
     useCreateResume();

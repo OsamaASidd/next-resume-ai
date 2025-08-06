@@ -112,7 +112,9 @@ export default function ChatInterface() {
       const newData = isGuest
         ? (guestResume as TResumeEditFormValues)
         : createInitialData(currentResume);
-
+      if (!isGuest) {
+        applyTemplate(currentResume.template_id || 'template-one');
+      }
       console.log('Resetting form with resume data:', currentResume);
       console.log('New form data:', newData);
       form.reset(newData);

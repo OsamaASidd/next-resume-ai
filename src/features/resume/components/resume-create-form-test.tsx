@@ -29,7 +29,7 @@ interface ResumeCreateFormTestProps {
 
 export function ResumeCreateFormTest({
   profileId = null,
-  templateId = '',
+  templateId = 'template-one',
   setIsOpen,
   selectedProfile = null
 }: ResumeCreateFormTestProps) {

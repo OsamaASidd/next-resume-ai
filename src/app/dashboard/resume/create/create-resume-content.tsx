@@ -6,12 +6,13 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { ResumeCreateForm } from '@/features/resume/components/resume-create-form';
 import PageContainer from '@/components/layout/page-container';
+import { useTemplateStore } from '@/features/resume/store/use-template-store';
 
 export default function CreateResumeContent() {
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
     null
   );
-
+  const { selectedTemplate } = useTemplateStore();
   const { steps, currentStepIndex, step, isFirstStep, isLastStep, back, next } =
     useMultistepForm([
       <ProfileSelectionStep
@@ -21,7 +22,11 @@ export default function CreateResumeContent() {
           next();
         }}
       />,
-      <ResumeCreateForm key='resume-form' profileId={selectedProfileId} />
+      <ResumeCreateForm
+        key='resume-form'
+        profileId={selectedProfileId}
+        templateId={selectedTemplate}
+      />
     ]);
 
   return (

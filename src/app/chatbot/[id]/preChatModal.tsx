@@ -50,6 +50,7 @@ export default function PreChatModal({ setIsOpen, isOpen }: PreChatModalProps) {
         profileId={selectedProfile?.id}
         setIsOpen={setIsOpen}
         selectedProfile={selectedProfile}
+        templateId={selectedTemplate}
       />
     ]);
   return (

@@ -37,6 +37,9 @@ export function ResumeEditContent({ resume }: ResumeEditContentProps) {
   } = useTemplateStore();
 
   useEffect(() => {
+    applyTemplate(resume.templateId || 'template-one');
+  }, []);
+  useEffect(() => {
     if (mode === 'edit') {
       setSelectedTemplate(currentTemplate);
     }
