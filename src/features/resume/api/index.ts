@@ -31,7 +31,9 @@ export const useGetResume = (id: string) => {
 export const useUpdateResume = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: TResumeEditFormValues & { id: string }) => {
+    mutationFn: async (
+      data: TResumeEditFormValues & { id: string } & { templateId: string }
+    ) => {
       const response = await client.resume.updateResume.$post(data);
       return response.json();
     }

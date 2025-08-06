@@ -15,13 +15,14 @@ import { Skills } from './skills';
 import { Tools } from './tools';
 import { WorkExperience } from './work-experience';
 import { useAuth } from '@clerk/nextjs';
-
+import { useTemplateStore } from '@/features/resume/store/use-template-store';
 interface EditResumeFormProps {
   form: UseFormReturn<TResumeEditFormValues>;
 }
 
 export const EditResumeForm = ({ form }: EditResumeFormProps) => {
   const { userId } = useAuth();
+  const { currentTemplate } = useTemplateStore();
   const { mutateAsync: uploadPreviewImage, isPending: isLoading } =
     useUploadPreviewImage();
   const { mutateAsync: updateResume, isPending: isUpdating } =
@@ -66,6 +67,7 @@ export const EditResumeForm = ({ form }: EditResumeFormProps) => {
 
       await updateResume({
         id: values.resume_id!,
+        templateId: currentTemplate,
         ...values
       });
 
@@ -85,6 +87,7 @@ export const EditResumeForm = ({ form }: EditResumeFormProps) => {
       // Update resume data first
       await updateResume({
         id: values.resume_id!,
+        templateId: currentTemplate,
         ...values
       });
 
