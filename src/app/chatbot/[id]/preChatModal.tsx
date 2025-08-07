@@ -40,6 +40,7 @@ export default function PreChatModal({ setIsOpen, isOpen }: PreChatModalProps) {
         }}
       />,
       <TemplateSelection
+        key='template-selection'
         selectedTemplate={selectedTemplate}
         onTemplateSelect={setSelectedTemplate}
         onApplyTemplate={applyTemplate}

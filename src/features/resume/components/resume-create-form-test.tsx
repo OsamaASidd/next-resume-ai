@@ -42,8 +42,8 @@ export function ResumeCreateFormTest({
   const form = useForm<TResumeFormValues>({
     resolver: zodResolver(resumeFormSchema),
     defaultValues: {
-      jd_job_title: '',
-      employer: '',
+      jd_job_title: 'Professional Role',
+      employer: 'Various Companies',
       jd_post_details: ''
     }
   });
@@ -134,7 +134,7 @@ export function ResumeCreateFormTest({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
         <div className='space-y-4'>
-          <FormField
+          {/* <FormField
             control={form.control}
             name='jd_job_title'
             render={({ field }) => (
@@ -160,7 +160,7 @@ export function ResumeCreateFormTest({
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
 
           <FormField
             control={form.control}

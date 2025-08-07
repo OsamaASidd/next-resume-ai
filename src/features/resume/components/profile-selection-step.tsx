@@ -159,7 +159,8 @@ export function ProfileSelectionStep({
           console.log('Profile created successfully:', profile);
 
           toast.success('Profile created successfully from resume!');
-          onProfileSelect(profile?.id || '');
+          const profileId = (profile as any)?.id || '';
+          onProfileSelect(profileId);
         } catch (validationError) {
           console.error('Profile validation error:', validationError);
           toast.error(
