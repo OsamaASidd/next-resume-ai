@@ -141,7 +141,7 @@ export function ResumeCreateFormTest({
               <FormItem>
                 <FormLabel>Job Title</FormLabel>
                 <FormControl>
-                  <Input placeholder='Software Engineer' {...field} />
+                  <Input placeholder='Job Title (Optional)' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -155,7 +155,7 @@ export function ResumeCreateFormTest({
               <FormItem>
                 <FormLabel>Employer</FormLabel>
                 <FormControl>
-                  <Input placeholder='Company Name' {...field} />
+                  <Input placeholder='Company Name (Optional)' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

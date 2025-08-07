@@ -2,10 +2,8 @@ import * as z from 'zod';
 
 // for resume creation page
 export const resumeFormSchema = z.object({
-  jd_job_title: z.string().min(3, { message: 'Please enter job title' }),
-  employer: z
-    .string()
-    .min(3, { message: 'Employer name must be at least 3 characters long' }),
+  jd_job_title: z.string().optional(), // Now optional
+  employer: z.string().optional(),
   jd_post_details: z
     .string()
     .min(3, { message: 'Job description must be at least 3 characters long' })
