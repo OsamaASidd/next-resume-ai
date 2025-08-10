@@ -49,7 +49,7 @@ JSON Change Format (when applicable):
 For multiple changes, provide an array of change objects.`;
 
         const completion = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4o-mini', // gpt-5
           messages: [{ role: 'system', content: systemPrompt }, ...messages],
           temperature: 0.7,
           max_tokens: 2000
