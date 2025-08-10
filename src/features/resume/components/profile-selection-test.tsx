@@ -153,13 +153,11 @@ export function ProfileSelectionStepTest({
     formData.append('pdf', file);
 
     try {
-      const response = await fetch(
-        'https://nlp-resume-parser-1-q5gk.onrender.com/api/parse-resume',
-        {
-          method: 'POST',
-          body: formData
-        }
-      );
+      // Use local API route instead of external service
+      const response = await fetch('/api/parse-resume', {
+        method: 'POST',
+        body: formData
+      });
 
       const result = await response.json();
 
