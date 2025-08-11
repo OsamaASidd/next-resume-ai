@@ -22,6 +22,8 @@ import { useCreateProfile, useUpdateProfile } from '../api';
 import { profileSchema, TProfileFormValues } from '../utils/form-schema';
 import { Certificates } from './certificates';
 import { Extracurriculars } from './extracurriculars';
+import { useUser } from '@clerk/nextjs';
+
 interface CreateProfileFormProps {
   profile?: ProfileWithRelations;
   closeModal: () => void;
@@ -31,8 +33,9 @@ const transformProfileToFormValues = (
   profile?: ProfileWithRelations
 ): TProfileFormValues => {
   if (!profile) {
+    const { user } = useUser();
     return {
-      email: '',
+      email: user?.primaryEmailAddress?.emailAddress || '',
       firstname: '',
       lastname: '',
       contactno: '',
