@@ -112,7 +112,8 @@ Rules:
 2) All listed keys must be present even if empty.
 3) Do not include any fields not shown above.
 4) Combine bullet points for job descriptions into one string.
-5) Use "" for any unknown values.`
+5) Dates must be valid format YYYY-MM-DD in case DD is not available then make hypothetical DD, else empty only.
+6) Use "" for any unknown values.`
             }
           ]
         }
@@ -146,14 +147,13 @@ Rules:
       { success: false, error: message },
       { status: 500 }
     );
+  } finally {
+    if (uploadedFileId) {
+      try {
+        await client.files.delete(uploadedFileId);
+      } catch {
+        console.warn('Error Deleting file on Open Ai storage');
+      }
+    }
   }
-  //   finally {
-  //     if (uploadedFileId) {
-  //       try {
-  //         await client.files.del(uploadedFileId);
-  //       } catch {
-  //         // ignore cleanup errors
-  //       }
-  //     }
-  //   }
 }
