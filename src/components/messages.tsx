@@ -37,6 +37,178 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
     }
   }, [messages]);
 
+  // Formatting function for assistant responses
+  function formatAssistantResponse(rawResponse: string): string {
+    const lines = rawResponse.split('\n');
+    const formattedContent: string[] = [];
+    let listType: 'ul' | 'ol' | null = null;
+    let inCodeBlock = false;
+    let codeBlockContent: string[] = [];
+
+    const processInlineFormatting = (text: string): string => {
+      // Handle code blocks first (```code```)
+      text = text.replace(
+        /```([^`]+)```/g,
+        '<code class="bg-gray-100 px-1 py-0.5 rounded text-sm">$1</code>'
+      );
+
+      // Handle inline code (`code`)
+      text = text.replace(
+        /`([^`]+)`/g,
+        '<code class="bg-gray-100 px-1 py-0.5 rounded text-sm">$1</code>'
+      );
+
+      // Handle bold with ** or __ (non-greedy)
+      text = text.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/__([^_]+?)__/g, '<strong>$1</strong>');
+
+      // Handle italics with * or _ (non-greedy, avoid conflict with bold)
+      text = text.replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, '<em>$1</em>');
+      text = text.replace(/(?<!_)_([^_]+?)_(?!_)/g, '<em>$1</em>');
+
+      // Handle strikethrough
+      text = text.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+
+      // Handle links [text](url)
+      text = text.replace(
+        /\[([^\]]+)\]\(([^)]+)\)/g,
+        '<a href="$2" class="text-blue-600 hover:text-blue-800 underline">$1</a>'
+      );
+
+      return text;
+    };
+
+    const closeCurrentList = () => {
+      if (listType) {
+        formattedContent.push(listType === 'ul' ? '</ul>' : '</ol>');
+        listType = null;
+      }
+    };
+
+    const closeCodeBlock = () => {
+      if (inCodeBlock) {
+        formattedContent.push(
+          '<pre class="bg-gray-100 p-3 rounded-lg overflow-x-auto"><code>' +
+            codeBlockContent.join('\n') +
+            '</code></pre>'
+        );
+        codeBlockContent = [];
+        inCodeBlock = false;
+      }
+    };
+
+    lines.forEach((line) => {
+      const trimmedLine = line.trim();
+
+      // Handle code blocks
+      if (trimmedLine.startsWith('```')) {
+        if (inCodeBlock) {
+          closeCodeBlock();
+        } else {
+          closeCurrentList();
+          inCodeBlock = true;
+        }
+        return;
+      }
+
+      if (inCodeBlock) {
+        codeBlockContent.push(line);
+        return;
+      }
+
+      // Handle horizontal rules
+      if (
+        trimmedLine === '---' ||
+        trimmedLine === '***' ||
+        trimmedLine === '___'
+      ) {
+        closeCurrentList();
+        formattedContent.push('<hr class="my-4 border-gray-300">');
+        return;
+      }
+
+      // Handle headings
+      if (trimmedLine.startsWith('#')) {
+        closeCurrentList();
+        const headingMatch = trimmedLine.match(/^(#{1,6})\s+(.+)$/);
+        if (headingMatch) {
+          const level = headingMatch[1].length;
+          const text = processInlineFormatting(headingMatch[2]);
+          const headingClasses = {
+            1: 'text-2xl font-bold mt-6 mb-3',
+            2: 'text-xl font-bold mt-5 mb-3',
+            3: 'text-lg font-bold mt-4 mb-2',
+            4: 'text-base font-bold mt-3 mb-2',
+            5: 'text-sm font-bold mt-2 mb-1',
+            6: 'text-xs font-bold mt-2 mb-1'
+          };
+          formattedContent.push(
+            `<h${level} class="${headingClasses[level as keyof typeof headingClasses]}">${text}</h${level}>`
+          );
+        }
+        return;
+      }
+
+      // Handle unordered list items
+      if (
+        trimmedLine.startsWith('- ') ||
+        trimmedLine.startsWith('* ') ||
+        trimmedLine.startsWith('+ ')
+      ) {
+        if (listType !== 'ul') {
+          closeCurrentList();
+          formattedContent.push(
+            '<ul class="list-disc list-inside my-2 space-y-1">'
+          );
+          listType = 'ul';
+        }
+        const content = processInlineFormatting(trimmedLine.slice(2));
+        formattedContent.push(`<li class="ml-4">${content}</li>`);
+        return;
+      }
+
+      // Handle ordered list items
+      const orderedListMatch = trimmedLine.match(/^(\d+)\.\s+(.+)$/);
+      if (orderedListMatch) {
+        if (listType !== 'ol') {
+          closeCurrentList();
+          formattedContent.push(
+            '<ol class="list-decimal list-inside my-2 space-y-1">'
+          );
+          listType = 'ol';
+        }
+        const content = processInlineFormatting(orderedListMatch[2]);
+        formattedContent.push(`<li class="ml-4">${content}</li>`);
+        return;
+      }
+
+      // Handle blockquotes
+      if (trimmedLine.startsWith('>')) {
+        closeCurrentList();
+        const content = processInlineFormatting(trimmedLine.slice(1).trim());
+        formattedContent.push(
+          `<blockquote class="border-l-4 border-gray-300 pl-4 py-2 my-2 bg-gray-50 italic">${content}</blockquote>`
+        );
+        return;
+      }
+
+      // Handle regular paragraphs
+      if (trimmedLine) {
+        closeCurrentList();
+        const content = processInlineFormatting(trimmedLine);
+        formattedContent.push(`<p class="my-2">${content}</p>`);
+      } else {
+        // Empty line - close lists but don't add content
+        closeCurrentList();
+      }
+    });
+
+    // Clean up any remaining open tags
+    closeCurrentList();
+    closeCodeBlock();
+
+    return formattedContent.join('');
+  }
   const parseAISuggestions = (content: string) => {
     const regex = /<RESUME_CHANGES>\s*([\s\S]*?)\s*<\/RESUME_CHANGES>/;
     const match = content.match(regex);
@@ -131,6 +303,12 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
       .replace(/<RESUME_CHANGES>\s*([\s\S]*?)\s*<\/RESUME_CHANGES>/, '')
       .trim();
 
+    // Format the content based on role
+    const formattedContent =
+      msg.role === 'assistant'
+        ? formatAssistantResponse(displayContent)
+        : displayContent;
+
     return (
       <div
         key={idx}
@@ -144,7 +322,14 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
               msg.role === 'user' ? 'rounded-s-xl bg-secondary' : 'rounded-e-xl'
             }`}
           >
-            {displayContent}
+            {msg.role === 'assistant' ? (
+              <div
+                dangerouslySetInnerHTML={{ __html: formattedContent }}
+                className='prose prose-sm max-w-none [&>li]:my-1 [&>ol]:my-2 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0 [&>p]:my-1 [&>ul]:my-2'
+              />
+            ) : (
+              <div>{formattedContent}</div>
+            )}
           </div>
 
           {/* Show apply changes button if there are suggestions */}
