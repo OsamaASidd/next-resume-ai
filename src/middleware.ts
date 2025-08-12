@@ -8,7 +8,8 @@ const isPublicRoute = createRouteMatcher([
   '/chatbot/guest(.*)',
   '/marketplace(.*)',
   '/api/webhooks(.*)',
-  '/api/parse-resume(.*)'
+  '/api/parse-resume(.*)',
+  '/api/chat/sendMessage(.*)'
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
