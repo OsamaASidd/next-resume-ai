@@ -18,6 +18,7 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+  const [applyingChanges, setApplyingChanges] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const seedPrompts = [
@@ -29,15 +30,15 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
     'What keywords should I include for this industry?'
   ];
 
-  // Scroll to bottom when messages change
+  // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (messagesContainerRef.current) {
-      const scrollContainer = messagesContainerRef.current;
-      scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      const el = messagesContainerRef.current;
+      el.scrollTop = el.scrollHeight;
     }
   }, [messages]);
 
-  // Formatting function for assistant responses
+  /** ---------- Formatting helpers for assistant replies ---------- **/
   function formatAssistantResponse(rawResponse: string): string {
     const lines = rawResponse.split('\n');
     const formattedContent: string[] = [];
@@ -46,95 +47,82 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
     let codeBlockContent: string[] = [];
 
     const processInlineFormatting = (text: string): string => {
-      // Handle code blocks first (```code```)
+      // fenced inline code ```code```
       text = text.replace(
         /```([^`]+)```/g,
         '<code class="bg-gray-100 px-1 py-0.5 rounded text-sm">$1</code>'
       );
-
-      // Handle inline code (`code`)
+      // inline code `code`
       text = text.replace(
         /`([^`]+)`/g,
         '<code class="bg-gray-100 px-1 py-0.5 rounded text-sm">$1</code>'
       );
-
-      // Handle bold with ** or __ (non-greedy)
+      // bold
       text = text.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
       text = text.replace(/__([^_]+?)__/g, '<strong>$1</strong>');
-
-      // Handle italics with * or _ (non-greedy, avoid conflict with bold)
+      // italics
       text = text.replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, '<em>$1</em>');
       text = text.replace(/(?<!_)_([^_]+?)_(?!_)/g, '<em>$1</em>');
-
-      // Handle strikethrough
+      // strikethrough
       text = text.replace(/~~([^~]+)~~/g, '<del>$1</del>');
-
-      // Handle links [text](url)
+      // links
       text = text.replace(
         /\[([^\]]+)\]\(([^)]+)\)/g,
-        '<a href="$2" class="text-blue-600 hover:text-blue-800 underline">$1</a>'
+        '<a href="$2" class="text-blue-600 hover:text-blue-800 underline" target="_blank" rel="noreferrer">$1</a>'
       );
-
       return text;
     };
 
     const closeCurrentList = () => {
-      if (listType) {
-        formattedContent.push(listType === 'ul' ? '</ul>' : '</ol>');
-        listType = null;
-      }
+      if (!listType) return;
+      formattedContent.push(listType === 'ul' ? '</ul>' : '</ol>');
+      listType = null;
     };
 
     const closeCodeBlock = () => {
-      if (inCodeBlock) {
-        formattedContent.push(
-          '<pre class="bg-gray-100 p-3 rounded-lg overflow-x-auto"><code>' +
-            codeBlockContent.join('\n') +
-            '</code></pre>'
-        );
-        codeBlockContent = [];
-        inCodeBlock = false;
-      }
+      if (!inCodeBlock) return;
+      formattedContent.push(
+        '<pre class="bg-gray-100 p-3 rounded-lg overflow-x-auto"><code>' +
+          codeBlockContent.join('\n') +
+          '</code></pre>'
+      );
+      codeBlockContent = [];
+      inCodeBlock = false;
     };
 
-    lines.forEach((line) => {
-      const trimmedLine = line.trim();
+    for (const line of lines) {
+      const trimmed = line.trim();
 
-      // Handle code blocks
-      if (trimmedLine.startsWith('```')) {
+      // code blocks
+      if (trimmed.startsWith('```')) {
         if (inCodeBlock) {
           closeCodeBlock();
         } else {
           closeCurrentList();
           inCodeBlock = true;
         }
-        return;
+        continue;
       }
-
       if (inCodeBlock) {
         codeBlockContent.push(line);
-        return;
+        continue;
       }
 
-      // Handle horizontal rules
-      if (
-        trimmedLine === '---' ||
-        trimmedLine === '***' ||
-        trimmedLine === '___'
-      ) {
+      // hr
+      if (trimmed === '---' || trimmed === '***' || trimmed === '___') {
         closeCurrentList();
         formattedContent.push('<hr class="my-4 border-gray-300">');
-        return;
+        continue;
       }
 
-      // Handle headings
-      if (trimmedLine.startsWith('#')) {
+      // headings
+      if (trimmed.startsWith('#')) {
         closeCurrentList();
-        const headingMatch = trimmedLine.match(/^(#{1,6})\s+(.+)$/);
-        if (headingMatch) {
-          const level = headingMatch[1].length;
-          const text = processInlineFormatting(headingMatch[2]);
-          const headingClasses = {
+        const m = trimmed.match(/^(#{1,6})\s+(.+)$/);
+        if (m) {
+          const level = m[1].length;
+          const text = processInlineFormatting(m[2]);
+          const classes: Record<number, string> = {
             1: 'text-2xl font-bold mt-6 mb-3',
             2: 'text-xl font-bold mt-5 mb-3',
             3: 'text-lg font-bold mt-4 mb-2',
@@ -143,17 +131,17 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
             6: 'text-xs font-bold mt-2 mb-1'
           };
           formattedContent.push(
-            `<h${level} class="${headingClasses[level as keyof typeof headingClasses]}">${text}</h${level}>`
+            `<h${level} class="${classes[level]}">${text}</h${level}>`
           );
         }
-        return;
+        continue;
       }
 
-      // Handle unordered list items
+      // unordered list
       if (
-        trimmedLine.startsWith('- ') ||
-        trimmedLine.startsWith('* ') ||
-        trimmedLine.startsWith('+ ')
+        trimmed.startsWith('- ') ||
+        trimmed.startsWith('* ') ||
+        trimmed.startsWith('+ ')
       ) {
         if (listType !== 'ul') {
           closeCurrentList();
@@ -162,14 +150,14 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
           );
           listType = 'ul';
         }
-        const content = processInlineFormatting(trimmedLine.slice(2));
+        const content = processInlineFormatting(trimmed.slice(2));
         formattedContent.push(`<li class="ml-4">${content}</li>`);
-        return;
+        continue;
       }
 
-      // Handle ordered list items
-      const orderedListMatch = trimmedLine.match(/^(\d+)\.\s+(.+)$/);
-      if (orderedListMatch) {
+      // ordered list
+      const ol = trimmed.match(/^(\d+)\.\s+(.+)$/);
+      if (ol) {
         if (listType !== 'ol') {
           closeCurrentList();
           formattedContent.push(
@@ -177,57 +165,67 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
           );
           listType = 'ol';
         }
-        const content = processInlineFormatting(orderedListMatch[2]);
+        const content = processInlineFormatting(ol[2]);
         formattedContent.push(`<li class="ml-4">${content}</li>`);
-        return;
+        continue;
       }
 
-      // Handle blockquotes
-      if (trimmedLine.startsWith('>')) {
+      // blockquote
+      if (trimmed.startsWith('>')) {
         closeCurrentList();
-        const content = processInlineFormatting(trimmedLine.slice(1).trim());
+        const content = processInlineFormatting(trimmed.slice(1).trim());
         formattedContent.push(
           `<blockquote class="border-l-4 border-gray-300 pl-4 py-2 my-2 bg-gray-50 italic">${content}</blockquote>`
         );
-        return;
+        continue;
       }
 
-      // Handle regular paragraphs
-      if (trimmedLine) {
+      // paragraph / empty line
+      if (trimmed) {
         closeCurrentList();
-        const content = processInlineFormatting(trimmedLine);
+        const content = processInlineFormatting(trimmed);
         formattedContent.push(`<p class="my-2">${content}</p>`);
       } else {
-        // Empty line - close lists but don't add content
         closeCurrentList();
       }
-    });
+    }
 
-    // Clean up any remaining open tags
+    // cleanup
     closeCurrentList();
     closeCodeBlock();
-
     return formattedContent.join('');
   }
+
+  /** ---------- Parse <RESUME_CHANGES>…</RESUME_CHANGES> safely ---------- **/
   const parseAISuggestions = (content: string) => {
     const regex = /<RESUME_CHANGES>\s*([\s\S]*?)\s*<\/RESUME_CHANGES>/;
     const match = content.match(regex);
+    if (!match) return null;
 
-    if (match) {
-      try {
-        const suggestionsText = match[1].trim();
-        const suggestions = JSON.parse(suggestionsText);
-        return Array.isArray(suggestions) ? suggestions : [suggestions];
-      } catch (error) {
-        console.error('Error parsing suggestions:', error);
-        return null;
+    try {
+      const suggestionsText = match[1].trim();
+      let suggestions = JSON.parse(suggestionsText);
+
+      if (!Array.isArray(suggestions)) {
+        suggestions = [suggestions];
       }
+
+      const valid = suggestions.filter((s: any) => {
+        const ok = s && typeof s === 'object' && s.section && s.action;
+        if (!ok) console.warn('Invalid suggestion structure:', s);
+        return ok;
+      });
+
+      return valid.length ? valid : null;
+    } catch (err) {
+      console.error('Error parsing suggestions:', err);
+      return null;
     }
-    return null;
   };
 
+  /** ---------- Send message to your API ---------- **/
   const sendMessage = async (messageText?: string) => {
-    const userMessage = messageText || input;
+    const userMessage = messageText ?? input;
     if (!userMessage.trim()) return;
 
     const newUserMessage = { role: 'user' as const, content: userMessage };
@@ -236,43 +234,32 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
     setLoading(true);
 
     try {
-      // Fixed: Use the correct API endpoint
       const response = await fetch('/api/chat/sendMessage', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, newUserMessage].map((msg) => ({
-            role: msg.role,
-            content: msg.content
+          messages: [...messages, newUserMessage].map((m) => ({
+            role: m.role,
+            content: m.content
           })),
           formData
         })
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
+      if (!response.ok) throw new Error('Failed to get response');
 
       const result = await response.json();
+      if (!result.success) throw new Error(result.error || 'Unknown error');
 
-      if (result.success) {
-        // Parse suggestions from the response
-        const suggestions = parseAISuggestions(result.content);
-
-        const assistantMessage: Message = {
-          role: 'assistant',
-          content: result.content,
-          suggestions: suggestions || undefined
-        };
-
-        setMessages((prev) => [...prev, assistantMessage]);
-      } else {
-        throw new Error(result.error || 'Unknown error');
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
+      const suggestions = parseAISuggestions(result.content);
+      const assistantMessage: Message = {
+        role: 'assistant',
+        content: result.content,
+        suggestions: suggestions || undefined
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (err) {
+      console.error('Error sending message:', err);
       setMessages((prev) => [
         ...prev,
         {
@@ -285,25 +272,62 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
     }
   };
 
-  const handleApplyChanges = (suggestions: any[]) => {
-    onApplyChanges(suggestions);
-    // Optionally add a confirmation message
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: 'assistant',
-        content: '✅ Changes have been applied to your resume!'
-      }
-    ]);
+  /** ---------- Apply parsed changes ---------- **/
+  const handleApplyChanges = async (suggestions: any[]) => {
+    if (!suggestions || suggestions.length === 0) {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: '❌ No valid changes to apply.' }
+      ]);
+      return;
+    }
+
+    setApplyingChanges(true);
+    try {
+      onApplyChanges(suggestions);
+
+      const changesSummary = suggestions
+        .map((change: any) => {
+          const { section, action, explanation } = change || {};
+          const sectionName =
+            typeof section === 'string'
+              ? section.replace(/_/g, ' ').toUpperCase()
+              : 'SECTION';
+          const actionName =
+            typeof action === 'string' ? action.toUpperCase() : 'UPDATED';
+          return `• ${actionName} ${sectionName}: ${explanation || 'Updated successfully'}`;
+        })
+        .join('\n');
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: `✅ Successfully applied ${suggestions.length} change(s) to your resume:\n\n${changesSummary}`
+        }
+      ]);
+    } catch (err) {
+      console.error('Error applying changes:', err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content:
+            '❌ Failed to apply some changes. Please try again or apply them manually.'
+        }
+      ]);
+    } finally {
+      setApplyingChanges(false);
+    }
   };
 
+  /** ---------- Render helpers ---------- **/
   const renderMessage = (msg: Message, idx: number) => {
-    // Remove the <RESUME_CHANGES> tags from display content
+    // strip the RESUME_CHANGES payload from visible content
     const displayContent = msg.content
       .replace(/<RESUME_CHANGES>\s*([\s\S]*?)\s*<\/RESUME_CHANGES>/, '')
       .trim();
 
-    // Format the content based on role
     const formattedContent =
       msg.role === 'assistant'
         ? formatAssistantResponse(displayContent)
@@ -332,25 +356,42 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
             )}
           </div>
 
-          {/* Show apply changes button if there are suggestions */}
+          {/* Suggestions block with improved details + loading state */}
           {msg.suggestions && (
             <div className='mt-2 rounded-lg border border-blue-200 bg-blue-50 p-3'>
               <p className='mb-2 text-sm text-blue-800'>
                 I have {msg.suggestions.length} suggestion(s) to improve your
                 resume:
               </p>
-              {msg.suggestions.map((suggestion, i) => (
-                <div key={i} className='mb-1 text-xs text-blue-700'>
-                  • {suggestion.explanation}
-                </div>
-              ))}
+              <div className='mb-3 space-y-1'>
+                {msg.suggestions.map((s, i) => (
+                  <div key={i} className='text-xs text-blue-700'>
+                    •{' '}
+                    <span className='font-medium'>
+                      {s?.action?.toUpperCase?.() || 'UPDATE'}
+                    </span>{' '}
+                    {(s?.section || '').toString().replace(/_/g, ' ')}:{' '}
+                    {s?.explanation || 'No explanation provided'}
+                  </div>
+                ))}
+              </div>
               <Button
                 onClick={() => handleApplyChanges(msg.suggestions!)}
                 size='sm'
-                className='mt-2 bg-blue-600 hover:bg-blue-700'
+                className='bg-blue-600 hover:bg-blue-700'
+                disabled={applyingChanges}
               >
-                <CheckCircle className='mr-1 h-4 w-4' />
-                Apply Changes
+                {applyingChanges ? (
+                  <>
+                    <div className='mr-1 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent' />
+                    Applying Changes...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className='mr-1 h-4 w-4' />
+                    Apply Changes
+                  </>
+                )}
               </Button>
             </div>
           )}
@@ -359,6 +400,7 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
     );
   };
 
+  /** ---------- UI ---------- **/
   return (
     <div className='relative flex h-screen w-full flex-col p-2'>
       {!messages.length && (
@@ -372,17 +414,16 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
         </div>
       )}
 
-      {/* Scrollable Messages Section */}
+      {/* Scrollable Messages */}
       <div
         ref={messagesContainerRef}
         className='flex-grow overflow-y-auto rounded-lg p-4 pb-[120px] scrollbar-hide'
       >
         {messages.map(renderMessage)}
-
         {loading && <p className='text-sm'>Thinking...</p>}
       </div>
 
-      {/* Input Section */}
+      {/* Input */}
       <div className='sticky bottom-0 left-0 w-full p-4'>
         {!messages.length && (
           <div className='animate__animated animate__fadeInUp mb-4 flex flex-wrap justify-center gap-2'>
@@ -405,9 +446,7 @@ export default function Messages({ formData, onApplyChanges }: MessagesProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !loading) {
-                sendMessage();
-              }
+              if (e.key === 'Enter' && !loading) sendMessage();
             }}
             placeholder='Send a message...'
             className='w-full rounded-full border bg-secondary px-4 py-3 pr-20 shadow focus:outline-none'

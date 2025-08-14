@@ -25,6 +25,11 @@ import { TemplateSelection } from '@/features/resume/components/template-selecti
 import { EditResumeForm } from '@/features/resume/components/edit-resume-form';
 import { ModeToggle } from '@/features/resume/components/mode-toggle';
 import { Icons } from '@/components/icons';
+import {
+  validateResumeChanges,
+  ResumeChange,
+  summarizeChanges
+} from '@/utils/resume-changes';
 
 export default function ChatInterface() {
   const [guestResume, setGuestResume] = useState<any>({});
@@ -130,74 +135,247 @@ export default function ChatInterface() {
 
   const formData = form.watch();
 
-  // Handle applying AI suggestions to the form
   const handleApplyChanges = useCallback(
     (changes: any[]) => {
       console.log('Applying changes:', changes);
 
-      changes.forEach((change) => {
-        const { section, action, index, data } = change;
+      // Validate changes using utility function
+      const validChanges = validateResumeChanges(changes);
 
-        switch (action) {
-          case 'update':
-            if (
-              typeof index === 'number' &&
-              Array.isArray(formData[section as keyof typeof formData])
-            ) {
-              // Update specific array item
-              const currentArray =
-                (form.getValues(
-                  section as keyof TResumeEditFormValues
-                ) as any[]) || [];
-              if (currentArray[index]) {
-                currentArray[index] = { ...currentArray[index], ...data };
-                form.setValue(
-                  section as keyof TResumeEditFormValues,
-                  currentArray as any
-                );
-              }
-            } else {
-              // Update entire section or object property
+      if (validChanges.length === 0) {
+        console.warn('No valid changes to apply');
+        return;
+      }
+
+      if (validChanges.length !== changes.length) {
+        console.warn(
+          `${changes.length - validChanges.length} invalid changes were filtered out`
+        );
+      }
+
+      let hasChanges = false;
+
+      validChanges.forEach((change: ResumeChange, changeIndex) => {
+        try {
+          const { section, action, index, data } = change;
+
+          switch (action) {
+            case 'update':
               if (section === 'personal_details') {
+                // Handle personal details update
                 const currentPersonalDetails =
                   form.getValues('personal_details') || {};
-                form.setValue('personal_details', {
+                const updatedPersonalDetails = {
                   ...currentPersonalDetails,
                   ...data
-                });
+                };
+                form.setValue('personal_details', updatedPersonalDetails);
+                hasChanges = true;
               } else {
-                form.setValue(section as keyof TResumeEditFormValues, data);
-              }
-            }
-            break;
+                // Handle array sections (jobs, educations, skills, tools, languages)
+                const currentArray =
+                  (form.getValues(
+                    section as keyof TResumeEditFormValues
+                  ) as any[]) || [];
 
-          case 'add':
-            if (Array.isArray(formData[section as keyof typeof formData])) {
+                if (typeof index === 'number') {
+                  // Update specific array item
+                  if (index >= 0 && index < currentArray.length) {
+                    const updatedArray = [...currentArray];
+                    updatedArray[index] = { ...updatedArray[index], ...data };
+                    form.setValue(
+                      section as keyof TResumeEditFormValues,
+                      updatedArray as any
+                    );
+                    hasChanges = true;
+                  } else {
+                    console.warn(
+                      `Invalid index ${index} for section ${section} with length ${currentArray.length}`
+                    );
+                  }
+                } else {
+                  // Replace entire array
+                  form.setValue(
+                    section as keyof TResumeEditFormValues,
+                    data as any
+                  );
+                  hasChanges = true;
+                }
+              }
+              break;
+
+            case 'add':
+              if (section === 'personal_details') {
+                console.warn('Cannot add to personal_details section');
+                return;
+              }
+
+              // Handle adding to array sections
               const currentArray =
                 (form.getValues(
                   section as keyof TResumeEditFormValues
                 ) as any[]) || [];
+              const updatedArray = [...currentArray, data];
               form.setValue(
                 section as keyof TResumeEditFormValues,
-                [...currentArray, data] as any
+                updatedArray as any
               );
-            }
-            break;
+              hasChanges = true;
+              break;
 
-          default:
-            console.warn('Unknown action:', action);
+            case 'remove':
+              if (section === 'personal_details') {
+                console.warn('Cannot remove from personal_details section');
+                return;
+              }
+
+              // Handle removing from array sections
+              const arrayToRemoveFrom =
+                (form.getValues(
+                  section as keyof TResumeEditFormValues
+                ) as any[]) || [];
+
+              if (typeof index === 'number') {
+                // Remove specific item by index
+                if (index >= 0 && index < arrayToRemoveFrom.length) {
+                  const updatedArray = arrayToRemoveFrom.filter(
+                    (_, i) => i !== index
+                  );
+                  form.setValue(
+                    section as keyof TResumeEditFormValues,
+                    updatedArray as any
+                  );
+                  hasChanges = true;
+                } else {
+                  console.warn(
+                    `Invalid remove index ${index} for section ${section} with length ${arrayToRemoveFrom.length}`
+                  );
+                }
+              } else if (data) {
+                // Remove item by matching criteria
+                const updatedArray = arrayToRemoveFrom.filter((item) => {
+                  return !Object.keys(data).every(
+                    (key) => item[key] === data[key]
+                  );
+                });
+                if (updatedArray.length !== arrayToRemoveFrom.length) {
+                  form.setValue(
+                    section as keyof TResumeEditFormValues,
+                    updatedArray as any
+                  );
+                  hasChanges = true;
+                } else {
+                  console.warn('No matching items found to remove');
+                }
+              } else {
+                console.warn(
+                  'Remove action requires either index or data criteria'
+                );
+              }
+              break;
+
+            default:
+              console.warn(`Unknown action: ${action}`);
+          }
+        } catch (error) {
+          console.error(
+            `Error applying change at index ${changeIndex}:`,
+            error,
+            change
+          );
         }
       });
 
-      // If guest user, also update localStorage
-      if (isGuest) {
-        const updatedGuestResume = form.getValues();
-        localStorage.setItem('guestResume', JSON.stringify(updatedGuestResume));
-        setGuestResume(updatedGuestResume);
+      // Trigger form validation and re-render
+      if (hasChanges) {
+        form.trigger();
+
+        // If guest user, also update localStorage
+        if (isGuest) {
+          try {
+            const updatedGuestResume = form.getValues();
+            localStorage.setItem(
+              'guestResume',
+              JSON.stringify(updatedGuestResume)
+            );
+            setGuestResume(updatedGuestResume);
+          } catch (error) {
+            console.error('Error updating localStorage:', error);
+          }
+        }
       }
     },
-    [form, formData, isGuest]
+    [form, isGuest, setGuestResume]
   );
+
+  // Handle applying AI suggestions to the form
+  // const handleApplyChanges = useCallback(
+  //   (changes: any[]) => {
+  //     console.log('Applying changes:', changes);
+
+  //     changes.forEach((change) => {
+  //       const { section, action, index, data } = change;
+
+  //       switch (action) {
+  //         case 'update':
+  //           if (
+  //             typeof index === 'number' &&
+  //             Array.isArray(formData[section as keyof typeof formData])
+  //           ) {
+  //             // Update specific array item
+  //             const currentArray =
+  //               (form.getValues(
+  //                 section as keyof TResumeEditFormValues
+  //               ) as any[]) || [];
+  //             if (currentArray[index]) {
+  //               currentArray[index] = { ...currentArray[index], ...data };
+  //               form.setValue(
+  //                 section as keyof TResumeEditFormValues,
+  //                 currentArray as any
+  //               );
+  //             }
+  //           } else {
+  //             // Update entire section or object property
+  //             if (section === 'personal_details') {
+  //               const currentPersonalDetails =
+  //                 form.getValues('personal_details') || {};
+  //               form.setValue('personal_details', {
+  //                 ...currentPersonalDetails,
+  //                 ...data
+  //               });
+  //             } else {
+  //               form.setValue(section as keyof TResumeEditFormValues, data);
+  //             }
+  //           }
+  //           break;
+
+  //         case 'add':
+  //           if (Array.isArray(formData[section as keyof typeof formData])) {
+  //             const currentArray =
+  //               (form.getValues(
+  //                 section as keyof TResumeEditFormValues
+  //               ) as any[]) || [];
+  //             form.setValue(
+  //               section as keyof TResumeEditFormValues,
+  //               [...currentArray, data] as any
+  //             );
+  //           }
+  //           break;
+
+  //         default:
+  //           console.warn('Unknown action:', action);
+  //       }
+  //     });
+
+  //     // If guest user, also update localStorage
+  //     if (isGuest) {
+  //       const updatedGuestResume = form.getValues();
+  //       localStorage.setItem('guestResume', JSON.stringify(updatedGuestResume));
+  //       setGuestResume(updatedGuestResume);
+  //     }
+  //   },
+  //   [form, formData, isGuest]
+  // );
 
   const renderContent = useCallback(() => {
     if (mode === 'edit') {

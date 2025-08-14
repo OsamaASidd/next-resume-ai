@@ -1,4 +1,3 @@
-// src/server/routers/chat-router.ts
 import { z } from 'zod';
 import { j, publicProcedure } from '../jstack';
 import OpenAI from 'openai';
@@ -38,18 +37,57 @@ Rules for your responses:
 5. Keep responses conversational but professional
 
 JSON Change Format (when applicable):
+For single change:
 {
   "section": "personal_details" | "jobs" | "educations" | "skills" | "tools" | "languages",
   "action": "update" | "add" | "remove",
-  "index": number (for array items, optional),
-  "data": {...} (the new/updated data),
+  "index": number (for array items - required for update/remove actions on arrays),
+  "data": {...} (the new/updated data - not required for remove actions),
   "explanation": "Brief explanation of why this change improves the resume"
 }
 
-For multiple changes, provide an array of change objects.`;
+For multiple changes, provide an array:
+[
+  {
+    "section": "skills",
+    "action": "add",
+    "data": "Python",
+    "explanation": "Added Python as it's mentioned in the job requirements"
+  },
+  {
+    "section": "jobs",
+    "action": "update",
+    "index": 0,
+    "data": { "description": "Led a team of 5 developers..." },
+    "explanation": "Added leadership experience to highlight management skills"
+  },
+  {
+    "section": "skills",
+    "action": "remove",
+    "index": 2,
+    "explanation": "Removed outdated skill that's no longer relevant"
+  }
+]
+
+Important guidelines for actions:
+- UPDATE: Use for modifying existing items. For arrays, always include "index". For personal_details, omit index.
+- ADD: Use for adding new items to arrays (jobs, educations, skills, tools, languages). Cannot be used with personal_details.
+- REMOVE: Use for removing items from arrays. Always include "index" to specify which item to remove. Cannot be used with personal_details.
+
+Section-specific rules:
+- personal_details: Only supports "update" action, no index needed
+- jobs, educations: Objects with properties like jobTitle, employer, description, etc.
+- skills, tools, languages: Arrays of strings
+- Always validate that the index exists when using update/remove actions
+
+Example scenarios:
+1. Adding a skill: {"section": "skills", "action": "add", "data": "React", "explanation": "Added React for frontend development"}
+2. Updating a job description: {"section": "jobs", "action": "update", "index": 0, "data": {"description": "new description"}, "explanation": "Enhanced job description"}
+3. Removing an outdated skill: {"section": "skills", "action": "remove", "index": 1, "explanation": "Removed outdated technology"}
+4. Updating personal summary: {"section": "personal_details", "action": "update", "data": {"summary": "new summary"}, "explanation": "Improved professional summary"}`;
 
         const completion = await openai.chat.completions.create({
-          model: 'gpt-4o-mini', // gpt-5
+          model: 'gpt-5',
           messages: [{ role: 'system', content: systemPrompt }, ...messages],
           temperature: 0.7,
           max_tokens: 2000
