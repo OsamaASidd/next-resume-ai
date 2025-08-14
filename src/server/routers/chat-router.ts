@@ -87,7 +87,7 @@ Example scenarios:
 4. Updating personal summary: {"section": "personal_details", "action": "update", "data": {"summary": "new summary"}, "explanation": "Improved professional summary"}`;
 
         const completion = await openai.chat.completions.create({
-          model: 'gpt-5',
+          model: 'gpt-4o',
           messages: [{ role: 'system', content: systemPrompt }, ...messages],
           temperature: 0.7,
           max_tokens: 2000
