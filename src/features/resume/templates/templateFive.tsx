@@ -257,21 +257,23 @@ export default function EuropassTemplate({ formData }: TResumeTemplateProps) {
               : ''}
           </View>
           {/* Language Skills Section */}
-          <SectionHeader title='Language Skills' />
-          <View style={tw('ml-4 mb-2')}>
-            <Text style={tw(' text-sm mb-2')}>
-              Mother tongue(s):{' '}
-              {formData?.languages?.length ? (
-                <Text style={tw(' font-bold')}>
-                  {formData.languages
-                    .map((lang) => lang.lang_name?.toUpperCase())
-                    .join(', ')}
+          {formData?.languages?.length ? (
+            <>
+              <SectionHeader title='Language Skills' />
+              <View style={tw('ml-4 mb-2')}>
+                <Text style={tw(' text-sm mb-2')}>
+                  Mother tongue(s):{' '}
+                  <Text style={tw(' font-bold')}>
+                    {formData.languages
+                      .map((lang) => lang.lang_name?.toUpperCase())
+                      .join(', ')}
+                  </Text>
                 </Text>
-              ) : (
-                <Text style={tw(' font-bold')}>URDU</Text>
-              )}
-            </Text>
-          </View>
+              </View>
+            </>
+          ) : (
+            ''
+          )}
           {/* Skills Section */}
           {(formData?.skills?.length || formData.tools?.length) && (
             <>
