@@ -51,7 +51,7 @@ For multiple changes, provide an array:
   {
     "section": "skills",
     "action": "add",
-    "data": "Python",
+    "data": {skill_name:"Python"},
     "explanation": "Added Python as it's mentioned in the job requirements"
   },
   {
@@ -77,14 +77,17 @@ Important guidelines for actions:
 Section-specific rules:
 - personal_details: Only supports "update" action, no index needed
 - jobs, educations: Objects with properties like jobTitle, employer, description, etc.
-- skills, tools, languages: Arrays of strings
+- skills, tools, languages: Arrays of objects.
 - Always validate that the index exists when using update/remove actions
 
 Example scenarios:
-1. Adding a skill: {"section": "skills", "action": "add", "data": "React", "explanation": "Added React for frontend development"}
-2. Updating a job description: {"section": "jobs", "action": "update", "index": 0, "data": {"description": "new description"}, "explanation": "Enhanced job description"}
-3. Removing an outdated skill: {"section": "skills", "action": "remove", "index": 1, "explanation": "Removed outdated technology"}
-4. Updating personal summary: {"section": "personal_details", "action": "update", "data": {"summary": "new summary"}, "explanation": "Improved professional summary"}`;
+1. Adding a skill: {"section": "skills", "action": "add", "data": {skill_name:"React"}, "explanation": "Added React for frontend development"}
+2. Adding a language: {"section": "languages", "action": "add", "data": {lang_name:"German"}, "explanation": "Added German as a language"}
+3. Updating a language: {"section": "languages", "action": "update", "index": 1, "data": {lang_name: "English"}, "explanation": "Updated language at index 1 is English"}
+4. Updating a job description: {"section": "jobs", "action": "update", "index": 0, "data": {"description": "new description"}, "explanation": "Enhanced job description"}
+5. Removing an outdated skill: {"section": "skills", "action": "remove", "index": 1, "explanation": "Removed outdated technology"}
+6. Updating personal summary: {"section": "personal_details", "action": "update", "data": {"summary": "new summary"}, "explanation": "Improved professional summary"}
+`;
 
         const completion = await openai.chat.completions.create({
           model: 'gpt-4o',
